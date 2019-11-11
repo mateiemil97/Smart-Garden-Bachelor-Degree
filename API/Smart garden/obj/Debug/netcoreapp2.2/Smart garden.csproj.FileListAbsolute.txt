@@ -1,0 +1,16 @@
+D:\Licenta\API\Smart garden\Smart garden\bin\Debug\netcoreapp2.2\appsettings.Development.json
+D:\Licenta\API\Smart garden\Smart garden\bin\Debug\netcoreapp2.2\appsettings.json
+D:\Licenta\API\Smart garden\Smart garden\bin\Debug\netcoreapp2.2\Properties\launchSettings.json
+D:\Licenta\API\Smart garden\Smart garden\bin\Debug\netcoreapp2.2\Smart garden.deps.json
+D:\Licenta\API\Smart garden\Smart garden\bin\Debug\netcoreapp2.2\Smart garden.runtimeconfig.json
+D:\Licenta\API\Smart garden\Smart garden\bin\Debug\netcoreapp2.2\Smart garden.runtimeconfig.dev.json
+D:\Licenta\API\Smart garden\Smart garden\bin\Debug\netcoreapp2.2\Smart garden.dll
+D:\Licenta\API\Smart garden\Smart garden\obj\Debug\netcoreapp2.2\Smart garden.csprojAssemblyReference.cache
+D:\Licenta\API\Smart garden\Smart garden\obj\Debug\netcoreapp2.2\Smart garden.RazorAssemblyInfo.cache
+D:\Licenta\API\Smart garden\Smart garden\obj\Debug\netcoreapp2.2\Smart garden.RazorAssemblyInfo.cs
+D:\Licenta\API\Smart garden\Smart garden\obj\Debug\netcoreapp2.2\Smart garden.AssemblyInfoInputs.cache
+D:\Licenta\API\Smart garden\Smart garden\obj\Debug\netcoreapp2.2\Smart garden.AssemblyInfo.cs
+D:\Licenta\API\Smart garden\Smart garden\obj\Debug\netcoreapp2.2\Smart garden.RazorTargetAssemblyInfo.cache
+D:\Licenta\API\Smart garden\Smart garden\bin\Debug\netcoreapp2.2\Smart garden.pdb
+D:\Licenta\API\Smart garden\Smart garden\obj\Debug\netcoreapp2.2\Smart garden.dll
+D:\Licenta\API\Smart garden\Smart garden\obj\Debug\netcoreapp2.2\Smart garden.pdb
