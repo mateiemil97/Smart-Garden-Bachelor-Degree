@@ -15,12 +15,12 @@ namespace Smart_garden.Repository
             _context = context;
             table = _context.Set<T>();
         }
-        public IEnumerable GetAll()
+        public virtual IEnumerable GetAll()
         {
             return table.ToList();
         }
 
-        public T Get(int id)
+        public virtual T Get(int id)
         {
             return table.Find(id);
         }

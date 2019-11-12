@@ -10,6 +10,6 @@ namespace Smart_garden.Repository.SensorRepository
     public interface ISensorRepository: IRepository<Sensor>
     {
         object GetSensorsBySystem(int systemId);
-        IQueryable<SensorDto> GetSensorBySystem(int systemId, int sensorId);
+        IQueryable<Sensor> GetSensorBySystem(int systemId, int sensorId);
     }
 }

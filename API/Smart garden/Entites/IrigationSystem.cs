@@ -25,7 +25,7 @@ namespace Smart_garden.Entites
 
         public User User { get; set; }
         public ICollection<Sensor> Sensors { get; set; }
-        public ICollection<Environment> Environment = new List<Environment>();
+        public ICollection<Measurement> Measurement = new List<Measurement>();
         public ICollection<SystemState> SystemState = new List<SystemState>();
         public ICollection<Schedule> Schedule = new List<Schedule>();
 

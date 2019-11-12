@@ -18,7 +18,7 @@ namespace Smart_garden.Entites
         public DbSet<Sensor> Sensor { get; set; }
         public DbSet<SystemState> SystemState { get; set; }
         public DbSet<Schedule> Schedule { get; set; }
-        public DbSet<Environment> Environment { get; set; }
+        public DbSet<Measurement> Measurement { get; set; }
 
 
     }

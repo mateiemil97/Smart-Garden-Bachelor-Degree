@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,10 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Smart_garden.Entites;
 using Smart_garden.Repository;
+using Smart_garden.Repository.MeasurementRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
 using Smart_garden.UnitOfWork;
@@ -54,6 +49,8 @@ namespace Smart_garden
             services.AddScoped<IRepository<Sensor>, Repository<Sensor>>();
             services.AddScoped<ISensorRepository, SensorRepository>();
 
+            services.AddScoped<IRepository<Measurement>, Repository<Measurement>>();
+            services.AddScoped<IMeasurementRepository, MeasurementRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
 

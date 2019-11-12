@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Smart_garden.Entites
 {
-    public class Environment
+    public class Measurement
     {
         [Key]
         [Required]

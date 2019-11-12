@@ -27,7 +27,7 @@ namespace Smart_garden.Entites
 
         public IrigationSystem System { get; set; }
 
-        public ICollection<Environment> Environment = new List<Environment>();
+        public ICollection<Measurement> Measurement = new List<Measurement>();
 
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Smart_garden.Entites;
+using Smart_garden.Models;
 using Smart_garden.Models.SensorDto;
 using Smart_garden.Models.SystemDto;
 using Smart_garden.Models.UserDto;
@@ -25,8 +26,9 @@ namespace Smart_garden
 
             CreateMap<Sensor, SensorDto>();
             CreateMap<SensorForCreationDto, Sensor>();
-            CreateMap<IQueryable<SensorDto>, Sensor>();
 
+            CreateMap<Measurement, MeasurementDto>();
+        
         }
     }
 }

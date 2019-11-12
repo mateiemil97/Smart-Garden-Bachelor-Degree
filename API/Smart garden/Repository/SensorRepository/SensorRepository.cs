@@ -36,13 +36,13 @@ namespace Smart_garden.Repository.SensorRepository
             return sensors;
         }
 
-        public IQueryable<SensorDto> GetSensorBySystem(int systemId, int sensorId)
+        public IQueryable<Sensor> GetSensorBySystem(int systemId, int sensorId)
         {
             var sensor = (from sys in _context.IrigationSystem
                     join sns in _context.Sensor
                         on sys.Id equals sns.SystemId
                     where sns.SystemId == sys.Id && sns.Id == sensorId
-                    select new SensorDto
+                    select new Sensor
                     {
                         Id = sns.Id,
                         SystemId = sys.Id,
@@ -52,6 +52,5 @@ namespace Smart_garden.Repository.SensorRepository
                 );
             return sensor;
         }
-
     }
 }

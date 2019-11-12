@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Licenta\\API\\Smart garden\\Smart garden\\Smart garden.csproj": {}
+    "D:\\Licenta\\API\\Smart garden\\Smart garden.csproj": {}
   },
   "projects": {
-    "D:\\Licenta\\API\\Smart garden\\Smart garden\\Smart garden.csproj": {
+    "D:\\Licenta\\API\\Smart garden\\Smart garden.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Licenta\\API\\Smart garden\\Smart garden\\Smart garden.csproj",
+        "projectUniqueName": "D:\\Licenta\\API\\Smart garden\\Smart garden.csproj",
         "projectName": "Smart garden",
-        "projectPath": "D:\\Licenta\\API\\Smart garden\\Smart garden\\Smart garden.csproj",
+        "projectPath": "D:\\Licenta\\API\\Smart garden\\Smart garden.csproj",
         "packagesPath": "C:\\Users\\Emil\\.nuget\\packages\\",
-        "outputPath": "D:\\Licenta\\API\\Smart garden\\Smart garden\\obj\\",
+        "outputPath": "D:\\Licenta\\API\\Smart garden\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

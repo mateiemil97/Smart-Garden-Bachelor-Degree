@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Smart_garden.Entites;
 using Smart_garden.Repository;
+using Smart_garden.Repository.MeasurementRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
 
@@ -18,17 +19,21 @@ namespace Smart_garden.UnitOfWork
         public IRepository<User> UserGenericRepository { get; }
 
         public ISensorRepository SensorRepository { get; }
+        public IMeasurementRepository MeasurementRepository { get; }
+
         public UnitOfWork(
             SmartGardenContext context,
             IRepository<User> userRepository,
             IIrigationSystemRepository irigationSystemRepository,
-            ISensorRepository sensorRepository
+            ISensorRepository sensorRepository,
+            IMeasurementRepository measurementRepository
             )
         {
             _context = context;
             UserGenericRepository = userRepository;
             IrigationSystemRepository = irigationSystemRepository;
             SensorRepository = sensorRepository;
+            MeasurementRepository = measurementRepository;
         }
 
         
