@@ -26,9 +26,6 @@ namespace Smart_garden
 
             CreateMap<Sensor, SensorDto>();
             CreateMap<SensorForCreationDto, Sensor>();
-
-            CreateMap<Measurement, MeasurementDto>();
-        
         }
     }
 }

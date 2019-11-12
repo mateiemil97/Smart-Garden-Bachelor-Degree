@@ -25,9 +25,11 @@ namespace Smart_garden.Entites
         [Required]
         public float Value { get; set; }
 
+        [Required]
+        public DateTime DateTime { get; set; }
         public IrigationSystem System { get; set; }
 
-        public ICollection<Measurement> Measurement = new List<Measurement>();
+        
 
     }
 }

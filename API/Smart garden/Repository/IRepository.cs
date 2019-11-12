@@ -14,6 +14,5 @@ namespace Smart_garden.Repository
         void Delete(T a);
         void Update(T obj);
         T Exist(int id);
-    
     }
 }
