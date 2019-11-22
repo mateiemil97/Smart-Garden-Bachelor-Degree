@@ -7,8 +7,11 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+//PIN 
 #define TEMPERATURE_SENSOR_PIN 2
 #define MOISTURE_SENSOR_PIN A0
+
+#define TEMPERATURE_INTERVAL_TIME_POST 5000
 
 const String  api = "https://192.168.1.2:45457/api";
 const String fingerPrint = "EF:4F:02:3E:EB:0B:F9:7A:F1:93:7C:70:3F:94:5F:52:24:26:34:12";
@@ -24,14 +27,27 @@ int previousMoisture;
 
 bool systemState = true;
 
-WifiConnect wifi = WifiConnect("INTERNET","c6c202emov");
+unsigned long temperatureTimeNow = millis();
+unsigned long temperatureTimeTrigger = millis();
+
+unsigned long currentTime = millis();
+
+
+//WifiConnect wifi = WifiConnect("INTERNET","c6c202emov");
+
+WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
+
 
 
 void setup() {
   wifi.Connect();
+  Serial.begin(9600);
+  
   pinMode(MOISTURE_SENSOR_PIN,INPUT);
   pinMode(TEMPERATURE_SENSOR_PIN ,INPUT);
-  Serial.begin(9600);
+
+  temperatureTimeTrigger = millis();
+  
 }
 
 
@@ -40,13 +56,46 @@ void loop() {
   if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
 
     //PostSensorValue(1, "Moisture", 80);
-    moisture = ReadMoisture();
-    Serial.print("bla bla bla ");
-    Serial.println(moisture);
+//    moisture = ReadMoisture();
+//    Serial.print("bla bla bla ");
+//    Serial.println(moisture);
 
    temperature = ReadTemperature();
+
+   currentTime = millis();
+   Serial.print("previouse-temp");
+   Serial.println(previousTemperature);
+   Serial.print("tempTrigger");
+   Serial.println(temperatureTimeTrigger);
+
+   if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST) && 
+      ((temperature >= previousTemperature + 0.20) || (temperature <= previousTemperature - 0.20)))
+      {
+        PostSensorValue(1,"Temperature",temperature);
+      }
+   else if(((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST) && 
+      ((temperature <= previousTemperature + 0.20) || (temperature >= previousTemperature - 0.20))))
+   {
+        temperatureTimeTrigger = millis();
+        Serial.println("hit");
+   }
+   else
+     {
+      Serial.println("Not big difference of temperature or time not elapsed");
+     }
+      
+
+//   if(systemState == true)
+//   {
+//     
+//   }
+//   else 
+//   {
+//    
+//   }
+   
     
-    delay(3000);    //Send a request every 30 seconds
+     delay(3000);    //Send a request every 30 seconds
   }
 }
 
@@ -79,8 +128,13 @@ void PostSensorValue(int systemId, String type, float value)
  
     Serial.println(httpCode);   //Print HTTP return code
     Serial.println(payload);    //Print request response payload
- 
+
+    previousTemperature = value;
+
+    temperatureTimeTrigger = millis();
+    
     http.end();  //Close connection
+    
 }
 
 int ReadMoisture()
@@ -95,7 +149,7 @@ int ReadMoisture()
   return moisturePercentage;
 }
 
-int ReadTemperature()
+float ReadTemperature()
 {
   // Setup a oneWire instance to communicate with any OneWire device
   OneWire oneWire(TEMPERATURE_SENSOR_PIN);  
@@ -109,4 +163,5 @@ int ReadTemperature()
   Serial.print("Temperature: ");
   Serial.print(sensors.getTempCByIndex(0));
   Serial.println("C");
+  return sensors.getTempCByIndex(0);
 }
