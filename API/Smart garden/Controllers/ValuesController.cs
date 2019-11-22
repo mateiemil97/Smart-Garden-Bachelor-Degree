@@ -14,7 +14,7 @@ namespace Smart_garden.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return new string[] { "value1", "value2" };
+            return new string[] { "value1", "value2" }; //7552 53
         }
 
         // GET api/values/5
