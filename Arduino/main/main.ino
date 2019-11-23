@@ -12,9 +12,11 @@
 #define MOISTURE_SENSOR_PIN A0
 
 #define TEMPERATURE_INTERVAL_TIME_POST 5000
+#define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 5000
+#define MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF 10000
 
 const String  api = "https://192.168.1.2:45457/api";
-const String fingerPrint = "EF:4F:02:3E:EB:0B:F9:7A:F1:93:7C:70:3F:94:5F:52:24:26:34:12";
+const String fingerPrint = "EF:4F:02:3E:EB:0B:F9:7A:F1:93:7C:70:3F:94:5F:52:24:26:34:12"; 
 
 HTTPClient http;
 WiFiClient cli;
@@ -27,8 +29,8 @@ int previousMoisture;
 
 bool systemState = true;
 
-unsigned long temperatureTimeNow = millis();
 unsigned long temperatureTimeTrigger = millis();
+unsigned long moistureTimeTrigger = millis();
 
 unsigned long currentTime = millis();
 
@@ -61,41 +63,75 @@ void loop() {
 //    Serial.println(moisture);
 
    temperature = ReadTemperature();
-
+   moisture = ReadMoisture();
+   
    currentTime = millis();
+   
    Serial.print("previouse-temp");
    Serial.println(previousTemperature);
    Serial.print("tempTrigger");
    Serial.println(temperatureTimeTrigger);
 
    if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST) && 
-      ((temperature >= previousTemperature + 0.20) || (temperature <= previousTemperature - 0.20)))
+      ((temperature >= previousTemperature + 1) || (temperature <= previousTemperature - 1)))
       {
         PostSensorValue(1,"Temperature",temperature);
       }
    else if(((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST) && 
-      ((temperature <= previousTemperature + 0.20) || (temperature >= previousTemperature - 0.20))))
+      ((temperature <= previousTemperature + 1) || (temperature >= previousTemperature - 1))))
    {
         temperatureTimeTrigger = millis();
-        Serial.println("hit");
+        Serial.println("Reinitialize temperature trigger");
    }
    else
      {
       Serial.println("Not big difference of temperature or time not elapsed");
      }
       
-
-//   if(systemState == true)
-//   {
-//     
-//   }
-//   else 
-//   {
-//    
-//   }
+    //check for moisture
+   if(systemState == true)
+   {
+     Serial.print("previouse-moisture");
+     Serial.println(previousMoisture);
+     Serial.print("moistureTrigger");
+     Serial.println(moistureTimeTrigger);
+     if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON) && 
+      ((moisture >= previousMoisture + 5) || (moisture <= previousMoisture - 5)))
+      {
+        PostSensorValue(1,"Moisture",moisture);
+      }
+   else if(((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON) && 
+      ((moisture <= previousMoisture + 5) || (moisture >= previousMoisture - 5))))
+   {
+        moistureTimeTrigger = millis();
+        Serial.println("Reinitialize moisture trigger");
+   }
+   else
+     {
+      Serial.println("Not big difference of moisture or time not elapsed");
+     }
+   }
+   else if(systemState == false)
+   {
+    if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF) && 
+      ((moisture >= previousMoisture + 5) || (moisture <= previousMoisture - 5)))
+      {
+        PostSensorValue(1,"Moisture",moisture);
+      }
+   else if(((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF) && 
+      ((moisture <= previousMoisture + 5) || (moisture >= previousMoisture - 5))))
+   {
+        moistureTimeTrigger = millis();
+        Serial.println("Reinitialize moisture trigger");
+   }
+   else
+     {
+      Serial.println("Not big difference of moisture or time not elapsed");
+     }
+   }
    
     
-     delay(3000);    //Send a request every 30 seconds
+     //delay(30000);    //Send a request every 30 seconds
   }
 }
 
@@ -129,10 +165,16 @@ void PostSensorValue(int systemId, String type, float value)
     Serial.println(httpCode);   //Print HTTP return code
     Serial.println(payload);    //Print request response payload
 
-    previousTemperature = value;
-
-    temperatureTimeTrigger = millis();
-    
+    if(type == "Temperature")
+    {
+      previousTemperature = value;
+      temperatureTimeTrigger = millis();
+    }
+    else if(type == "Moisture")
+    {
+      previousMoisture = value;
+      moistureTimeTrigger = millis();
+    }
     http.end();  //Close connection
     
 }
