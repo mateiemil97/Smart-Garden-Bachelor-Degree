@@ -8,6 +8,7 @@ using Smart_garden.Entites;
 using Smart_garden.Models;
 using Smart_garden.Models.SensorDto;
 using Smart_garden.Models.SystemDto;
+using Smart_garden.Models.SystemStateDto;
 using Smart_garden.Models.UserDto;
 
 namespace Smart_garden
@@ -26,6 +27,9 @@ namespace Smart_garden
 
             CreateMap<Sensor, SensorDto>();
             CreateMap<SensorForCreationDto, Sensor>();
+
+            CreateMap<SystemStateForCreationDto, SystemState>();
+            CreateMap<SystemState, SystemStateDto>();
         }
     }
 }

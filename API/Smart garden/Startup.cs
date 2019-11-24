@@ -10,6 +10,7 @@ using Smart_garden.Entites;
 using Smart_garden.Repository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
+using Smart_garden.Repository.SystemStateRepository;
 using Smart_garden.UnitOfWork;
 
 namespace Smart_garden
@@ -47,6 +48,7 @@ namespace Smart_garden
 
             services.AddScoped<IRepository<Sensor>, Repository<Sensor>>();
             services.AddScoped<ISensorRepository, SensorRepository>();
+            services.AddScoped<ISystemStateRepository, SystemStateRepository>();
 
 
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();

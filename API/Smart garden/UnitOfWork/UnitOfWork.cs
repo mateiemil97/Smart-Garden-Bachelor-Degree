@@ -7,6 +7,7 @@ using Smart_garden.Entites;
 using Smart_garden.Repository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
+using Smart_garden.Repository.SystemStateRepository;
 
 namespace Smart_garden.UnitOfWork
 {
@@ -18,19 +19,21 @@ namespace Smart_garden.UnitOfWork
         public IRepository<User> UserGenericRepository { get; }
 
         public ISensorRepository SensorRepository { get; }
+        public ISystemStateRepository SystemStateRepository { get; }
 
         public UnitOfWork(
             SmartGardenContext context,
             IRepository<User> userRepository,
             IIrigationSystemRepository irigationSystemRepository,
-            ISensorRepository sensorRepository
-             
-            )
+            ISensorRepository sensorRepository,
+            ISystemStateRepository systemStateRepository
+        )
         {
             _context = context;
             UserGenericRepository = userRepository;
             IrigationSystemRepository = irigationSystemRepository;
             SensorRepository = sensorRepository;
+            SystemStateRepository = systemStateRepository;
         }
 
         
