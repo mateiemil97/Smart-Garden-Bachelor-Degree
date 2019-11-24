@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Smart_garden.Models.SystemStateDto;
 using Smart_garden.UnitOfWork;
 
 namespace Smart_garden.Controllers
@@ -33,6 +34,23 @@ namespace Smart_garden.Controllers
             var systemStateFromRepo = _unitOfWork.SystemStateRepository.GetSystemStatesBySystem(systemid);
 
             return Ok(systemStateFromRepo);
+        }
+
+        [HttpGet("currentState")]
+        public IActionResult GetCurrentState(int systemId)
+        {
+            var isSystem = _unitOfWork.IrigationSystemRepository.Exist(systemId);
+
+            if (isSystem == null)
+            {
+                return BadRequest("System doesn't exist!");
+            }
+            
+            var currentStateFromRepo = _unitOfWork.SystemStateRepository.GetCurrentState(systemId);
+
+            var currentStateMapped = _mapper.Map<SystemStateDto>(currentStateFromRepo);
+
+            return Ok(currentStateMapped);
         }
 
     }
