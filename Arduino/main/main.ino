@@ -10,13 +10,14 @@
 //PIN 
 #define TEMPERATURE_SENSOR_PIN 2
 #define MOISTURE_SENSOR_PIN A0
+#define RELAYS_PUMP_PIN 5
 
 #define TEMPERATURE_INTERVAL_TIME_POST 5000
 #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 5000
 #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF 10000
 
-const String  api = "https://192.168.1.2:45457/api";
-const String fingerPrint = "EF:4F:02:3E:EB:0B:F9:7A:F1:93:7C:70:3F:94:5F:52:24:26:34:12"; 
+const String  api = "https://smart-garden.conveyor.cloud/api";
+const String fingerPrint = "82:88:7C:B6:41:71:8B:04:67:A5:10:C2:34:40:24:04:78:A6:7E:55"; 
 
 HTTPClient http;
 WiFiClient cli;
@@ -27,7 +28,7 @@ float previousTemperature;
 int moisture;
 int previousMoisture;
 
-bool systemState = true;
+bool systemState;
 
 unsigned long temperatureTimeTrigger = millis();
 unsigned long moistureTimeTrigger = millis();
@@ -35,9 +36,9 @@ unsigned long moistureTimeTrigger = millis();
 unsigned long currentTime = millis();
 
 
-//WifiConnect wifi = WifiConnect("INTERNET","c6c202emov");
+WifiConnect wifi = WifiConnect("INTERNET","c6c202emov");
 
-WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
+// WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
 
 
 
@@ -47,7 +48,7 @@ void setup() {
   
   pinMode(MOISTURE_SENSOR_PIN,INPUT);
   pinMode(TEMPERATURE_SENSOR_PIN ,INPUT);
-
+  pinMode(RELAYS_PUMP_PIN,OUTPUT);
   temperatureTimeTrigger = millis();
   
 }
@@ -57,11 +58,9 @@ void loop() {
 
   if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
 
-    //PostSensorValue(1, "Moisture", 80);
-//    moisture = ReadMoisture();
-//    Serial.print("bla bla bla ");
-//    Serial.println(moisture);
-
+   systemState = CheckForRemoteStateChanges(1);
+   Serial.print("System state");
+   Serial.println(systemState);
    temperature = ReadTemperature();
    moisture = ReadMoisture();
    
@@ -71,6 +70,15 @@ void loop() {
    Serial.println(previousTemperature);
    Serial.print("tempTrigger");
    Serial.println(temperatureTimeTrigger);
+
+   if(systemState == true)
+   {
+      digitalWrite(RELAYS_PUMP_PIN,HIGH); 
+   }
+   else if(systemState == false)
+   {
+      digitalWrite(RELAYS_PUMP_PIN,LOW);
+   }
 
    if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST) && 
       ((temperature >= previousTemperature + 1) || (temperature <= previousTemperature - 1)))
@@ -131,7 +139,7 @@ void loop() {
    }
    
     
-     //delay(30000);    //Send a request every 30 seconds
+     delay(30000);    //Send a request every 30 seconds
   }
 }
 
@@ -153,8 +161,6 @@ void PostSensorValue(int systemId, String type, float value)
 
   char JSONmessageBuffer[capacity];
   JSONencoder.prettyPrintTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
-  Serial.println(JSONmessageBuffer);
-
   
   http.begin(api+"/systems/"+systemId+"/sensors",fingerPrint);      //Specify request destination
     http.addHeader("Content-Type", "application/json");  //Specify content-type header
@@ -206,4 +212,33 @@ float ReadTemperature()
   Serial.print(sensors.getTempCByIndex(0));
   Serial.println("C");
   return sensors.getTempCByIndex(0);
+}
+
+bool CheckForRemoteStateChanges(int systemId)
+{
+  bool working = 0;
+  
+  http.begin(api+"/systems/"+systemId+"/currentState",fingerPrint); //Specify the URL
+  int httpCode = http.GET();             
+    if (httpCode > 0) { //Check for the returning code
+ 
+        String payload = http.getString();
+        Serial.println(httpCode);
+        
+
+      const int capacity = JSON_OBJECT_SIZE(3) + 103;;
+      StaticJsonBuffer<capacity> JSONbuffer;
+      JsonObject& root = JSONbuffer.parseObject(payload);
+      
+      // Parameters
+      working = root["working"]; 
+      // Serial.println(working);
+    }
+    else 
+    {
+      Serial.println("Error on HTTP request");
+    }
+    http.end(); //Free the resources
+    
+    return working;
 }
