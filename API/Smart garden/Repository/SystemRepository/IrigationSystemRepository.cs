@@ -18,11 +18,12 @@ namespace Smart_garden.Repository.SystemRepository
         {
             var system = (from sys in _context.IrigationSystem
                     join user in _context.User on sys.UserId equals user.Id
+                    join boardKeys in _context.BoardKey on sys.BoardKeyId equals boardKeys.Id
                     select new
                     {
                         UserId = user.Id,
                         SystemId = sys.Id,
-                        SeriesKey = sys.SeriesKey
+                        SeriesKey = boardKeys.SeriesKey
                     }
                 );
             return system;
@@ -37,7 +38,7 @@ namespace Smart_garden.Repository.SystemRepository
 
         public bool ExistSeries(string series)
         {
-            var isSeries = _context.IrigationSystem.FirstOrDefault(s => s.SeriesKey == series);
+            var isSeries = _context.BoardKey.FirstOrDefault(s => s.SeriesKey == series);
 
             return isSeries != null;
         }

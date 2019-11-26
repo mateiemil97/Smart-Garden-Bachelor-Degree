@@ -18,5 +18,6 @@ namespace Smart_garden.Entites
         public DbSet<Sensor> Sensor { get; set; }
         public DbSet<SystemState> SystemState { get; set; }
         public DbSet<Schedule> Schedule { get; set; }
+        public DbSet<BoardsKeys> BoardKey { get; set; }
     }
 }

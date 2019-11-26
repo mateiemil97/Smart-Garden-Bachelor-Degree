@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smart_garden.Entites;
 
 namespace Smart_garden.Migrations
 {
     [DbContext(typeof(SmartGardenContext))]
-    partial class SmartGardenContextModelSnapshot : ModelSnapshot
+    [Migration("20191126172803_UpdateScheduleTable")]
+    partial class UpdateScheduleTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -19,36 +21,19 @@ namespace Smart_garden.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Smart_garden.Entites.BoardsKeys", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("Registered");
-
-                    b.Property<string>("SeriesKey")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("BoardKey");
-                });
-
             modelBuilder.Entity("Smart_garden.Entites.IrigationSystem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("BoardKeyId");
+                    b.Property<string>("SeriesKey")
+                        .IsRequired()
+                        .HasMaxLength(20);
 
                     b.Property<int>("UserId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BoardKeyId")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -171,11 +156,6 @@ namespace Smart_garden.Migrations
 
             modelBuilder.Entity("Smart_garden.Entites.IrigationSystem", b =>
                 {
-                    b.HasOne("Smart_garden.Entites.BoardsKeys", "BoardKey")
-                        .WithOne("IrigationSystem")
-                        .HasForeignKey("Smart_garden.Entites.IrigationSystem", "BoardKeyId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("Smart_garden.Entites.User", "User")
                         .WithMany("System")
                         .HasForeignKey("UserId")

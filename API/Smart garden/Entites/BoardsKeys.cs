@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Smart_garden.Entites
 {
-    public class Schedule
+    public class BoardsKeys
     {
         [Required]
         [Key]
@@ -15,17 +16,12 @@ namespace Smart_garden.Entites
         public int Id { get; set; }
 
         [Required]
-        [ForeignKey("System")]
-        public int  SystemId { get; set; }
+        public string SeriesKey { get; set; }
 
         [Required]
-        public DateTime Start { get; set; }
-        public DateTime Stop { get; set; }
-        public float TemperatureStart {get; set; }
-        public int MoistureStart { get; set; }
-        public int MoistureReference { get; set; }
-        
-        public IrigationSystem System { get; set; }
-        
+        public bool Registered { get; set; }
+
+        public IrigationSystem IrigationSystem { get; set; }
+
     }
 }

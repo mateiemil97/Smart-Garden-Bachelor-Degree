@@ -20,13 +20,15 @@ namespace Smart_garden.UnitOfWork
 
         public ISensorRepository SensorRepository { get; }
         public ISystemStateRepository SystemStateRepository { get; }
+        public IRepository<BoardsKeys> BoardsKeyRepository { get; }
 
         public UnitOfWork(
             SmartGardenContext context,
             IRepository<User> userRepository,
             IIrigationSystemRepository irigationSystemRepository,
             ISensorRepository sensorRepository,
-            ISystemStateRepository systemStateRepository
+            ISystemStateRepository systemStateRepository,
+            IRepository<BoardsKeys> boardsKeysRepository
         )
         {
             _context = context;
@@ -34,6 +36,7 @@ namespace Smart_garden.UnitOfWork
             IrigationSystemRepository = irigationSystemRepository;
             SensorRepository = sensorRepository;
             SystemStateRepository = systemStateRepository;
+            BoardsKeyRepository = boardsKeysRepository;
         }
 
         

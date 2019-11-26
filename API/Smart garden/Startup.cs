@@ -49,6 +49,7 @@ namespace Smart_garden
             services.AddScoped<IRepository<Sensor>, Repository<Sensor>>();
             services.AddScoped<ISensorRepository, SensorRepository>();
             services.AddScoped<ISystemStateRepository, SystemStateRepository>();
+            services.AddScoped<IRepository<BoardsKeys>, Repository<BoardsKeys>>();
 
 
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();

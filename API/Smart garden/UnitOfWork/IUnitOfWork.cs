@@ -16,6 +16,7 @@ namespace Smart_garden.UnitOfWork
         IRepository<User> UserGenericRepository { get; }
         ISensorRepository SensorRepository { get; }
         ISystemStateRepository SystemStateRepository { get; }
+        IRepository<BoardsKeys> BoardsKeyRepository { get; }
 
         bool Save();
     }

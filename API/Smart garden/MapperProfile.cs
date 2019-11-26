@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Smart_garden.Entites;
 using Smart_garden.Models;
+using Smart_garden.Models.BoardKeyDto;
 using Smart_garden.Models.SensorDto;
 using Smart_garden.Models.SystemDto;
 using Smart_garden.Models.SystemStateDto;
@@ -26,10 +27,14 @@ namespace Smart_garden
             CreateMap<IrigationSystem, IrigationSystemDto>();
 
             CreateMap<Sensor, SensorDto>();
-            CreateMap<SensorForCreationDto, Sensor>();
-
+            CreateMap<SensorForCreationDto, Sensor>().ForMember(dest => dest.Value, src => src.MapFrom(value =>
+                 Math.Round(value.Value, 1)));
             CreateMap<SystemStateForCreationDto, SystemState>();
             CreateMap<SystemState, SystemStateDto>();
+
+            CreateMap<BoardsKeys, BoardKeyForUpdateDto>();
+            CreateMap<BoardsKeys, BoardKeyDto>();
+
         }
     }
 }
