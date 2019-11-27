@@ -31,19 +31,17 @@ namespace Smart_garden.Controllers
             return Ok(seriesMapped);
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetBoardSerie(int id)
+        [HttpGet("{series}")]
+        public IActionResult GetBoardSerie(string series)
         {
-            var serieFromRepo = _unitOfWork.BoardsKeyRepository.Get(id);
+            var sysFromRepo = _unitOfWork.BoardsKeyRepository.GetSystemBySeries(series);
 
-            if (serieFromRepo == null)
+            if (sysFromRepo == null)
             {
                 return NotFound();
             }
 
-            var serieMapped = _mapper.Map<BoardKeyDto>(serieFromRepo);
-
-            return Ok(serieMapped);
+            return Ok(sysFromRepo);
         }
 
         [HttpPut("{id}")]

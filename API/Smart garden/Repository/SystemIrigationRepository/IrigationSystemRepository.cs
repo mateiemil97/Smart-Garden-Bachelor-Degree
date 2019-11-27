@@ -49,5 +49,19 @@ namespace Smart_garden.Repository.SystemRepository
 
             return isSystem != null;
         }
+
+        public IQueryable GetSystemBySeries(string series)
+        {
+            var system = from sys in _context.IrigationSystem
+                join brdKey in _context.BoardKey
+                    on sys.BoardKeyId equals brdKey.Id
+                where brdKey.SeriesKey == series
+                select new
+                {
+                    IrigationSystemId = sys.Id,
+                    Registered = brdKey.Registered
+                };
+            return system;
+        }
     }
 }

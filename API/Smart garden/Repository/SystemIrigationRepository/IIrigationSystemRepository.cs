@@ -12,6 +12,7 @@ namespace Smart_garden.Repository.SystemRepository
         bool ExistUser(int id);
         bool ExistSeries(string series); 
         bool ExistIrigationSystem(int id);
+        IQueryable GetSystemBySeries(string series);
 
     }
 }

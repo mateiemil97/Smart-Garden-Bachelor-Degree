@@ -16,6 +16,16 @@
 #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 5000
 #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF 10000
 
+struct Board 
+{ 
+   bool registered; 
+   int id; 
+};
+
+const String series = "AAAA";
+bool registered; //if user registered system from app
+Board board;
+
 const String  api = "https://smart-garden.conveyor.cloud/api";
 const String fingerPrint = "82:88:7C:B6:41:71:8B:04:67:A5:10:C2:34:40:24:04:78:A6:7E:55"; 
 
@@ -50,15 +60,20 @@ void setup() {
   pinMode(TEMPERATURE_SENSOR_PIN ,INPUT);
   pinMode(RELAYS_PUMP_PIN,OUTPUT);
   temperatureTimeTrigger = millis();
-  
+  // registered = CheckForRegisteredBoard(series);
+  board = GetBoardByBoardSeries("AAAA");
+  Serial.print("Id:");
+  Serial.println(board.id);
+  Serial.print("Registered:");
+  Serial.println(board.registered);
 }
 
 
 void loop() {
 
-  if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
+  if (WiFi.status() == WL_CONNECTED && board.registered) { //Check WiFi connection status
 
-   systemState = CheckForRemoteStateChanges(1);
+   systemState = CheckForRemoteStateChanges(board.id);
    Serial.print("System state");
    Serial.println(systemState);
    temperature = ReadTemperature();
@@ -83,7 +98,7 @@ void loop() {
    if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST) && 
       ((temperature >= previousTemperature + 1) || (temperature <= previousTemperature - 1)))
       {
-        PostSensorValue(1,"Temperature",temperature);
+        PostSensorValue(board.id,"Temperature",temperature);
       }
    else if(((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST) && 
       ((temperature <= previousTemperature + 1) || (temperature >= previousTemperature - 1))))
@@ -106,7 +121,7 @@ void loop() {
      if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON) && 
       ((moisture >= previousMoisture + 5) || (moisture <= previousMoisture - 5)))
       {
-        PostSensorValue(1,"Moisture",moisture);
+        PostSensorValue(board.id,"Moisture",moisture);
       }
    else if(((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON) && 
       ((moisture <= previousMoisture + 5) || (moisture >= previousMoisture - 5))))
@@ -124,7 +139,7 @@ void loop() {
     if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF) && 
       ((moisture >= previousMoisture + 5) || (moisture <= previousMoisture - 5)))
       {
-        PostSensorValue(1,"Moisture",moisture);
+        PostSensorValue(board.id,"Moisture",moisture);
       }
    else if(((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF) && 
       ((moisture <= previousMoisture + 5) || (moisture >= previousMoisture - 5))))
@@ -241,4 +256,61 @@ bool CheckForRemoteStateChanges(int systemId)
     http.end(); //Free the resources
     
     return working;
+}
+//bool CheckForRegisteredBoard(String series)
+//{
+//  bool registered;
+//  http.begin(api+"/boardsseries/"+series,fingerPrint); //Specify the URL
+//  int httpCode = http.GET();             
+//    if (httpCode > 0) { //Check for the returning code
+// 
+//        String payload = http.getString();
+//        Serial.println(httpCode);
+//        
+//
+//      const int capacity = JSON_OBJECT_SIZE(3)+93;
+//      StaticJsonBuffer<capacity> JSONbuffer;
+//      JsonObject& root = JSONbuffer.parseObject(payload);
+//      
+//      // Parameters
+//      registered = root["registered"]; 
+//      // Serial.println(working);
+//    }
+//    else 
+//    {
+//      Serial.println("Error on HTTP request");
+//    }
+//    http.end(); //Free the resources
+//    
+//    return registered;
+//}
+
+Board GetBoardByBoardSeries(String series)
+{
+  Board board;
+  http.begin(api+"/boardsseries/"+series,fingerPrint); //Specify the URL
+  int httpCode = http.GET();             
+    if (httpCode > 0) { //Check for the returning code
+ 
+        String payload = http.getString();
+        Serial.println(httpCode);
+        
+
+      const int capacity = JSON_OBJECT_SIZE(2)+61;
+      StaticJsonBuffer<capacity> JSONbuffer;
+      JsonObject& root = JSONbuffer.parseObject(payload);
+      Serial.println(payload);
+      // Parameters
+      board.registered = root["registered"]; 
+      board.id = root["irigationSystemId"];
+      int a = root["irigationSystemId"];
+      Serial.println(board.id);
+    }
+    else 
+    {
+      Serial.println("Error on HTTP request");
+    }
+    http.end(); //Free the resources
+          Serial.println(board.id);
+    return board;
 }

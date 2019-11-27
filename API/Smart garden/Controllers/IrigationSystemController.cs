@@ -42,6 +42,8 @@ namespace Smart_garden.Controllers
             return Ok(systemsMapped);
         }
 
+
+
         [HttpGet("system/users/{userid}")]
          public IActionResult GetSystemByUser(int userid)
          {
@@ -62,7 +64,8 @@ namespace Smart_garden.Controllers
             return Ok(systemsByUser);
         }
 
-         [HttpPost("system/users", Name = "system")]
+
+        [HttpPost("system/users", Name = "system")]
          public IActionResult CreateSystem([FromBody] IrigationSystemForCreationDto system)
          {
              var user = _unitOfWork.IrigationSystemRepository.ExistUser(system.UserId);
