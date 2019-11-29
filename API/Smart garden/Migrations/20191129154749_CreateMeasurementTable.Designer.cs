@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smart_garden.Entites;
 
 namespace Smart_garden.Migrations
 {
     [DbContext(typeof(SmartGardenContext))]
-    partial class SmartGardenContextModelSnapshot : ModelSnapshot
+    [Migration("20191129154749_CreateMeasurementTable")]
+    partial class CreateMeasurementTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,7 +80,9 @@ namespace Smart_garden.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("Manual");
+                    b.Property<int>("MoistureReference");
+
+                    b.Property<int>("MoistureStart");
 
                     b.Property<DateTime>("Start");
 
@@ -201,29 +205,6 @@ namespace Smart_garden.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("Smart_garden.Entites.Zone", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("MoistureStart");
-
-                    b.Property<int>("MoistureStop");
-
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.Property<int>("SensorId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SensorId")
-                        .IsUnique();
-
-                    b.ToTable("Zone");
-                });
-
             modelBuilder.Entity("Smart_garden.Entites.IrigationSystem", b =>
                 {
                     b.HasOne("Smart_garden.Entites.BoardsKeys", "BoardKey")
@@ -271,14 +252,6 @@ namespace Smart_garden.Migrations
                     b.HasOne("Smart_garden.Entites.IrigationSystem", "System")
                         .WithMany()
                         .HasForeignKey("SystemId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Smart_garden.Entites.Zone", b =>
-                {
-                    b.HasOne("Smart_garden.Entites.Sensor", "Sensor")
-                        .WithOne("Zone")
-                        .HasForeignKey("Smart_garden.Entites.Zone", "SensorId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

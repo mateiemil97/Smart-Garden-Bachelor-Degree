@@ -4,26 +4,19 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Smart_garden.Entites
 {
-    public class Schedule
+    public class SensorPort
     {
         [Required]
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
-        [ForeignKey("System")]
-        public int  SystemId { get; set; }
-
-        [Required]
-        public DateTime Start { get; set; }
-        public DateTime Stop { get; set; }
-        public float TemperatureStart {get; set; }
-        public bool Manual { get; set; }
-
-        public IrigationSystem System { get; set; }
+        public string Port {get; set; }
+        public Sensor Sensor { get; set; }
     }
 }

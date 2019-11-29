@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Zones and schedule
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-card>
+          <ion-item>
+            <ion-label>Irigation start time</ion-label>
+            <ion-datetime display-format="HH:mm" picker-format="HH:mm" value="1990-02-19T07:43Z"></ion-datetime>
+          </ion-item>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Temperature start irrigation: 25°C</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-label>Irrigation start at 23:45 if temperature is lowe than 'Temperature start irrigation value',
+              otherwise irrigation will be reschedueled after 30 min
+            </ion-label>
+            <ion-range color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
+              <ion-icon size="small" color="danger" slot="start" name="thermometer"></ion-icon>
+              <ion-icon slot="end" color="danger" name="thermometer"></ion-icon>
+            </ion-range>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+            Zone: Tomatos
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-label>Start moisture</ion-label>
+            <ion-range color="primary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
+              <ion-icon size="small" color="primary" slot="start" name="water"></ion-icon>
+              <ion-icon slot="end" color="primary" name="water"></ion-icon>
+            </ion-range>
+            <ion-label>Stop moisture</ion-label>
+            <ion-range color="primary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
+              <ion-icon size="small" color="primary" slot="start" name="water"></ion-icon>
+              <ion-icon slot="end" color="primary" name="water"></ion-icon>
+            </ion-range>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

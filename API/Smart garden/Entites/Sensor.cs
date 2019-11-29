@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Smart_garden.Entites
@@ -22,14 +23,17 @@ namespace Smart_garden.Entites
         [MaxLength(20)]
         public string Type { get; set; }
 
+//        [Required]
+//        public float Value { get; set; }
         [Required]
-        public float Value { get; set; }
+        [ForeignKey("SensorPort")]
+        public int PortId { get; set; }
 
         [Required]
         public DateTime DateTime { get; set; }
         public IrigationSystem System { get; set; }
-
-        
-
+        public SensorPort SensorPort { get; set; }
+        public ICollection<Measurement> Measurement { get; set; }
+        public Zone Zone {get;set;}
     }
 }

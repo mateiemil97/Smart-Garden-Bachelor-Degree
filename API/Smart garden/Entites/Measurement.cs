@@ -7,23 +7,16 @@ using System.Threading.Tasks;
 
 namespace Smart_garden.Entites
 {
-    public class Schedule
+    public class Measurement
     {
         [Required]
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
         [Required]
-        [ForeignKey("System")]
-        public int  SystemId { get; set; }
+        [ForeignKey("Sensor")]
+        public int SensorId { get; set; }
+        public float Value { get; set; }
 
-        [Required]
-        public DateTime Start { get; set; }
-        public DateTime Stop { get; set; }
-        public float TemperatureStart {get; set; }
-        public bool Manual { get; set; }
-
-        public IrigationSystem System { get; set; }
+        public Sensor Sensor { get; set; }
     }
 }

@@ -257,33 +257,6 @@ bool CheckForRemoteStateChanges(int systemId)
     
     return working;
 }
-//bool CheckForRegisteredBoard(String series)
-//{
-//  bool registered;
-//  http.begin(api+"/boardsseries/"+series,fingerPrint); //Specify the URL
-//  int httpCode = http.GET();             
-//    if (httpCode > 0) { //Check for the returning code
-// 
-//        String payload = http.getString();
-//        Serial.println(httpCode);
-//        
-//
-//      const int capacity = JSON_OBJECT_SIZE(3)+93;
-//      StaticJsonBuffer<capacity> JSONbuffer;
-//      JsonObject& root = JSONbuffer.parseObject(payload);
-//      
-//      // Parameters
-//      registered = root["registered"]; 
-//      // Serial.println(working);
-//    }
-//    else 
-//    {
-//      Serial.println("Error on HTTP request");
-//    }
-//    http.end(); //Free the resources
-//    
-//    return registered;
-//}
 
 Board GetBoardByBoardSeries(String series)
 {
@@ -292,9 +265,8 @@ Board GetBoardByBoardSeries(String series)
   int httpCode = http.GET();             
     if (httpCode > 0) { //Check for the returning code
  
-        String payload = http.getString();
-        Serial.println(httpCode);
-        
+      String payload = http.getString();
+      Serial.println(httpCode);
 
       const int capacity = JSON_OBJECT_SIZE(2)+61;
       StaticJsonBuffer<capacity> JSONbuffer;
@@ -311,6 +283,5 @@ Board GetBoardByBoardSeries(String series)
       Serial.println("Error on HTTP request");
     }
     http.end(); //Free the resources
-          Serial.println(board.id);
     return board;
 }

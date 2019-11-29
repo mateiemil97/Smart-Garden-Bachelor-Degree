@@ -27,9 +27,10 @@ namespace Smart_garden
             CreateMap<IrigationSystem, IrigationSystemDto>();
 
             CreateMap<Sensor, SensorDto>();
-            CreateMap<SensorForCreationDto, Sensor>().ForMember(dest => dest.Value, src => src.MapFrom(value =>
-                 Math.Round(value.Value, 1)));
-            CreateMap<SystemStateForCreationDto, SystemState>();
+            //            CreateMap<SensorForCreationDto, Sensor>().ForMember(dest => dest.Value, src => src.MapFrom(value =>
+            //                 Math.Round(value.Value, 1)));
+            CreateMap<SensorForCreationDto, Sensor>();
+           CreateMap<SystemStateForCreationDto, SystemState>();
             CreateMap<SystemState, SystemStateDto>();
 
             CreateMap<BoardsKeys, BoardKeyForUpdateDto>();
