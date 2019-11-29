@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Smart_garden.Entites;
 using Smart_garden.Repository;
 using Smart_garden.Repository.BoardsKeyRepository;
+using Smart_garden.Repository.ScheduleRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
 using Smart_garden.Repository.SystemStateRepository;
@@ -51,7 +52,7 @@ namespace Smart_garden
             services.AddScoped<ISensorRepository, SensorRepository>();
             services.AddScoped<ISystemStateRepository, SystemStateRepository>();
             services.AddScoped<IBoardsKeysRepository, BoardsKeysRepository>();
-
+            services.AddScoped<IScheduleRepository, ScheduleRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
 

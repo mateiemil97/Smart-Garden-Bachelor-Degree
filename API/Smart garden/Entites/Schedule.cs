@@ -21,7 +21,8 @@ namespace Smart_garden.Entites
         [Required]
         public DateTime Start { get; set; }
         public DateTime Stop { get; set; }
-        public float TemperatureStart {get; set; }
+        public float TemperatureMin {get; set; }
+        public float TemperatureMax { get; set; }
         public bool Manual { get; set; }
 
         public IrigationSystem System { get; set; }

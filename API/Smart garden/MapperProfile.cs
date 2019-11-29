@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Smart_garden.Entites;
 using Smart_garden.Models;
 using Smart_garden.Models.BoardKeyDto;
+using Smart_garden.Models.ScheduleDto;
 using Smart_garden.Models.SensorDto;
 using Smart_garden.Models.SystemDto;
 using Smart_garden.Models.SystemStateDto;
@@ -35,6 +36,8 @@ namespace Smart_garden
 
             CreateMap<BoardsKeys, BoardKeyForUpdateDto>();
             CreateMap<BoardsKeys, BoardKeyDto>();
+
+            CreateMap<Schedule,ScheduleDto>();
 
         }
     }

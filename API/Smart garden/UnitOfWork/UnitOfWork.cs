@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Smart_garden.Entites;
 using Smart_garden.Repository;
 using Smart_garden.Repository.BoardsKeyRepository;
+using Smart_garden.Repository.ScheduleRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
 using Smart_garden.Repository.SystemStateRepository;
@@ -22,14 +23,15 @@ namespace Smart_garden.UnitOfWork
         public ISensorRepository SensorRepository { get; }
         public ISystemStateRepository SystemStateRepository { get; }
         public IBoardsKeysRepository BoardsKeyRepository { get; }
-
+        public IScheduleRepository ScheduleRepository { get; }
         public UnitOfWork(
             SmartGardenContext context,
             IRepository<User> userRepository,
             IIrigationSystemRepository irigationSystemRepository,
             ISensorRepository sensorRepository,
             ISystemStateRepository systemStateRepository,
-            IBoardsKeysRepository boardsKeysRepository
+            IBoardsKeysRepository boardsKeysRepository,
+            IScheduleRepository scheduleRepository
         )
         {
             _context = context;
@@ -38,6 +40,7 @@ namespace Smart_garden.UnitOfWork
             SensorRepository = sensorRepository;
             SystemStateRepository = systemStateRepository;
             BoardsKeyRepository = boardsKeysRepository;
+            ScheduleRepository = scheduleRepository;
         }
 
         

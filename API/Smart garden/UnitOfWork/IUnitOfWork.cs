@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Smart_garden.Entites;
 using Smart_garden.Repository;
 using Smart_garden.Repository.BoardsKeyRepository;
+using Smart_garden.Repository.ScheduleRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
 using Smart_garden.Repository.SystemStateRepository;
@@ -18,7 +19,7 @@ namespace Smart_garden.UnitOfWork
         ISensorRepository SensorRepository { get; }
         ISystemStateRepository SystemStateRepository { get; }
         IBoardsKeysRepository BoardsKeyRepository { get; }
-
+        IScheduleRepository ScheduleRepository { get; }
         bool Save();
     }
 }
