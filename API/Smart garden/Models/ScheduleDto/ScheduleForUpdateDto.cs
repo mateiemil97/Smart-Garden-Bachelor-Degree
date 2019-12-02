@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Smart_garden.Models.ScheduleDto
 {
-    public class ScheduleForCreationDto
+    public class ScheduleForUpdateDto
     {
         public int SystemId { get; set; }
         public DateTime Start { get; set; }

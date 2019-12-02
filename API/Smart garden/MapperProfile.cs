@@ -38,6 +38,8 @@ namespace Smart_garden
             CreateMap<BoardsKeys, BoardKeyDto>();
 
             CreateMap<Schedule,ScheduleDto>();
+            CreateMap<ScheduleForCreationDto, Schedule>();
+            CreateMap<ScheduleForUpdateDto, Schedule>();
 
         }
     }

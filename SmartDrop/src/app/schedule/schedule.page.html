@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header >
   <ion-toolbar>
     <ion-title>
       Zones and schedule
@@ -13,7 +13,7 @@
         <ion-card>
           <ion-item>
             <ion-label>Irigation start time</ion-label>
-            <ion-datetime display-format="HH:mm" picker-format="HH:mm" value="1990-02-19T07:43Z"></ion-datetime>
+            <ion-datetime (ionChange)="UpdateSchedule()" display-format="HH:mm" picker-format="HH:mm" [(ngModel)]="schedule.start"  name="start"></ion-datetime>
           </ion-item>
         </ion-card>
       </ion-col>
@@ -22,13 +22,13 @@
       <ion-col offset-md="3" size-md="6">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Temperature start irrigation: 25°C</ion-card-title>
+            <ion-card-title>Temperature start irrigation: {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <ion-label>Irrigation start at 23:45 if temperature is lowe than 'Temperature start irrigation value',
+            <ion-label>Irrigation start at {{schedule.start | date:'HH:mm'}} if temperature value is between {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C,
               otherwise irrigation will be reschedueled after 30 min
             </ion-label>
-            <ion-range dualKnobs="true" color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
+            <ion-range (ionBlur)="presentAlertConfirm()" [(ngModel)]="dualKnobs" name="dualKnobs" dualKnobs="true" color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
               <ion-icon size="small" color="danger" slot="start" name="thermometer"></ion-icon>
               <ion-icon slot="end" color="danger" name="thermometer"></ion-icon>
             </ion-range>
