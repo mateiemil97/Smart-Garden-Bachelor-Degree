@@ -9,6 +9,7 @@ using Smart_garden.Repository.ScheduleRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
 using Smart_garden.Repository.SystemStateRepository;
+using Smart_garden.Repository.ZoneRepository;
 
 namespace Smart_garden.UnitOfWork
 {
@@ -20,6 +21,7 @@ namespace Smart_garden.UnitOfWork
         ISystemStateRepository SystemStateRepository { get; }
         IBoardsKeysRepository BoardsKeyRepository { get; }
         IScheduleRepository ScheduleRepository { get; }
+        IZoneRepository ZoneRepository { get; }
         bool Save();
     }
 }

@@ -1,4 +1,4 @@
-<ion-header >
+<ion-header>
   <ion-toolbar>
     <ion-title>
       Zones and schedule
@@ -13,7 +13,8 @@
         <ion-card>
           <ion-item>
             <ion-label>Irigation start time</ion-label>
-            <ion-datetime (ionChange)="UpdateSchedule()" display-format="HH:mm" picker-format="HH:mm" [(ngModel)]="schedule.start"  name="start"></ion-datetime>
+            <ion-datetime (ionChange)="UpdateSchedule()" display-format="HH:mm" picker-format="HH:mm"
+              [(ngModel)]="schedule.start" name="start"></ion-datetime>
           </ion-item>
         </ion-card>
       </ion-col>
@@ -22,13 +23,16 @@
       <ion-col offset-md="3" size-md="6">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Temperature start irrigation: {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C</ion-card-title>
+            <ion-card-title>Temperature start irrigation: {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C
+            </ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <ion-label>Irrigation start at {{schedule.start | date:'HH:mm'}} if temperature value is between {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C,
+            <ion-label>Irrigation start at {{schedule.start | date:'HH:mm'}} if temperature value is between
+              {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C,
               otherwise irrigation will be reschedueled after 30 min
             </ion-label>
-            <ion-range (ionBlur)="presentAlertConfirm()" [(ngModel)]="dualKnobs" name="dualKnobs" dualKnobs="true" color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
+            <ion-range (ionBlur)="presentAlertConfirm()" [(ngModel)]="dualKnobs" name="dualKnobs" dualKnobs="true"
+              color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
               <ion-icon size="small" color="danger" slot="start" name="thermometer"></ion-icon>
               <ion-icon slot="end" color="danger" name="thermometer"></ion-icon>
             </ion-range>
@@ -38,20 +42,22 @@
     </ion-row>
     <ion-row>
       <ion-col offset-md="3" size-md="6">
-        <ion-card>
+        <ion-card *ngFor="let zone of zones">
           <ion-card-header>
             <ion-card-title>
-            Zone: Tomatos
+              Zone: {{zone.name}}
             </ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <ion-label>Start moisture</ion-label>
-            <ion-range color="primary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
+            <ion-label>Start moisture {{zone.moistureStart}}%</ion-label>
+            <ion-range color="primary" pin="true" max=100 min=0 step=10 snaps=true ticks=true
+              [value]="zone.moistureStart">
               <ion-icon size="small" color="primary" slot="start" name="water"></ion-icon>
               <ion-icon slot="end" color="primary" name="water"></ion-icon>
             </ion-range>
-            <ion-label>Stop moisture</ion-label>
-            <ion-range color="primary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
+            <ion-label>Stop moisture {{zone.moistureStop}}%</ion-label>
+            <ion-range color="primary" pin="true" max=100 min=0 step=10 snaps=true ticks=true
+              [value]="zone.moistureStop">
               <ion-icon size="small" color="primary" slot="start" name="water"></ion-icon>
               <ion-icon slot="end" color="primary" name="water"></ion-icon>
             </ion-range>
@@ -59,5 +65,10 @@
         </ion-card>
       </ion-col>
     </ion-row>
+    <ion-fab>
+      <ion-fab-button (click)="OpenModal()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
   </ion-grid>
 </ion-content>

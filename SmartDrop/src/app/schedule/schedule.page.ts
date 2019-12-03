@@ -1,7 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ScheduleService } from './services/schedule.service';
 import { Schedule } from '../models/schedule.model';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, ToastController, ModalController } from '@ionic/angular';
+import { Zone } from '../models/zone.model';
+import { ModalZoneComponent } from './modal-zone/modal-zone.component';
 
 @Component({
   selector: 'app-schedule',
@@ -15,10 +17,13 @@ export class SchedulePage implements OnInit {
   public systemId = 1012;
   public dualKnobs = { lower: 15, upper: 15 };
 
+  public zones: Zone;
+
   constructor(
     public scheduleService: ScheduleService,
     private alertController: AlertController,
     public toastController: ToastController,
+    public modalController: ModalController
   ) { }
 
   ngOnInit() {
@@ -28,6 +33,19 @@ export class SchedulePage implements OnInit {
       this.dualKnobs = { lower: this.schedule.temperatureMin, upper: this.schedule.temperatureMax };
       // this.schedule.start.
     });
+
+    this.scheduleService.GetZones(this.systemId).subscribe(zone => {
+      this.zones = zone;
+      console.log(this.zones);
+    });
+
+  }
+
+  async OpenModal() {
+    const modal = await this.modalController.create({
+      component: ModalZoneComponent
+    });
+    return await modal.present();
   }
 
   UpdateSchedule() {

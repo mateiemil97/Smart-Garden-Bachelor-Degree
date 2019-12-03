@@ -8,24 +8,25 @@ using Microsoft.AspNetCore.Mvc;
 using Smart_garden.Entites;
 using Smart_garden.Models.UserDto;
 using Smart_garden.Repository;
+using Smart_garden.UnitOfWork;
 
 namespace Smart_garden.Controllers
 {
     [Route("api/users")]
     public class UserController: Controller
     {
-        private UnitOfWork.UnitOfWork _unitOfWork;
+        private IUnitOfWork _unitOfWork;
         private IMapper _mapper;
         private UserManager<User> _userManager;
 
-        public UserController(UnitOfWork.UnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
+        public UserController(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
         }
 
-        [HttpGet]
+        [HttpGet()]
         public IActionResult GetAll()
         {
             var users = _unitOfWork.UserGenericRepository.GetAll();
@@ -49,7 +50,7 @@ namespace Smart_garden.Controllers
             return Ok(mappedUser);
         }
 
-        [HttpPost("register")]
+        [HttpPost("register", Name = "register")]
         public async Task<IActionResult> Create([FromBody] UserForCreationDto user)
         {
             var userForRegister = new User()
@@ -63,7 +64,7 @@ namespace Smart_garden.Controllers
             try
             {
                 var result = await _userManager.CreateAsync(userForRegister, user.Password);
-                return Ok(result);
+                return Created("register", result);
             }
             catch(Exception ex)
             {

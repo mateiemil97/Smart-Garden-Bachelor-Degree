@@ -10,6 +10,7 @@ using Smart_garden.Repository.ScheduleRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
 using Smart_garden.Repository.SystemStateRepository;
+using Smart_garden.Repository.ZoneRepository;
 
 namespace Smart_garden.UnitOfWork
 {
@@ -24,6 +25,7 @@ namespace Smart_garden.UnitOfWork
         public ISystemStateRepository SystemStateRepository { get; }
         public IBoardsKeysRepository BoardsKeyRepository { get; }
         public IScheduleRepository ScheduleRepository { get; }
+        public IZoneRepository ZoneRepository { get; }
         public UnitOfWork(
             SmartGardenContext context,
             IRepository<User> userRepository,
@@ -31,7 +33,8 @@ namespace Smart_garden.UnitOfWork
             ISensorRepository sensorRepository,
             ISystemStateRepository systemStateRepository,
             IBoardsKeysRepository boardsKeysRepository,
-            IScheduleRepository scheduleRepository
+            IScheduleRepository scheduleRepository,
+            IZoneRepository zoneRepository
         )
         {
             _context = context;
@@ -41,9 +44,9 @@ namespace Smart_garden.UnitOfWork
             SystemStateRepository = systemStateRepository;
             BoardsKeyRepository = boardsKeysRepository;
             ScheduleRepository = scheduleRepository;
+            ZoneRepository = zoneRepository;
         }
 
-        
         public bool Save()
         {
             return (_context.SaveChanges() >= 1);

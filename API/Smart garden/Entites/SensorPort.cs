@@ -17,6 +17,6 @@ namespace Smart_garden.Entites
 
         [Required]
         public string Port {get; set; }
-        public Sensor Sensor { get; set; }
+        public ICollection<Sensor> Sensor { get; set; }
     }
 }

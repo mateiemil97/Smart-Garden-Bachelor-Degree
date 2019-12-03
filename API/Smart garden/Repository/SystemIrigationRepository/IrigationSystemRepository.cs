@@ -19,6 +19,7 @@ namespace Smart_garden.Repository.SystemRepository
             var system = (from sys in _context.IrigationSystem
                     join user in _context.User on sys.UserId equals user.Id
                     join boardKeys in _context.BoardKey on sys.BoardKeyId equals boardKeys.Id
+                          where sys.Id == id
                     select new
                     {
                         UserId = user.Id,

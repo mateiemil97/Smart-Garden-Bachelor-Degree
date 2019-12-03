@@ -23,8 +23,6 @@ namespace Smart_garden.Entites
         [MaxLength(20)]
         public string Type { get; set; }
 
-//        [Required]
-//        public float Value { get; set; }
         [Required]
         [ForeignKey("SensorPort")]
         public int PortId { get; set; }

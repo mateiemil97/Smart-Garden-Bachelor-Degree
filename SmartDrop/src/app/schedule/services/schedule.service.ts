@@ -19,4 +19,8 @@ export class ScheduleService {
   public GetSchedule(systemId: number): Observable<any> {
     return this.http.get(`${environment.url}/systems/${systemId}/schedule`);
   }
+
+  public GetZones(systemId: number): Observable<any> {
+    return this.http.get(`${environment.url}/systems/${systemId}/zones`);
+  }
 }

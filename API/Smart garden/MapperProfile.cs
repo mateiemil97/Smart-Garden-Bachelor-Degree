@@ -12,6 +12,7 @@ using Smart_garden.Models.SensorDto;
 using Smart_garden.Models.SystemDto;
 using Smart_garden.Models.SystemStateDto;
 using Smart_garden.Models.UserDto;
+using Smart_garden.Models.ZoneDto;
 
 namespace Smart_garden
 {
@@ -41,6 +42,8 @@ namespace Smart_garden
             CreateMap<ScheduleForCreationDto, Schedule>();
             CreateMap<ScheduleForUpdateDto, Schedule>();
 
+            CreateMap<Zone, ZoneDto>();
+            CreateMap<ZoneForCreationDto,Zone>();
         }
     }
 }
