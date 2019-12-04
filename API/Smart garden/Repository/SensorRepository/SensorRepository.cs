@@ -59,7 +59,7 @@ namespace Smart_garden.Repository.SensorRepository
                 join sns in _context.Sensor
                     on sys.Id equals sns.SystemId
                 where sns.Type == type
-                orderby sns.DateTime descending
+                //orderby sns.DateTime descending
                 select sns).Take(1).SingleOrDefault();
 
             return measurement;

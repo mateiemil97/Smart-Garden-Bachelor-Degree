@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Smart_garden.Entites;
+using Smart_garden.Models.CompositesObjects;
+using Smart_garden.Models.SensorDto;
 using Smart_garden.Models.ZoneDto;
 using Smart_garden.UnitOfWork;
 
@@ -62,7 +64,7 @@ namespace Smart_garden.Controllers
         }
 
         [HttpPost(Name="zone")]
-        public IActionResult CreateZone(int systemId, [FromBody] ZoneForCreationDto zone)
+        public IActionResult CreateZone(int systemId, [FromBody] ZoneSensorComposite zoneSensor)
         {
             var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
 
@@ -71,8 +73,24 @@ namespace Smart_garden.Controllers
                 return NotFound("Irrigation system not found!");
             }
 
-            var zoneMapped = _mapper.Map<Zone>(zone);
+
+            var sensorForCreation = _mapper.Map<SensorForCreationDto>(zoneSensor);
+            sensorForCreation.SystemId = systemId;
+            var sensorMapped = _mapper.Map<Sensor>(sensorForCreation);
+
+            _unitOfWork.SensorRepository.Create(sensorMapped);
+
+
+
+            var zoneForCreation = _mapper.Map<ZoneForCreationDto>(zoneSensor);
+
+            //Getting id of sensor
+            zoneForCreation.SensorId = sensorMapped.Id;
+
+            var zoneMapped = _mapper.Map<Zone>(zoneForCreation);
+
             _unitOfWork.ZoneRepository.Create(zoneMapped);
+
             if (!_unitOfWork.Save())
             {
                 return StatusCode(500, "A problem happened with handling your request. Try again!");

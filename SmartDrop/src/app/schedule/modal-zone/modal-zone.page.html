@@ -1,0 +1,63 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>Add zone</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content >
+  <form #f="ngForm" (ngSubmit)="submit(f)">
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+          <ion-item>
+            <ion-label position="floating">Zone name</ion-label>
+            <ion-input required [(ngModel)]="zoneForCreate.name" name="name"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+          <ion-item>
+            <ion-label>Select sensor port</ion-label>
+            <ion-select required [(ngModel)]="zoneForCreate.port" #port name="port">
+              <ion-select-option *ngFor="let port of ports" [value]="port.id">{{port.port}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+          <ion-label>Start moisture %</ion-label>
+          <ion-range [(ngModel)]="zoneForCreate.moistureStart" name="moistureStart" color="primary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
+            <ion-icon size="small" color="primary" slot="start" name="water"></ion-icon>
+            <ion-icon slot="end" color="primary" name="water"></ion-icon>
+          </ion-range>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+          <ion-label>Stop moisture %</ion-label>
+          <ion-range [(ngModel)]="zoneForCreate.moistureStop" name="moistureStop" color="primary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
+            <ion-icon size="small" color="primary" slot="start" name="water"></ion-icon>
+            <ion-icon slot="end" color="primary" name="water"></ion-icon>
+          </ion-range>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    <ion-button expand="full" color="primary" type="submit">Add zone</ion-button>
+  </form>
+
+
+</ion-content>
+
+
+
+<!-- sensorId?: number;
+moistureStart: number;
+moistureStop: number;
+name?: string; -->

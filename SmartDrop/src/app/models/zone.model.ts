@@ -1,7 +1,7 @@
 export class Zone {
     id: number;
-    sensorId: number;
+    sensorId?: number;
     moistureStart: number;
     moistureStop: number;
-    name: string;
+    name?: string;
 }

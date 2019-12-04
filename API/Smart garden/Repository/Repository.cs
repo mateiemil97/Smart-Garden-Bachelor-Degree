@@ -15,7 +15,7 @@ namespace Smart_garden.Repository
             _context = context;
             table = _context.Set<T>();
         }
-        public virtual IEnumerable GetAll()
+        public IEnumerable GetAll()
         {
             return table.ToList();
         }

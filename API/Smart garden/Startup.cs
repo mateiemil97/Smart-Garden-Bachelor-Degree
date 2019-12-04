@@ -10,6 +10,7 @@ using Smart_garden.Entites;
 using Smart_garden.Repository;
 using Smart_garden.Repository.BoardsKeyRepository;
 using Smart_garden.Repository.ScheduleRepository;
+using Smart_garden.Repository.SensorPortRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
 using Smart_garden.Repository.SystemStateRepository;
@@ -55,6 +56,7 @@ namespace Smart_garden
             services.AddScoped<IBoardsKeysRepository, BoardsKeysRepository>();
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<IZoneRepository,ZoneRepository>();
+            services.AddScoped<ISensorPortRepository, SensorPortRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
 

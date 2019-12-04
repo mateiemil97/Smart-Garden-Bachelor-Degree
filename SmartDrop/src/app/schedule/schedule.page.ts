@@ -3,7 +3,7 @@ import { ScheduleService } from './services/schedule.service';
 import { Schedule } from '../models/schedule.model';
 import { AlertController, ToastController, ModalController } from '@ionic/angular';
 import { Zone } from '../models/zone.model';
-import { ModalZoneComponent } from './modal-zone/modal-zone.component';
+import { ModalZonePage } from './modal-zone/modal-zone.page';
 
 @Component({
   selector: 'app-schedule',
@@ -43,7 +43,7 @@ export class SchedulePage implements OnInit {
 
   async OpenModal() {
     const modal = await this.modalController.create({
-      component: ModalZoneComponent
+      component: ModalZonePage
     });
     return await modal.present();
   }

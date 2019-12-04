@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Smart_garden.Entites;
 using Smart_garden.Models;
 using Smart_garden.Models.BoardKeyDto;
+using Smart_garden.Models.CompositesObjects;
 using Smart_garden.Models.ScheduleDto;
 using Smart_garden.Models.SensorDto;
+using Smart_garden.Models.SensorPortDto;
 using Smart_garden.Models.SystemDto;
 using Smart_garden.Models.SystemStateDto;
 using Smart_garden.Models.UserDto;
@@ -44,6 +46,20 @@ namespace Smart_garden
 
             CreateMap<Zone, ZoneDto>();
             CreateMap<ZoneForCreationDto,Zone>();
+
+            CreateMap<ZoneSensorComposite, SensorForCreationDto>()
+                .ForMember(dest => dest.SystemId, src => src.MapFrom(id => id.SystemId))
+                .ForMember(dest => dest.Type, src => src.MapFrom(type => type.Type))
+                .ForMember(dest => dest.PortId, src => src.MapFrom(port => port.PortId));
+
+
+
+            CreateMap<ZoneSensorComposite, ZoneForCreationDto>()
+                .ForMember(dest => dest.Name, src => src.MapFrom(name => name.Name))
+                .ForMember(dest => dest.MoistureStart, src => src.MapFrom(moisture => moisture.MoistureStart))
+                .ForMember(dest => dest.MoistureStop, src => src.MapFrom(moisture => moisture.MoistureStop));
+
+            CreateMap<SensorPort, SensorPortDto>();
         }
     }
 }

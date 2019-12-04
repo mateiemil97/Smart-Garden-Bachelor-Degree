@@ -27,8 +27,7 @@ namespace Smart_garden.Entites
         [ForeignKey("SensorPort")]
         public int PortId { get; set; }
 
-        [Required]
-        public DateTime DateTime { get; set; }
+        
         public IrigationSystem System { get; set; }
         public SensorPort SensorPort { get; set; }
         public ICollection<Measurement> Measurement { get; set; }
