@@ -4,6 +4,7 @@ import { Schedule } from 'src/app/models/schedule.model';
 import {environment} from './../../../environments/environment';
 import { Observable } from 'rxjs';
 import { ZoneForCreate } from 'src/app/models/zoneForCreate.model';
+import { Zone } from 'src/app/models/zone.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -31,5 +32,9 @@ export class ScheduleService {
 
   public AddZone(systemId: number, zone: ZoneForCreate): Observable<any> {
     return this.http.post(`${environment.url}/systems/${systemId}/zones`, zone);
+  }
+
+  public DeleteZone(systemId: number, zoneId: number): Observable<any> {
+    return this.http.delete(`${environment.url}/systems/${systemId}/zones/${zoneId}`);
   }
 }

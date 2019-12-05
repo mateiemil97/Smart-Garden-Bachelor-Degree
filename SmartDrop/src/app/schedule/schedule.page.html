@@ -45,7 +45,19 @@
         <ion-card *ngFor="let zone of zones">
           <ion-card-header>
             <ion-card-title>
-              Zone: {{zone.name}}
+              <ion-row>
+                <ion-col>
+                  Zone: {{zone.name}}
+                </ion-col>
+                <ion-col offset="1">
+                  <ion-button (click)="presentAlertDeleteZone(zone)">
+                    <ion-icon slot="icon-only" name="trash"></ion-icon>
+                  </ion-button>
+                  <ion-button>
+                    <ion-icon slot="icon-only" name="create"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
             </ion-card-title>
           </ion-card-header>
           <ion-card-content>

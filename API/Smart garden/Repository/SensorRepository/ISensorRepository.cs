@@ -12,5 +12,6 @@ namespace Smart_garden.Repository.SensorRepository
         object GetSensorsBySystem(int systemId);
         IQueryable<Sensor> GetSensorBySystem(int systemId, int sensorId);
         Sensor GetLatestSensorValueByType(int systemId, string type);
+        Sensor GetSensorById(int id);
     }
 }

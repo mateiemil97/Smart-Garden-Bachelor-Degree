@@ -27,6 +27,9 @@ export class SchedulePage implements OnInit {
   ) { }
 
   ngOnInit() {
+  }
+
+  ionViewWillEnter() {
     this.scheduleService.GetSchedule(this.systemId).subscribe(sch => {
       this.schedule = sch;
       console.log(this.schedule);
@@ -38,7 +41,6 @@ export class SchedulePage implements OnInit {
       this.zones = zone;
       console.log(this.zones);
     });
-
   }
 
   async OpenModal() {
@@ -86,6 +88,40 @@ export class SchedulePage implements OnInit {
             this.schedule.temperatureMax = this.dualKnobs.upper;
             this.UpdateSchedule();
             console.log('temp updates');
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  DeleteZone(zoneId: number) {
+    this.scheduleService.DeleteZone(this.systemId, zoneId).subscribe(
+      x => console.log('Observer got a next value: ' + x),
+      err => this.presentToast('An error occured. Try again later'),
+      () => {
+        this.presentToast('Succefully deleted');
+      });
+  }
+
+  async presentAlertDeleteZone(zone: Zone) {
+    const alert = await this.alertController.create({
+      header: 'Confirm!',
+      message: 'Delete ' + zone.name + ' zone?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          cssClass: 'secondary',
+        }, {
+          text: 'Yes',
+          handler: () => {
+            this.DeleteZone(zone.id);
+            // const index = this.zones.indexOf(zone, 0);
+            // if (index > -1) {
+            //   this.zones.splice(index, 1);
+            // }
+            // console.log(zone.id);
           }
         }
       ]

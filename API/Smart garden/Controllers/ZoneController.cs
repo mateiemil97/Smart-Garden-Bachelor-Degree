@@ -98,5 +98,35 @@ namespace Smart_garden.Controllers
 
             return CreatedAtRoute("zone", zoneMapped);
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteZone(int systemId, int id)
+        {
+
+            var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
+
+            if (!system)
+            {
+                return NotFound("Irrigation system not found!");
+            }
+
+            var zone = _unitOfWork.ZoneRepository.GetZoneBySystem(systemId,id);
+            if (zone == null)
+            {
+                return NotFound("Zone not found!");
+            }
+
+            _unitOfWork.ZoneRepository.Delete(zone);
+
+            var sensor = _unitOfWork.SensorRepository.GetSensorById(zone.SensorId);
+            _unitOfWork.SensorRepository.Delete(sensor);
+
+            if (!_unitOfWork.Save())
+            {
+                return StatusCode(500, "A problem happened with handling your request. Try again!");
+            }
+
+            return NoContent();
+        }
     }
 }

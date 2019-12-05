@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Remotion.Linq.Clauses;
 using Smart_garden.Entites;
+using Smart_garden.Migrations;
 using Smart_garden.Models.SensorDto;
 
 namespace Smart_garden.Repository.SensorRepository
@@ -64,5 +65,12 @@ namespace Smart_garden.Repository.SensorRepository
 
             return measurement;
         }
+
+        public Sensor GetSensorById(int id)
+        {
+            var sensor = _context.Sensor.FirstOrDefault(sns => sns.Id == id);
+            return sensor;
+        }
+
     }
 }
