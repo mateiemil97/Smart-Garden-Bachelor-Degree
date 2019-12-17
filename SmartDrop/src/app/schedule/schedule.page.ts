@@ -4,6 +4,7 @@ import { Schedule } from '../models/schedule.model';
 import { AlertController, ToastController, ModalController } from '@ionic/angular';
 import { Zone } from '../models/zone.model';
 import { ModalZonePage } from './modal-zone/modal-zone.page';
+import { ZoneForUpdate } from '../models/zoneForUpdate.model';
 
 @Component({
   selector: 'app-schedule',
@@ -17,7 +18,7 @@ export class SchedulePage implements OnInit {
   public systemId = 1012;
   public dualKnobs = { lower: 15, upper: 15 };
 
-  public zones: Zone;
+  public zones: Zone[];
 
   constructor(
     public scheduleService: ScheduleService,
@@ -72,7 +73,42 @@ export class SchedulePage implements OnInit {
     toast.present();
   }
 
-  async presentAlertConfirm() {
+  UpdateZoneMoisture(systemId: number, zoneId: number, zone: ZoneForUpdate) {
+    this.scheduleService.UpdateMoisture(systemId, zoneId, zone).subscribe(
+      x => console.log('Observer got a next value: ' + x),
+      err => this.presentToast('An error occured. Try again later'),
+      () => this.presentToast('Succefully updated')
+    );
+  }
+
+  async presentMoistureAlertConfirm(zoneId: number, zone: Zone) {
+    const alert = await this.alertController.create({
+      header: 'Confirm!',
+      message: 'Change moisture range?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+        }, {
+          text: 'Okay',
+          handler: () => {
+            const zoneForUpdate = {
+              moistureStart: zone.moistureStart,
+              moistureStop: zone.moistureStop
+            };
+
+            this.UpdateZoneMoisture(this.systemId, zoneId, zoneForUpdate);
+            console.log('moisture updates');
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+
+  async presentTemperatureAlertConfirm() {
     const alert = await this.alertController.create({
       header: 'Confirm!',
       message: 'Change temperature range?',
@@ -117,11 +153,11 @@ export class SchedulePage implements OnInit {
           text: 'Yes',
           handler: () => {
             this.DeleteZone(zone.id);
-            // const index = this.zones.indexOf(zone, 0);
-            // if (index > -1) {
-            //   this.zones.splice(index, 1);
-            // }
-            // console.log(zone.id);
+            const index = this.zones.indexOf(zone, 0);
+            if (index > -1) {
+              this.zones.splice(index, 1);
+            }
+            console.log(zone.id);
           }
         }
       ]

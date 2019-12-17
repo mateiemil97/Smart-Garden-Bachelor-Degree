@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Measurement } from '../models/measurement.model';
 import { DashboardService } from './service/dashboard.service';
+import { ScheduleService } from '../schedule/services/schedule.service';
+import { Zone } from '../models/zone.model';
+import { environment } from '../../environments/environment';
+import { mergeMap, delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,23 +14,36 @@ import { DashboardService } from './service/dashboard.service';
 export class DashboardPage implements OnInit {
 
   currentTemperature: Measurement;
-  currentMoisture: Measurement;
+  currentMoisture: Measurement[] = [];
+  zones: Zone[] = [];
+  currentState = false;
 
   constructor(
-    public dashboardService: DashboardService
-  ) {}
+    public dashboardService: DashboardService,
+    public scheduleService: ScheduleService
+  ) { }
 
   ngOnInit() {
-    this.dashboardService.GetLatestMeasurementValue(1012, 'temperature')
-      .subscribe(temp => {
-        console.log(temp);
-        this.currentTemperature = temp;
-      });
-    this.dashboardService.GetLatestMeasurementValue(1012, 'moisture')
-      .subscribe(mois => {
-        console.log(mois);
-        this.currentMoisture = mois;
-      });
+
+    this.dashboardService.GetLatestTemperature(environment.systemId).subscribe((temp: Measurement) => {
+      this.currentTemperature = temp;
+    });
+
+    this.scheduleService.GetZones(environment.systemId).subscribe(
+      zones => {
+        zones.forEach(element => {
+          this.dashboardService.GetLatestMeasurementValue(environment.systemId, element.sensorId).subscribe(a => {
+            this.currentMoisture.push(a);
+            console.log(this.currentMoisture);
+          });
+        });
+      }
+    );
+
+
   }
 
+  changeSystemState() {
+    this.currentState = !this.currentState;
+  }
 }

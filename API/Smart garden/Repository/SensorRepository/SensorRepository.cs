@@ -54,23 +54,35 @@ namespace Smart_garden.Repository.SensorRepository
             return sensor;
         }
 
-        public Sensor GetLatestSensorValueByType(int systemId, string type)
-        {
-            var measurement = (from sys in _context.IrigationSystem
-                join sns in _context.Sensor
-                    on sys.Id equals sns.SystemId
-                where sns.Type == type
-                //orderby sns.DateTime descending
-                select sns).Take(1).SingleOrDefault();
-
-            return measurement;
-        }
+//        public Sensor GetLatestSensorValueByType(int systemId, string type)
+//        {
+//            var measurement = (from sys in _context.IrigationSystem
+//                join sns in _context.Sensor
+//                    on sys.Id equals sns.SystemId
+//                where sns.Type == type
+//                //orderby sns.DateTime descending
+//                select sns).Take(1).SingleOrDefault();
+//
+//            return measurement;
+//        }
 
         public Sensor GetSensorById(int id)
         {
             var sensor = _context.Sensor.FirstOrDefault(sns => sns.Id == id);
             return sensor;
         }
+
+        public Sensor GetSensorBySystemAndPortName(int systemId, string portName)
+        {
+            var sensor = (from sys in _context.IrigationSystem
+                    join sns in _context.Sensor on sys.Id equals sns.SystemId
+                    join port in _context.SensorPort on sns.PortId equals port.Id
+                    where sys.Id == systemId && port.Port == portName
+                    select sns
+                ).FirstOrDefault();
+            return sensor;
+        }
+
 
     }
 }

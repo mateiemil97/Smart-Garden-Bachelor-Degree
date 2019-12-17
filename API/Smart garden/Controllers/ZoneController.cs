@@ -41,6 +41,23 @@ namespace Smart_garden.Controllers
             return Ok(zoneMapped);
         }
 
+        [HttpGet("arduino")]
+        public IActionResult GetZonesForArduino(int systemId)
+        {
+            var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
+
+            if (!system)
+            {
+                return NotFound("Irrigation system not found");
+            }
+
+            var zonesFromRepo = _unitOfWork.ZoneRepository.GetZonesBySystem(systemId);
+
+            var zoneMapped = _mapper.Map<IEnumerable<ZoneDtoForArduino>>(zonesFromRepo);
+
+            return Ok(zoneMapped);
+        }
+
         [HttpGet("{id}")]
         public IActionResult GetZone(int systemId, int id)
         {
@@ -120,6 +137,37 @@ namespace Smart_garden.Controllers
 
             var sensor = _unitOfWork.SensorRepository.GetSensorById(zone.SensorId);
             _unitOfWork.SensorRepository.Delete(sensor);
+
+            if (!_unitOfWork.Save())
+            {
+                return StatusCode(500, "A problem happened with handling your request. Try again!");
+            }
+
+            return NoContent();
+        }
+
+        [HttpPut("{zoneId}")]
+        public IActionResult UpdateZone(int systemId, int zoneId, [FromBody] ZoneForUpdateDto zone)
+        {
+            var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
+
+            if (!system)
+            {
+                return NotFound("Irrigation system not found");
+            }
+
+            var updateZone = _unitOfWork.ZoneRepository.GetZoneBySystem(systemId, zoneId);
+
+            if (updateZone == null)
+            {
+                return NotFound("Zone for update not found");
+            }
+
+            updateZone.MoistureStart = zone.MoistureStart;
+            updateZone.MoistureStop = zone.MoistureStop;
+            updateZone.WaterSwitch = zone.WaterSwitch;
+
+            _unitOfWork.ZoneRepository.Update(updateZone);
 
             if (!_unitOfWork.Save())
             {

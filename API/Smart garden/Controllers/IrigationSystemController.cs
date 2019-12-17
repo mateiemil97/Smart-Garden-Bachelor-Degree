@@ -32,6 +32,26 @@ namespace Smart_garden.Controllers
             return Ok(systemMapped);
         }
 
+        [HttpGet("{id}/arduino")]
+        public IActionResult GetDataForArduino(int id)
+        {
+
+            var systemRepo = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(id);
+            if (!systemRepo)
+            {
+                return NotFound();
+            }
+
+            var arduinoData = _unitOfWork.IrigationSystemRepository.GetDataForArduino(id);
+
+            if (arduinoData == null)
+            {
+                return NotFound("Requested data for arduino aren't available");
+            }
+
+            return Ok(arduinoData);
+        }
+
         [HttpGet]
         public IActionResult GetAllSystems()
         {

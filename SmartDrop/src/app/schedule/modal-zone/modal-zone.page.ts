@@ -39,10 +39,14 @@ export class ModalZonePage implements OnInit {
       type: 'Moisture'
     };
 
-    this.scheduleService.AddZone(this.systemId, zone).subscribe(
-      err => console.log('Error on creating zone'),
-      () => { console.log('Succefully created'); this.modalController.dismiss(); }
-    );
+    if (f.valid) {
+      this.scheduleService.AddZone(this.systemId, zone).subscribe(
+        err => console.log('Error on creating zone'),
+        () => { console.log('Succefully created'); this.modalController.dismiss(); }
+      );
+    } else {
+      this.formValidation = false;
+    }
 
     console.log(f.value.port);
     console.log(f.valid);

@@ -17,6 +17,7 @@ namespace Smart_garden.Entites
         public int SensorId { get; set; }
         public float Value { get; set; }
 
+        public DateTime DateTime { get; set; }
         public Sensor Sensor { get; set; }
     }
 }

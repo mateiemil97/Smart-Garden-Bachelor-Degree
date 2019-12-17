@@ -1,25 +1,45 @@
 #include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <SPI.h>
 #include "WifiConnect.h";
 #include <string.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <SoftwareSerial.h>
+
+int D5 = 14, D6 = 12;
+SoftwareSerial s(D6,D5);
 
 //PIN 
 #define TEMPERATURE_SENSOR_PIN 2
 #define MOISTURE_SENSOR_PIN A0
 #define RELAYS_PUMP_PIN 5
 
-#define TEMPERATURE_INTERVAL_TIME_POST 5000
-#define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 5000
-#define MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF 10000
+#define RELAYS_WATER_SWITCH_P0_PIN 4
+#define RELAYS_WATER_SWITCH_P1_PIN 0
+
+
+#define TEMPERATURE_INTERVAL_TIME_POST 60000
+#define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 30000
+#define MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF 60000
 
 struct Board 
 { 
    bool registered; 
    int id; 
+};
+
+struct Moisture
+{
+  const char* port;
+  int value;
+};
+
+struct Zone 
+{
+  int startMoisture;
+  int stopMoisture;
+  bool waterSwitch;
 };
 
 const String series = "AAAA";
@@ -32,34 +52,37 @@ const String fingerPrint = "82:88:7C:B6:41:71:8B:04:67:A5:10:C2:34:40:24:04:78:A
 HTTPClient http;
 WiFiClient cli;
 
-float temperature;
-float previousTemperature;
-
-int moisture;
-int previousMoisture;
-
 bool systemState;
 
-unsigned long temperatureTimeTrigger = millis();
-unsigned long moistureTimeTrigger = millis();
+float temperature;
+unsigned long temperatureTimeTrigger;
+
+Moisture moisture[2];
+unsigned long moistureTimeTrigger;
 
 unsigned long currentTime = millis();
 
+Zone zones[2];
 
-WifiConnect wifi = WifiConnect("INTERNET","c6c202emov");
 
-// WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
+//WifiConnect wifi = WifiConnect("INTERNET","c6c202emov");
 
+ WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
 
 
 void setup() {
   wifi.Connect();
   Serial.begin(9600);
-  
+  //serial with uno
+  s.begin(9600);
+
   pinMode(MOISTURE_SENSOR_PIN,INPUT);
   pinMode(TEMPERATURE_SENSOR_PIN ,INPUT);
   pinMode(RELAYS_PUMP_PIN,OUTPUT);
-  temperatureTimeTrigger = millis();
+
+  temperatureTimeTrigger = 0;
+  moistureTimeTrigger = millis();
+  
   // registered = CheckForRegisteredBoard(series);
   board = GetBoardByBoardSeries("AAAA");
   Serial.print("Id:");
@@ -71,21 +94,25 @@ void setup() {
 
 void loop() {
 
-  if (WiFi.status() == WL_CONNECTED && board.registered) { //Check WiFi connection status
+   ReadMoisture();
 
+  if (WiFi.status() == WL_CONNECTED && board.registered) { //Check WiFi connection status
+   currentTime = millis();
+  
    systemState = CheckForRemoteStateChanges(board.id);
    Serial.print("System state");
    Serial.println(systemState);
-   temperature = ReadTemperature();
-   moisture = ReadMoisture();
    
-   currentTime = millis();
-   
-   Serial.print("previouse-temp");
-   Serial.println(previousTemperature);
-   Serial.print("tempTrigger");
-   Serial.println(temperatureTimeTrigger);
+   GetZonesBySystemId(board.id);
 
+   temperature = ReadTemperature();
+
+   
+   
+   
+//   Serial.print("tempTrigger");
+//   Serial.println(temperatureTimeTrigger);
+  
    if(systemState == true)
    {
       digitalWrite(RELAYS_PUMP_PIN,HIGH); 
@@ -95,89 +122,77 @@ void loop() {
       digitalWrite(RELAYS_PUMP_PIN,LOW);
    }
 
-   if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST) && 
-      ((temperature >= previousTemperature + 1) || (temperature <= previousTemperature - 1)))
-      {
-        PostSensorValue(board.id,"Temperature",temperature);
-      }
-   else if(((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST) && 
-      ((temperature <= previousTemperature + 1) || (temperature >= previousTemperature - 1))))
-   {
-        temperatureTimeTrigger = millis();
-        Serial.println("Reinitialize temperature trigger");
-   }
-   else
-     {
-      Serial.println("Not big difference of temperature or time not elapsed");
-     }
+//   if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST))
+//      {
+//        PostSensorValue(board.id,"Temperature","D0",temperature);
+//        temperatureTimeTrigger = millis();
+//      }
+//   else
+//     {
+//      Serial.println("time not elapsed");
+//     }
+//     // Serial.println("aaaaaaaaaaaanfksdgmsdn bdsf blf dbf bklf");
+//     
       
     //check for moisture
+   
    if(systemState == true)
    {
-     Serial.print("previouse-moisture");
-     Serial.println(previousMoisture);
-     Serial.print("moistureTrigger");
-     Serial.println(moistureTimeTrigger);
-     if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON) && 
-      ((moisture >= previousMoisture + 5) || (moisture <= previousMoisture - 5)))
-      {
-        PostSensorValue(board.id,"Moisture",moisture);
-      }
-   else if(((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON) && 
-      ((moisture <= previousMoisture + 5) || (moisture >= previousMoisture - 5))))
-   {
-        moistureTimeTrigger = millis();
-        Serial.println("Reinitialize moisture trigger");
-   }
-   else
-     {
-      Serial.println("Not big difference of moisture or time not elapsed");
+    for(int i=0;i<2;i++) {
+      // Serial.print("previouse-moisture");
+     //  Serial.println(previousMoisture);
+     //  Serial.print("moistureTrigger");    
+           if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON))
+            {
+              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
+              if(i==1){
+              moistureTimeTrigger = millis();
+              }
+            }
+         else
+           {
+          //  Serial.println("moisture time not elapsed");
+           }
      }
+    }
+       
+       else if(systemState == false)
+       {
+        for(int i=0;i<2;i++) {
+          if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF))
+            {
+              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
+              if(i==1){
+              moistureTimeTrigger = millis();
+              }
+            }
+         else
+           {
+         //   Serial.println("moisture time not elapsed");
+           }
+         }
+       }
    }
-   else if(systemState == false)
-   {
-    if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF) && 
-      ((moisture >= previousMoisture + 5) || (moisture <= previousMoisture - 5)))
-      {
-        PostSensorValue(board.id,"Moisture",moisture);
-      }
-   else if(((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF) && 
-      ((moisture <= previousMoisture + 5) || (moisture >= previousMoisture - 5))))
-   {
-        moistureTimeTrigger = millis();
-        Serial.println("Reinitialize moisture trigger");
-   }
-   else
-     {
-      Serial.println("Not big difference of moisture or time not elapsed");
-     }
-   }
-   
-    
-     delay(30000);    //Send a request every 30 seconds
   }
-}
 
 
 //function to post sensors value
 
-void PostSensorValue(int systemId, String type, float value)
+void PostSensorValue(int systemId,String type, String port, float value)
 {
   Serial.println("making POST request");
   String contentType = "application/json";
 
-  const int capacity = JSON_OBJECT_SIZE(3) + 95;
+  const int capacity = JSON_OBJECT_SIZE(1) + 33;
   StaticJsonBuffer<capacity> JSONbuffer;
   JsonObject& JSONencoder = JSONbuffer.createObject();
   
-  JSONencoder["SystemId"] = systemId;
-  JSONencoder["Type"] = type;
   JSONencoder["Value"] = value;
 
   char JSONmessageBuffer[capacity];
   JSONencoder.prettyPrintTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
   
-  http.begin(api+"/systems/"+systemId+"/sensors",fingerPrint);      //Specify request destination
+  http.begin(api+"/systems/"+systemId+"/measurements/"+port,fingerPrint);      //Specify request destination
     http.addHeader("Content-Type", "application/json");  //Specify content-type header
  
     int httpCode = http.POST(JSONmessageBuffer);   //Send the request
@@ -186,30 +201,33 @@ void PostSensorValue(int systemId, String type, float value)
     Serial.println(httpCode);   //Print HTTP return code
     Serial.println(payload);    //Print request response payload
 
-    if(type == "Temperature")
-    {
-      previousTemperature = value;
-      temperatureTimeTrigger = millis();
-    }
-    else if(type == "Moisture")
-    {
-      previousMoisture = value;
-      moistureTimeTrigger = millis();
-    }
     http.end();  //Close connection
     
 }
 
-int ReadMoisture()
-{
-  int moisture = analogRead(MOISTURE_SENSOR_PIN);
-  Serial.print("Moisture");
-  Serial.println(moisture);
+void ReadMoisture() {
+  
+  //timer0_write(ESP.getCycleCount() + 40000000L);
+  const size_t capacity = JSON_ARRAY_SIZE(3) + 3*JSON_OBJECT_SIZE(2) + 215;
+  DynamicJsonBuffer jsonBuffer(capacity);
+  
+  JsonArray& root = jsonBuffer.parseArray(s);
+  //Serial.println("citireeeee");
 
-  int moisturePercentage = map(moisture,0,1023,250,0);
-  Serial.print(moisturePercentage);
-  Serial.println("%");
-  return moisturePercentage;
+  Serial.println(moisture[0].port);
+ Serial.println(moisture[0].value);
+   if (root.success()){
+    moisture[0].port = "A0";
+    moisture[0].value = root[0]["v"];
+    
+    moisture[1].port = "A1";
+    moisture[1].value = root[1]["v"]; 
+   Serial.println("JSON received and parsed");
+   root.prettyPrintTo(Serial);
+   Serial.println("---------------------xxxxx--------------------");
+
+  }
+ 
 }
 
 float ReadTemperature()
@@ -223,9 +241,9 @@ float ReadTemperature()
   sensors.requestTemperatures(); 
 
   //print the temperature in Celsius
-  Serial.print("Temperature: ");
-  Serial.print(sensors.getTempCByIndex(0));
-  Serial.println("C");
+  //Serial.print("Temperature: ");
+ // Serial.print(sensors.getTempCByIndex(0));
+ // Serial.println("C");
   return sensors.getTempCByIndex(0);
 }
 
@@ -283,5 +301,39 @@ Board GetBoardByBoardSeries(String series)
       Serial.println("Error on HTTP request");
     }
     http.end(); //Free the resources
+    
     return board;
+}
+
+void GetZonesBySystemId(int systemId)
+{
+  http.begin(api+"/systems/"+systemId+"/zones/arduino",fingerPrint); //Specify the URL
+  int httpCode = http.GET();             
+    if (httpCode > 0) { //Check for the returning code
+ 
+      String payload = http.getString();
+      Serial.println(httpCode);
+
+      const size_t capacity = JSON_ARRAY_SIZE(2) + 2*JSON_OBJECT_SIZE(3) + 120;
+      DynamicJsonBuffer jsonBuffer(capacity);
+           
+      JsonArray& root = jsonBuffer.parseArray(payload);
+      
+      JsonObject& root_0 = root[0];
+      zones[0].startMoisture = root_0["moistureStart"]; 
+      zones[0].stopMoisture = root_0["moistureStop"]; 
+      zones[0].waterSwitch = root_0["waterSwitch"]; 
+      
+      JsonObject& root_1 = root[1];
+      zones[1].startMoisture = root_1["moistureStart"]; 
+      zones[1].stopMoisture = root_1["moistureStop"];
+      zones[1].waterSwitch = root_1["waterSwitch"];
+    }
+    else 
+    {
+      Serial.println("Error on HTTP request");
+    }
+    http.end(); //Free the resources
+    
+   
 }

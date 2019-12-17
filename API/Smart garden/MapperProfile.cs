@@ -8,6 +8,7 @@ using Smart_garden.Entites;
 using Smart_garden.Models;
 using Smart_garden.Models.BoardKeyDto;
 using Smart_garden.Models.CompositesObjects;
+using Smart_garden.Models.MeasurementDto;
 using Smart_garden.Models.ScheduleDto;
 using Smart_garden.Models.SensorDto;
 using Smart_garden.Models.SensorPortDto;
@@ -47,6 +48,8 @@ namespace Smart_garden
             CreateMap<Zone, ZoneDto>();
             CreateMap<ZoneForCreationDto,Zone>();
 
+            CreateMap<Zone, ZoneDtoForArduino>();
+            
             CreateMap<ZoneSensorComposite, SensorForCreationDto>()
                 .ForMember(dest => dest.SystemId, src => src.MapFrom(id => id.SystemId))
                 .ForMember(dest => dest.Type, src => src.MapFrom(type => type.Type))
@@ -60,6 +63,10 @@ namespace Smart_garden
                 .ForMember(dest => dest.MoistureStop, src => src.MapFrom(moisture => moisture.MoistureStop));
 
             CreateMap<SensorPort, SensorPortDto>();
+
+            CreateMap<MeasurementForCreationDto, Measurement>();
+            CreateMap<Measurement,MeasurementDto>();
+            
         }
     }
 }

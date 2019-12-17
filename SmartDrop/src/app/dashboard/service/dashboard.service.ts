@@ -12,7 +12,11 @@ export class DashboardService {
     public http: HttpClient
   ) { }
 
-  public GetLatestMeasurementValue(systemId: number, type: string): Observable<any> {
-    return this.http.get(`${environment.url}/systems/${systemId}/measurements/${type}`);
+  public GetLatestMeasurementValue(systemId: number, sensorId: number): Observable<any> {
+    return this.http.get(`${environment.url}/systems/${systemId}/measurements/${sensorId}`);
+  }
+
+  public GetLatestTemperature(systemId: number) {
+    return this.http.get(`${environment.url}/systems/${systemId}/measurements/temperature`);
   }
 }

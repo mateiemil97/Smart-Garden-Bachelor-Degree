@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Smart_garden.Entites;
+using Smart_garden.Models.CompositesObjects;
 
 namespace Smart_garden.Repository.SystemRepository
 {
@@ -63,6 +64,24 @@ namespace Smart_garden.Repository.SystemRepository
                     Registered = brdKey.Registered
                 };
             return system;
+        }
+
+        public DataForArduino GetDataForArduino(int systemId)
+        {
+            var data = (from sys in _context.IrigationSystem
+                join sch in _context.Schedule
+                    on sys.Id equals sch.SystemId
+                where sys.Id == systemId
+                select new DataForArduino()
+                {
+                    Manual = sch.Manual,
+                    CurrentTime = DateTime.Now,
+                    Start = sch.Start,
+                    Stop = sch.Stop,
+                    TemperatureMax = sch.TemperatureMax,
+                    TemperatureMin = sch.TemperatureMin
+        }).SingleOrDefault();
+            return data;
         }
     }
 }

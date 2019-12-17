@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smart_garden.Entites;
 
 namespace Smart_garden.Migrations
 {
     [DbContext(typeof(SmartGardenContext))]
-    partial class SmartGardenContextModelSnapshot : ModelSnapshot
+    [Migration("20191213132806_AddDateTimeMeasurement")]
+    partial class AddDateTimeMeasurement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -216,8 +218,6 @@ namespace Smart_garden.Migrations
                         .IsRequired();
 
                     b.Property<int>("SensorId");
-
-                    b.Property<bool>("WaterSwitch");
 
                     b.HasKey("Id");
 

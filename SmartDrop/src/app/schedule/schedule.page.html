@@ -1,12 +1,12 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-title>
       Zones and schedule
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="content">
   <ion-grid>
     <ion-row>
       <ion-col offset-md="3" size-md="6">
@@ -31,7 +31,7 @@
               {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C,
               otherwise irrigation will be reschedueled after 30 min
             </ion-label>
-            <ion-range (ionBlur)="presentAlertConfirm()" [(ngModel)]="dualKnobs" name="dualKnobs" dualKnobs="true"
+            <ion-range (ionBlur)="presentTemperatureAlertConfirm()" [(ngModel)]="dualKnobs" name="dualKnobs" dualKnobs="true"
               color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
               <ion-icon size="small" color="danger" slot="start" name="thermometer"></ion-icon>
               <ion-icon slot="end" color="danger" name="thermometer"></ion-icon>
@@ -49,12 +49,9 @@
                 <ion-col>
                   Zone: {{zone.name}}
                 </ion-col>
-                <ion-col offset="1">
+                <ion-col offset="5">
                   <ion-button (click)="presentAlertDeleteZone(zone)">
                     <ion-icon slot="icon-only" name="trash"></ion-icon>
-                  </ion-button>
-                  <ion-button>
-                    <ion-icon slot="icon-only" name="create"></ion-icon>
                   </ion-button>
                 </ion-col>
               </ion-row>
@@ -62,16 +59,16 @@
           </ion-card-header>
           <ion-card-content>
             <ion-label>Start moisture {{zone.moistureStart}}%</ion-label>
-            <ion-range color="primary" pin="true" max=100 min=0 step=10 snaps=true ticks=true
-              [value]="zone.moistureStart">
-              <ion-icon size="small" color="primary" slot="start" name="water"></ion-icon>
-              <ion-icon slot="end" color="primary" name="water"></ion-icon>
+            <ion-range color="tertiary" (ionBlur)="presentMoistureAlertConfirm(zone.id,zone)" pin="true" max=100 min=0 step=10 snaps=true ticks=true
+            [(ngModel)]="zone.moistureStart">
+              <ion-icon class="drop" size="small"  slot="start" name="water"></ion-icon>
+              <ion-icon class="drop" slot="end"  name="water"></ion-icon>
             </ion-range>
             <ion-label>Stop moisture {{zone.moistureStop}}%</ion-label>
-            <ion-range color="primary" pin="true" max=100 min=0 step=10 snaps=true ticks=true
-              [value]="zone.moistureStop">
-              <ion-icon size="small" color="primary" slot="start" name="water"></ion-icon>
-              <ion-icon slot="end" color="primary" name="water"></ion-icon>
+            <ion-range (ionBlur)="presentMoistureAlertConfirm(zone.id,zone)" color="tertiary" pin="true" max=100 min=0 step=10 snaps=true ticks=true
+            [(ngModel)]="zone.moistureStop">
+              <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
+              <ion-icon slot="end" color="tertiary" name="water"></ion-icon>
             </ion-range>
           </ion-card-content>
         </ion-card>

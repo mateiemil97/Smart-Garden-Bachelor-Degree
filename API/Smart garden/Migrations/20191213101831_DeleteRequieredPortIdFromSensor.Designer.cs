@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smart_garden.Entites;
 
 namespace Smart_garden.Migrations
 {
     [DbContext(typeof(SmartGardenContext))]
-    partial class SmartGardenContextModelSnapshot : ModelSnapshot
+    [Migration("20191213101831_DeleteRequieredPortIdFromSensor")]
+    partial class DeleteRequieredPortIdFromSensor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,8 +62,6 @@ namespace Smart_garden.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("DateTime");
 
                     b.Property<int>("SensorId");
 
@@ -216,8 +216,6 @@ namespace Smart_garden.Migrations
                         .IsRequired();
 
                     b.Property<int>("SensorId");
-
-                    b.Property<bool>("WaterSwitch");
 
                     b.HasKey("Id");
 

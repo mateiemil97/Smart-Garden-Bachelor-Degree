@@ -20,7 +20,7 @@ namespace Smart_garden.Entites
         public int SensorId { get; set; }
         public int MoistureStart { get; set; }
         public int MoistureStop { get; set; }
-
+        public bool WaterSwitch { get; set; }
         public Sensor Sensor { get; set; }
     }
 }

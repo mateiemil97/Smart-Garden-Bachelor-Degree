@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Smart_garden.Entites;
+using Smart_garden.Models.CompositesObjects;
 
 namespace Smart_garden.Repository.SystemRepository
 {
@@ -13,6 +14,6 @@ namespace Smart_garden.Repository.SystemRepository
         bool ExistSeries(string series); 
         bool ExistIrigationSystem(int id);
         IQueryable GetSystemBySeries(string series);
-
+        DataForArduino GetDataForArduino(int systemId);
     }
 }
