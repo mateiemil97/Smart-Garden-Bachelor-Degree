@@ -28,7 +28,7 @@
             <ion-card-title>{{moisture.zone}}</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            Moisture {{moisture.value}}% <br> {{moisture.dateTime}}
+            Moisture {{moisture.value}}% <br> {{moisture.dateTime | date: 'd/MMM/y, H:mm:ss'}} 
           </ion-card-content>
         </ion-card>
   </div>

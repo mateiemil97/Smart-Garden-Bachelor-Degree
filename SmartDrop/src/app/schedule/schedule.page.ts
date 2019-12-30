@@ -16,7 +16,9 @@ export class SchedulePage implements OnInit {
   // tslint:disable-next-line: new-parens
   public schedule: Schedule = new Schedule();
   public systemId = 1012;
+
   public dualKnobs = { lower: 15, upper: 15 };
+  public temperatureUpdatedState = true;
 
   public zones: Zone[];
 
@@ -28,19 +30,32 @@ export class SchedulePage implements OnInit {
   ) { }
 
   ngOnInit() {
+
   }
 
   ionViewWillEnter() {
+    this.getSchedule();
+    this.getZones();
+  }
+
+  getZones() {
+    this.scheduleService.GetZones(this.systemId).subscribe(zone => {
+      this.zones = zone.map(item => {
+        return {
+          ...item,
+          changeState: true
+        };
+      });
+      console.log(this.zones);
+    });
+  }
+
+  getSchedule() {
     this.scheduleService.GetSchedule(this.systemId).subscribe(sch => {
       this.schedule = sch;
       console.log(this.schedule);
       this.dualKnobs = { lower: this.schedule.temperatureMin, upper: this.schedule.temperatureMax };
       // this.schedule.start.
-    });
-
-    this.scheduleService.GetZones(this.systemId).subscribe(zone => {
-      this.zones = zone;
-      console.log(this.zones);
     });
   }
 
@@ -77,11 +92,13 @@ export class SchedulePage implements OnInit {
     this.scheduleService.UpdateMoisture(systemId, zoneId, zone).subscribe(
       x => console.log('Observer got a next value: ' + x),
       err => this.presentToast('An error occured. Try again later'),
-      () => this.presentToast('Succefully updated')
+      () => {
+        this.presentToast('Succefully updated');
+      }
     );
   }
 
-  async presentMoistureAlertConfirm(zoneId: number, zone: Zone) {
+  async presentMoistureUpdateAlertConfirm(zoneId: number, zone: Zone) {
     const alert = await this.alertController.create({
       header: 'Confirm!',
       message: 'Change moisture range?',
@@ -90,6 +107,7 @@ export class SchedulePage implements OnInit {
           text: 'Cancel',
           role: 'cancel',
           cssClass: 'secondary',
+          handler: () => this.getZones()
         }, {
           text: 'Okay',
           handler: () => {
@@ -108,7 +126,7 @@ export class SchedulePage implements OnInit {
   }
 
 
-  async presentTemperatureAlertConfirm() {
+  async presentTemperatureUpdateAlertConfirm() {
     const alert = await this.alertController.create({
       header: 'Confirm!',
       message: 'Change temperature range?',
@@ -117,12 +135,17 @@ export class SchedulePage implements OnInit {
           text: 'Cancel',
           role: 'cancel',
           cssClass: 'secondary',
+          handler: () => {
+            this.getSchedule();
+            this.temperatureUpdatedState = true;
+          }
         }, {
           text: 'Okay',
           handler: () => {
             this.schedule.temperatureMin = this.dualKnobs.lower;
             this.schedule.temperatureMax = this.dualKnobs.upper;
             this.UpdateSchedule();
+            this.temperatureUpdatedState = true;
             console.log('temp updates');
           }
         }
@@ -163,5 +186,13 @@ export class SchedulePage implements OnInit {
       ]
     });
     await alert.present();
+  }
+
+  updateMoistureConfirmation(zone: Zone) {
+    zone.changeState = false;
+  }
+
+  updateTemperatureConfirmation() {
+    this.temperatureUpdatedState = false;
   }
 }

@@ -6,18 +6,26 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <SoftwareSerial.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
 
 int D5 = 14, D6 = 12;
 SoftwareSerial s(D6,D5);
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
+// For UTC +2.00 : 2 * 60 * 60 : 7200
+const long utcOffsetInSeconds = 7200;
 
 //PIN 
 #define TEMPERATURE_SENSOR_PIN 2
 #define MOISTURE_SENSOR_PIN A0
 #define RELAYS_PUMP_PIN 5
 
+
 #define RELAYS_WATER_SWITCH_P0_PIN 4
 #define RELAYS_WATER_SWITCH_P1_PIN 0
-
 
 #define TEMPERATURE_INTERVAL_TIME_POST 60000
 #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 30000
@@ -42,6 +50,14 @@ struct Zone
   bool waterSwitch;
 };
 
+struct Schedule
+{
+  int temperatureMin;
+  int temperatureMax;
+  bool manual;
+  const char* startTime;
+};
+
 const String series = "AAAA";
 bool registered; //if user registered system from app
 Board board;
@@ -60,10 +76,11 @@ unsigned long temperatureTimeTrigger;
 Moisture moisture[2];
 unsigned long moistureTimeTrigger;
 
+Schedule schedule;
+
 unsigned long currentTime = millis();
 
 Zone zones[2];
-
 
 //WifiConnect wifi = WifiConnect("INTERNET","c6c202emov");
 
@@ -75,6 +92,9 @@ void setup() {
   Serial.begin(9600);
   //serial with uno
   s.begin(9600);
+
+  timeClient.begin();
+  timeClient.setTimeOffset(utcOffsetInSeconds);
 
   pinMode(MOISTURE_SENSOR_PIN,INPUT);
   pinMode(TEMPERATURE_SENSOR_PIN ,INPUT);
@@ -93,86 +113,93 @@ void setup() {
 
 
 void loop() {
-
-   ReadMoisture();
-
-  if (WiFi.status() == WL_CONNECTED && board.registered) { //Check WiFi connection status
-   currentTime = millis();
+  timeClient.update();
+  int currentTimeFromServer = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60));
   
-   systemState = CheckForRemoteStateChanges(board.id);
-   Serial.print("System state");
-   Serial.println(systemState);
-   
-   GetZonesBySystemId(board.id);
-
-   temperature = ReadTemperature();
-
-   
-   
-   
-//   Serial.print("tempTrigger");
-//   Serial.println(temperatureTimeTrigger);
-  
-   if(systemState == true)
-   {
-      digitalWrite(RELAYS_PUMP_PIN,HIGH); 
-   }
-   else if(systemState == false)
-   {
-      digitalWrite(RELAYS_PUMP_PIN,LOW);
-   }
-
-//   if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST))
-//      {
-//        PostSensorValue(board.id,"Temperature","D0",temperature);
-//        temperatureTimeTrigger = millis();
-//      }
-//   else
-//     {
-//      Serial.println("time not elapsed");
+  schedule = GetScheduleBySystem(board.id);
+  Serial.println(schedule.temperatureMin);
+  int seconds = TransformTimeInSeconds(schedule.startTime);
+//   ReadMoisture();
+//
+//  if (WiFi.status() == WL_CONNECTED && board.registered) { //Check WiFi connection status
+//  currentTime = millis();
+//   systemState = true; //CheckForRemoteStateChanges(board.id);
+//   Serial.print("System state");
+//   Serial.println(systemState);
+//  
+//   temperature = ReadTemperature();
+//
+//   
+//   
+//   
+////   Serial.print("tempTrigger");
+////   Serial.println(temperatureTimeTrigger);
+//
+//   if(systemState == true)
+//   {
+//      digitalWrite(RELAYS_PUMP_PIN,HIGH); 
+//   }
+//   else if(systemState == false)
+//   {
+//      digitalWrite(RELAYS_PUMP_PIN,LOW);
+//   }
+//
+////   if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST))
+////      {
+////        PostSensorValue(board.id,"Temperature","D0",temperature);
+////        temperatureTimeTrigger = millis();
+////      }
+////   else
+////     {
+////      Serial.println("time not elapsed");
+////     }
+////     // Serial.println("aaaaaaaaaaaanfksdgmsdn bdsf blf dbf bklf");
+////     
+//      
+//    //check for moisture
+//   
+//   if(systemState == true)
+//   {
+//    for(int i=0;i<2;i++) {
+//      // Serial.print("previouse-moisture");
+//     //  Serial.println(previousMoisture);
+//     //  Serial.print("moistureTrigger");    
+//           if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON))
+//            {
+//              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
+//              if(i==1){
+//              moistureTimeTrigger = millis();
+//              }
+//            }
+//         else
+//           {
+//            Serial.println("moisture time not elapsed");
+//           }
 //     }
-//     // Serial.println("aaaaaaaaaaaanfksdgmsdn bdsf blf dbf bklf");
-//     
-      
-    //check for moisture
-   
-   if(systemState == true)
-   {
-    for(int i=0;i<2;i++) {
-      // Serial.print("previouse-moisture");
-     //  Serial.println(previousMoisture);
-     //  Serial.print("moistureTrigger");    
-           if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON))
-            {
-              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
-              if(i==1){
-              moistureTimeTrigger = millis();
-              }
-            }
-         else
-           {
-          //  Serial.println("moisture time not elapsed");
-           }
-     }
-    }
-       
-       else if(systemState == false)
-       {
-        for(int i=0;i<2;i++) {
-          if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF))
-            {
-              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
-              if(i==1){
-              moistureTimeTrigger = millis();
-              }
-            }
-         else
-           {
-         //   Serial.println("moisture time not elapsed");
-           }
-         }
-       }
-   }
+//    }
+//       
+//       else if(systemState == false)
+//       {
+//        for(int i=0;i<2;i++) {
+//          if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF))
+//            {
+//              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
+//              if(i==1){
+//              moistureTimeTrigger = millis();
+//              }
+//            }
+//         else
+//           {
+//            Serial.println("moisture time not elapsed");
+//           }
+//         }
+//       }
+//   }
+
+
+  
+
+  delay(1000);
   }
 
 
@@ -212,7 +239,7 @@ void ReadMoisture() {
   DynamicJsonBuffer jsonBuffer(capacity);
   
   JsonArray& root = jsonBuffer.parseArray(s);
-  //Serial.println("citireeeee");
+  Serial.println("citireeeee");
 
   Serial.println(moisture[0].port);
  Serial.println(moisture[0].value);
@@ -334,6 +361,56 @@ void GetZonesBySystemId(int systemId)
       Serial.println("Error on HTTP request");
     }
     http.end(); //Free the resources
-    
-   
 }
+Schedule GetScheduleBySystem(int systemId)
+  {
+    Schedule sch;
+    http.begin(api+"/systems/"+systemId+"/schedule",fingerPrint); //Specify the URL
+    int httpCode = http.GET();             
+      if (httpCode > 0) { //Check for the returning code
+   
+        String payload = http.getString();
+        Serial.println(httpCode);
+  
+        const size_t capacity = JSON_OBJECT_SIZE(7) + 238;
+        DynamicJsonBuffer jsonBuffer(capacity);
+             
+        JsonObject& root = jsonBuffer.parseObject(payload);
+  
+        
+        sch.startTime = root["start"]; // "2019-12-02T21:51:00"
+        sch.temperatureMin = root["temperatureMin"]; // 22
+        sch.temperatureMax = root["temperatureMax"]; // 32
+        sch.manual = root["manual"]; // true
+      }
+      else 
+      {
+        Serial.println("Error on HTTP request");
+      }
+      http.end(); //Free the resources
+      return sch;
+  }
+  int TransformTimeInSeconds(String date)
+  {
+     //Extract date
+     int splitT = date.indexOf("T");
+      // Extract time
+
+    String  timeFromDate = date.substring(splitT+1, date.lastIndexOf(":" +1));
+  
+    int firstColon = timeFromDate.indexOf(":");
+    int secondColon = timeFromDate.lastIndexOf(":");
+    
+    // get the substrings for hour, minute second:
+    String hourString = timeFromDate.substring(0, firstColon);
+    String minString = timeFromDate.substring(firstColon + 1, secondColon);
+    String secString = timeFromDate.substring(secondColon + 1);
+
+    int hours = hourString.toInt();
+    int minutes = minString.toInt();
+    int seconds = minString.toInt();
+    
+    int totalSeconds = (hours * 3600) + (minutes * 60);
+   // Serial.println(totalSeconds);
+    return totalSeconds;
+  }

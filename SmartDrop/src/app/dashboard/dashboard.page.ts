@@ -24,25 +24,24 @@ export class DashboardPage implements OnInit {
   ) { }
 
   ngOnInit() {
+  }
 
+  ionViewWillEnter() {
     this.dashboardService.GetLatestTemperature(environment.systemId).subscribe((temp: Measurement) => {
       this.currentTemperature = temp;
     });
-
+    this.currentMoisture = [];
     this.scheduleService.GetZones(environment.systemId).subscribe(
       zones => {
         zones.forEach(element => {
-          this.dashboardService.GetLatestMeasurementValue(environment.systemId, element.sensorId).subscribe(a => {
-            this.currentMoisture.push(a);
+          this.dashboardService.GetLatestMeasurementValue(environment.systemId, element.sensorId).subscribe(moist => {
+            this.currentMoisture.push(moist);
             console.log(this.currentMoisture);
           });
         });
       }
     );
-
-
   }
-
   changeSystemState() {
     this.currentState = !this.currentState;
   }

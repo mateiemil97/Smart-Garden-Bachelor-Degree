@@ -31,11 +31,20 @@
               {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C,
               otherwise irrigation will be reschedueled after 30 min
             </ion-label>
-            <ion-range (ionBlur)="presentTemperatureAlertConfirm()" [(ngModel)]="dualKnobs" name="dualKnobs" dualKnobs="true"
-              color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
+            <ion-range (ionFocus)="updateTemperatureConfirmation()" [(ngModel)]="dualKnobs" name="dualKnobs"
+              dualKnobs="true" color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
               <ion-icon size="small" color="danger" slot="start" name="thermometer"></ion-icon>
               <ion-icon slot="end" color="danger" name="thermometer"></ion-icon>
             </ion-range>
+            <ion-row>
+            <ion-col offset="10">
+              <ion-buttons>
+                <ion-button [disabled]=temperatureUpdatedState (click)="presentTemperatureUpdateAlertConfirm()" slot="icon-only">
+                  <ion-icon color="primary" name="done-all"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-col>
+            </ion-row>
           </ion-card-content>
         </ion-card>
       </ion-col>
@@ -46,30 +55,41 @@
           <ion-card-header>
             <ion-card-title>
               <ion-row>
-                <ion-col>
+                <ion-col size=5>
                   Zone: {{zone.name}}
                 </ion-col>
-                <ion-col offset="5">
-                  <ion-button (click)="presentAlertDeleteZone(zone)">
-                    <ion-icon slot="icon-only" name="trash"></ion-icon>
-                  </ion-button>
+                <ion-col offset="4">
+                  <ion-buttons>
+                    <ion-button class="deleteIcon" slot="icon-only" (click)="presentAlertDeleteZone(zone)">
+                      <ion-icon name="trash"></ion-icon>
+                    </ion-button>
+                  </ion-buttons>
                 </ion-col>
               </ion-row>
             </ion-card-title>
           </ion-card-header>
           <ion-card-content>
             <ion-label>Start moisture {{zone.moistureStart}}%</ion-label>
-            <ion-range color="tertiary" (ionBlur)="presentMoistureAlertConfirm(zone.id,zone)" pin="true" max=100 min=0 step=10 snaps=true ticks=true
-            [(ngModel)]="zone.moistureStart">
-              <ion-icon class="drop" size="small"  slot="start" name="water"></ion-icon>
-              <ion-icon class="drop" slot="end"  name="water"></ion-icon>
+            <ion-range color="tertiary" (ionFocus)="updateMoistureConfirmation(zone)" pin="true" max=100 min=0
+              step=10 snaps=true ticks=true [(ngModel)]="zone.moistureStart">
+              <ion-icon class="drop" size="small" slot="start" name="water"></ion-icon>
+              <ion-icon class="drop" slot="end" name="water"></ion-icon>
             </ion-range>
             <ion-label>Stop moisture {{zone.moistureStop}}%</ion-label>
-            <ion-range (ionBlur)="presentMoistureAlertConfirm(zone.id,zone)" color="tertiary" pin="true" max=100 min=0 step=10 snaps=true ticks=true
-            [(ngModel)]="zone.moistureStop">
+            <ion-range (ionFocus)="updateMoistureConfirmation(zone)" color="tertiary" pin="true" max=100 min=0
+              step=10 snaps=true ticks=true [(ngModel)]="zone.moistureStop">
               <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
               <ion-icon slot="end" color="tertiary" name="water"></ion-icon>
             </ion-range>
+            <ion-row>
+            <ion-col offset="10">
+              <ion-buttons>
+                <ion-button [disabled]=zone.changeState (click)="presentMoistureUpdateAlertConfirm(zone.id,zone)" slot="icon-only">
+                  <ion-icon color="primary" name="done-all"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-col>
+            </ion-row>
           </ion-card-content>
         </ion-card>
       </ion-col>
