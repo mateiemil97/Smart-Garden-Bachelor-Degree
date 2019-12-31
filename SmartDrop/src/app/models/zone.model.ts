@@ -4,5 +4,6 @@ export class Zone {
     moistureStart: number;
     moistureStop: number;
     name?: string;
-    changeState = true;
+    changeState: boolean;
+    waterSwitch: boolean;
 }

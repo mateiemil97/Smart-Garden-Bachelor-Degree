@@ -5,6 +5,9 @@ import { ScheduleService } from '../schedule/services/schedule.service';
 import { Zone } from '../models/zone.model';
 import { environment } from '../../environments/environment';
 import { mergeMap, delay } from 'rxjs/operators';
+import { ChangeIrigationState } from '../models/changeIrigationState';
+import { AlertController, ToastController } from '@ionic/angular';
+import { CurrentState } from '../models/currentState';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,11 +19,13 @@ export class DashboardPage implements OnInit {
   currentTemperature: Measurement;
   currentMoisture: Measurement[] = [];
   zones: Zone[] = [];
-  currentState = false;
-
+  currentState: CurrentState;
+  changeIrigationState: ChangeIrigationState = new ChangeIrigationState();
   constructor(
     public dashboardService: DashboardService,
-    public scheduleService: ScheduleService
+    public scheduleService: ScheduleService,
+    private alertController: AlertController,
+    public toastController: ToastController,
   ) { }
 
   ngOnInit() {
@@ -41,8 +46,65 @@ export class DashboardPage implements OnInit {
         });
       }
     );
+    this.getCurrentState();
   }
-  changeSystemState() {
-    this.currentState = !this.currentState;
+  updateIrigationState(irrigationState: ChangeIrigationState) {
+    this.dashboardService.ChangeIrigationState(environment.systemId, irrigationState).subscribe(
+      x => console.log('Observer got a next value: ' + x),
+      err => this.presentToast('An error occured. Try again later'),
+      () => {
+        this.presentToast(this.currentState.working ? 'Succefully turned off irrigation' : 'Succefully turned on irrigation');
+        this.getCurrentState();
+      });
   }
+
+  async presentIrrigationStateUpdateAlertConfirm() {
+    const alert = await this.alertController.create({
+      header: 'Confirm!',
+      message: this.currentState.working ? 'Turn off irrigation?' : 'Turn on irrigation?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+        }, {
+          text: 'Okay',
+          handler: () => {
+
+            if (this.currentState.working === true) {
+              this.changeIrigationState.working = false;
+              this.changeIrigationState.manual = false;
+            } else if (this.currentState.working === false) {
+              this.changeIrigationState.working = true;
+              this.changeIrigationState.manual = true;
+            }
+            this.updateIrigationState(this.changeIrigationState);
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      buttons: [
+        {
+          text: 'Close',
+          role: 'cancel',
+        }
+      ]
+    }
+    );
+    toast.present();
+  }
+
+  getCurrentState() {
+    this.dashboardService.GetSystemState(environment.systemId).subscribe(state => {
+      this.currentState = state;
+      console.log(this.currentState);
+    });
+  }
+
 }

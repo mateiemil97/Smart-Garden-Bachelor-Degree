@@ -6,8 +6,9 @@ ion-row {
   text-align: center;
 }
 
-.sensorValue {
+.temperatureValue {
   font-size: 40px;
+  color: black;  
 }
 
 .nameRow {
@@ -16,4 +17,14 @@ ion-row {
 
 .moistureLabel {
   padding-left: -2px !important;
+}
+
+.temperatureLabel {
+  color: black;
+  font-size: 25px;
+}
+
+.moistCardTextInfo {
+  color: black;
+  font-size: 16px;
 }

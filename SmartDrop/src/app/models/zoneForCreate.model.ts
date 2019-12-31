@@ -3,6 +3,7 @@ export class ZoneForCreate {
     moistureStop: number;
     name?: string;
     type: string;
+    waterSwitch: boolean;
     /**
      *
      */

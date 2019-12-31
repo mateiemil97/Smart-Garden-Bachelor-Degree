@@ -36,7 +36,8 @@ export class ModalZonePage implements OnInit {
       portId: f.value.port,
       moistureStart: f.value.moistureStart,
       moistureStop: f.value.moistureStop,
-      type: 'Moisture'
+      type: 'Moisture',
+      waterSwitch: true
     };
 
     if (f.valid) {

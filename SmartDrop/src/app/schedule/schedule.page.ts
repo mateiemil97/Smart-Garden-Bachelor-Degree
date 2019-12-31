@@ -101,22 +101,28 @@ export class SchedulePage implements OnInit {
   async presentMoistureUpdateAlertConfirm(zoneId: number, zone: Zone) {
     const alert = await this.alertController.create({
       header: 'Confirm!',
-      message: 'Change moisture range?',
+      message: 'Change zone details?',
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel',
           cssClass: 'secondary',
-          handler: () => this.getZones()
-        }, {
+          handler: () => {
+            this.getZones();
+            zone.changeState = true;
+          }
+        },
+        {
           text: 'Okay',
           handler: () => {
             const zoneForUpdate = {
               moistureStart: zone.moistureStart,
-              moistureStop: zone.moistureStop
+              moistureStop: zone.moistureStop,
+              waterSwitch: zone.waterSwitch
             };
 
             this.UpdateZoneMoisture(this.systemId, zoneId, zoneForUpdate);
+            zone.changeState = true;
             console.log('moisture updates');
           }
         }
