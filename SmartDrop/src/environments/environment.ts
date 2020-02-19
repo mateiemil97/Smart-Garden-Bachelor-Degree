@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   url: 'https://localhost:44362/api',
-  systemId: 1012
+  systemId: 1012,
+  userId: 1002
 };
 
 /*

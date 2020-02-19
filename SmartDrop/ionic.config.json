@@ -1,5 +1,7 @@
 {
   "name": "SmartDrop",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

@@ -15,12 +15,12 @@ namespace Smart_garden.Repository.SystemRepository
             _context = context;
         }
 
-        public object GetSystemByUser(int id)
+        public IEnumerable<object> GetSystemsByUser(int id)
         {
             var system = (from sys in _context.IrigationSystem
                     join user in _context.User on sys.UserId equals user.Id
                     join boardKeys in _context.BoardKey on sys.BoardKeyId equals boardKeys.Id
-                          where sys.Id == id
+                          where user.Id == id
                     select new
                     {
                         UserId = user.Id,

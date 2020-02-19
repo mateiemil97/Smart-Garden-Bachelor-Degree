@@ -8,17 +8,35 @@
 
 <ion-content class="content">
   <ion-grid>
-    <ion-row>
-      <ion-col offset-md="3" size-md="6">
-        <ion-card>
-          <ion-item>
-            <ion-label>Irigation start time</ion-label>
-            <ion-datetime (ionChange)="UpdateSchedule()" display-format="HH:mm" picker-format="HH:mm"
-              [(ngModel)]="schedule.start" name="start"></ion-datetime>
-          </ion-item>
+      <ion-row>
+        <ion-col offset-md="3" size-md="6">
+          <ion-card>
+          <ion-row>
+            <ion-col style="padding-bottom: 0;">
+              <ion-card>
+                <ion-item>
+                  <ion-label>Irigation start time</ion-label>
+                  <ion-datetime (ionChange)="UpdateSchedule()" display-format="HH:mm" picker-format="HH:mm"
+                    [(ngModel)]="schedule.start" name="start"></ion-datetime>
+                </ion-item>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col style="padding-top: 0;">
+              <ion-card>
+                <ion-item>
+                  <ion-label>Irigation last start time</ion-label>
+                  <ion-datetime (ionChange)="UpdateSchedule()" display-format="HH:mm" picker-format="HH:mm"
+                    [(ngModel)]="schedule.stop" name="stop"></ion-datetime>
+                </ion-item>
+              </ion-card>
+            </ion-col>
+          </ion-row>
         </ion-card>
-      </ion-col>
-    </ion-row>
+
+        </ion-col>
+      </ion-row>
     <ion-row>
       <ion-col offset-md="3" size-md="6">
         <ion-card>
@@ -100,12 +118,11 @@
         </ion-card>
       </ion-col>
     </ion-row>
-    
-      <ion-fab>
-        <ion-fab-button (click)="OpenModal()" vertical="bottom" horizontal="end" slot="fixed">
-          <ion-icon name="add"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
+    <ion-fab>
+      <ion-fab-button (click)="OpenModal()" vertical="bottom" horizontal="end" slot="fixed">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
 
   </ion-grid>
 </ion-content>

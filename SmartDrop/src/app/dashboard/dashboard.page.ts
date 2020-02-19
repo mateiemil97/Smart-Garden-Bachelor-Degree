@@ -8,6 +8,8 @@ import { mergeMap, delay } from 'rxjs/operators';
 import { ChangeIrigationState } from '../models/changeIrigationState';
 import { AlertController, ToastController } from '@ionic/angular';
 import { CurrentState } from '../models/currentState';
+import { ViewChild } from '@angular/core';
+import { IrrigationSystem } from '../models/irrigationSystem';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,6 +23,10 @@ export class DashboardPage implements OnInit {
   zones: Zone[] = [];
   currentState: CurrentState;
   changeIrigationState: ChangeIrigationState = new ChangeIrigationState();
+  irrigationSystems: IrrigationSystem[] = [];
+
+  currentIrrigationSystem: IrrigationSystem;
+
   constructor(
     public dashboardService: DashboardService,
     public scheduleService: ScheduleService,
@@ -29,32 +35,54 @@ export class DashboardPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.dashboardService.GetSystemsByUser(environment.userId).subscribe(system => {
+      this.irrigationSystems = system;
+      console.log(this.irrigationSystems);
+      this.currentIrrigationSystem = this.irrigationSystems[0];
+    });
   }
 
   ionViewWillEnter() {
-    this.dashboardService.GetLatestTemperature(environment.systemId).subscribe((temp: Measurement) => {
+     this.getTemperature(this.currentIrrigationSystem.systemId);
+     this.currentMoisture = [];
+     this.getZones(this.currentIrrigationSystem.systemId);
+     this.getCurrentState(this.currentIrrigationSystem.systemId);
+  }
+
+  getTemperature(systemId: number) {
+    this.dashboardService.GetLatestTemperature(this.currentIrrigationSystem.systemId).subscribe((temp: Measurement) => {
       this.currentTemperature = temp;
+      console.log(this.currentTemperature);
     });
-    this.currentMoisture = [];
-    this.scheduleService.GetZones(environment.systemId).subscribe(
+  }
+
+  getZones(systemId: number) {
+    this.scheduleService.GetZones(this.currentIrrigationSystem.systemId).subscribe(
       zones => {
         zones.forEach(element => {
-          this.dashboardService.GetLatestMeasurementValue(environment.systemId, element.sensorId).subscribe(moist => {
+          this.dashboardService.GetLatestMeasurementValue(this.currentIrrigationSystem.systemId, element.sensorId).subscribe(moist => {
             this.currentMoisture.push(moist);
             console.log(this.currentMoisture);
           });
         });
       }
     );
-    this.getCurrentState();
   }
-  updateIrigationState(irrigationState: ChangeIrigationState) {
-    this.dashboardService.ChangeIrigationState(environment.systemId, irrigationState).subscribe(
+
+  selectBoard(systemId: number) {
+    this.currentMoisture = [];
+    this.getTemperature(systemId);
+    this.getZones(systemId);
+    this.getCurrentState(systemId);
+  }
+
+  updateIrigationState(irrigationState: ChangeIrigationState, systemId: number) {
+    this.dashboardService.ChangeIrigationState(systemId, irrigationState).subscribe(
       x => console.log('Observer got a next value: ' + x),
       err => this.presentToast('An error occured. Try again later'),
       () => {
         this.presentToast(this.currentState.working ? 'Succefully turned off irrigation' : 'Succefully turned on irrigation');
-        this.getCurrentState();
+        this.getCurrentState(systemId);
       });
   }
 
@@ -78,7 +106,7 @@ export class DashboardPage implements OnInit {
               this.changeIrigationState.working = true;
               this.changeIrigationState.manual = true;
             }
-            this.updateIrigationState(this.changeIrigationState);
+            this.updateIrigationState(this.changeIrigationState, this.currentIrrigationSystem.systemId);
           }
         }
       ]
@@ -100,11 +128,12 @@ export class DashboardPage implements OnInit {
     toast.present();
   }
 
-  getCurrentState() {
-    this.dashboardService.GetSystemState(environment.systemId).subscribe(state => {
+  getCurrentState(systemId: number) {
+    this.dashboardService.GetSystemState(systemId).subscribe(state => {
       this.currentState = state;
       console.log(this.currentState);
     });
   }
+
 
 }

@@ -201,4 +201,12 @@ export class SchedulePage implements OnInit {
   updateTemperatureConfirmation() {
     this.temperatureUpdatedState = false;
   }
+
+  // restrictMoisture(zone: Zone) {
+  //   if (zone.moistureStart >= zone.moistureStop) {
+  //     zone.moistureStart = zone.moistureStop;
+  //     console.log(zone.moistureStart);
+  //     console.log('triggered');
+  //   }
+  // }
 }

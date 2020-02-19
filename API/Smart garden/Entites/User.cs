@@ -25,6 +25,9 @@ namespace Smart_garden.Entites
         [Required]
         public string FirstName { get; set; }
 
+        public string Country { get; set; }
+        public string City { get; set; }
+
         public  ICollection<IrigationSystem> System { get; set; } = new List<IrigationSystem>();
 
     }

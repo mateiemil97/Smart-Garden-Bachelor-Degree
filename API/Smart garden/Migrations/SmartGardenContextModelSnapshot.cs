@@ -163,7 +163,11 @@ namespace Smart_garden.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
+                    b.Property<string>("City");
+
                     b.Property<string>("ConcurrencyStamp");
+
+                    b.Property<string>("Country");
 
                     b.Property<string>("Email");
 

@@ -45,7 +45,7 @@ namespace Smart_garden.Controllers
 
 
 
-        [HttpGet("system/users/{userid}")]
+        [HttpGet("users/{userid}")]
          public IActionResult GetSystemByUser(int userid)
          {
              var user = _unitOfWork.IrigationSystemRepository.ExistUser(userid);
@@ -55,7 +55,7 @@ namespace Smart_garden.Controllers
                 return BadRequest();
             }
 
-            var systemsByUser = _unitOfWork.IrigationSystemRepository.GetSystemByUser(userid);
+            var systemsByUser = _unitOfWork.IrigationSystemRepository.GetSystemsByUser(userid);
 
             if (systemsByUser == null)
             {

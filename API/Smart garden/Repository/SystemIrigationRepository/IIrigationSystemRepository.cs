@@ -9,7 +9,7 @@ namespace Smart_garden.Repository.SystemRepository
 {
     public interface IIrigationSystemRepository: IRepository<IrigationSystem>
     {
-        object GetSystemByUser(int id);
+        IEnumerable<object> GetSystemsByUser(int id);
         bool ExistUser(int id);
         bool ExistSeries(string series); 
         bool ExistIrigationSystem(int id);

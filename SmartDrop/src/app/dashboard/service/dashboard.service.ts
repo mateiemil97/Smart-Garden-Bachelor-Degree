@@ -28,4 +28,8 @@ export class DashboardService {
   public GetSystemState(systemId: number): Observable<any> {
     return this.http.get(`${environment.url}/systems/${systemId}/currentState`);
   }
+
+  public GetSystemsByUser(userId: number): Observable<any> {
+    return this.http.get(`${environment.url}/systems/users/${userId}`);
+  }
 }

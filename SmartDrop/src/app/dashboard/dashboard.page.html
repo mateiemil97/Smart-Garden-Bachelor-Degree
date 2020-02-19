@@ -1,39 +1,60 @@
-<ion-header>
+<ion-header no-border>
   <ion-toolbar color="primary">
-    <ion-title>
-      Dashboard
+    <ion-title class="title">
+      Smart drop
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-card>
-    <ion-card-header>
-      <ion-row class="nameRow">
-        <ion-col>
-          <ion-label class="temperatureLabel">Temperature</ion-label>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col>
-          <ion-label class="temperatureValue">{{currentTemperature?.value}}°C</ion-label>
-        </ion-col>
-      </ion-row>
-    </ion-card-header>
-  </ion-card>
-
-  <div fxLayout="row" fxLayoutAlign="space-evenly center" >
-      <ion-card *ngFor="let moisture of currentMoisture">
+  <ion-item class="boardSelect">
+    <ion-label>Board</ion-label>
+    <ion-select [(ngModel)]="currentIrrigationSystem" #system (ionChange)="selectBoard(system.value.systemId)">
+      <ion-select-option *ngFor="let irSystem of irrigationSystems" [value]="irSystem">{{irSystem.seriesKey}}</ion-select-option>
+    </ion-select>
+  </ion-item>
+  <ion-grid>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-card>
           <ion-card-header>
-            <ion-card-title>{{moisture.zone}}</ion-card-title>
+            <ion-row class="nameRow">
+              <ion-col>
+                <ion-label class="temperatureLabel">Temperature</ion-label>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-label class="temperatureValue">{{currentTemperature?.value}}°C</ion-label>
+              </ion-col>
+            </ion-row>
           </ion-card-header>
-          <ion-card-content class="moistCardTextInfo">
-            Moisture {{moisture.value}}% <br> {{moisture.dateTime | date: 'd/MMM/y, H:mm:ss'}} 
-          </ion-card-content>
         </ion-card>
-  </div>
+      </ion-col>
+    </ion-row>
 
-  <ion-button *ngIf="!currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" expand="block">Start irrigation</ion-button>
-  <ion-button *ngIf="currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger" expand="block">Stop irrigation</ion-button>
-
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <div fxLayout="row" fxLayoutAlign="space-evenly center">
+          <ion-card *ngFor="let moisture of currentMoisture">
+            <ion-card-header>
+              <ion-card-title>{{moisture.zone}}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="moistCardTextInfo">
+              Moisture {{moisture.value}}% <br> {{moisture.dateTime | date: 'd/MMM/y, H:mm:ss'}}
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-button *ngIf="!currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" expand="block">
+          Start
+          irrigation</ion-button>
+        <ion-button *ngIf="currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger"
+          expand="block">Stop irrigation</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
