@@ -53,12 +53,15 @@ namespace Smart_garden.Controllers
         [HttpPost("register", Name = "register")]
         public async Task<IActionResult> Create([FromBody] UserForCreationDto user)
         {
+            
             var userForRegister = new User()
             {
                 LastName = user.LastName,
                 FirstName =  user.FirstName,
                 Email = user.Email,
-                UserName = user.UserName,
+                Country = user.Country,
+                City = user.City,
+                UserName = user.FirstName +  user.LastName
             };
 
             try
