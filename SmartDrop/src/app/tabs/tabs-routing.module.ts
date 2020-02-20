@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { AuthGuard } from '../guards/auth.guard';
 
 const routes: Routes = [
   {
@@ -12,6 +13,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
+            canActivate: [AuthGuard],
             loadChildren: () =>
               import('../dashboard/dashboard.module').then(m => m.DashboardPageModule)
           }
@@ -22,6 +24,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
+            canActivate: [AuthGuard],
             loadChildren: () =>
               import('../schedule/schedule.module').then(m => m.SchedulePageModule)
           }
@@ -29,6 +32,7 @@ const routes: Routes = [
       },
       {
         path: 'tab3',
+        canActivate: [AuthGuard],
         children: [
           {
             path: '',
@@ -39,6 +43,7 @@ const routes: Routes = [
       },
       {
         path: '',
+        canActivate: [AuthGuard],
         redirectTo: '/tabs/dashboard',
         pathMatch: 'full'
       }
@@ -46,6 +51,7 @@ const routes: Routes = [
   },
   {
     path: '',
+    canActivate: [AuthGuard],
     redirectTo: '/tabs/dashboard',
     pathMatch: 'full'
   }

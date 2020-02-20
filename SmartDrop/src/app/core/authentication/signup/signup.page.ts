@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserForCreation } from '../models/userForCreation';
+import { UserForCreation } from '../../../models/userForCreation';
 import { NgForm, FormGroup } from '@angular/forms';
 import { SignupService } from './signup.service';
 import { ToastController } from '@ionic/angular';

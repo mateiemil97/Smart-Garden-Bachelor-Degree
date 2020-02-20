@@ -1,9 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="home"></ion-back-button>
-    </ion-buttons>
-    <ion-title slot="secondary">Sign Up</ion-title>
+    <ion-title>Sign Up</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -40,7 +37,8 @@
         <ion-col size-sm="6" offset-sm="3">
           <ion-item>
             <ion-label position="floating">Email</ion-label>
-            <ion-input required type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" [(ngModel)]="userForRegister.email" name="email" #emailCtrl="ngModel">
+            <ion-input required type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+              [(ngModel)]="userForRegister.email" name="email" #emailCtrl="ngModel">
             </ion-input>
           </ion-item>
           <ion-item lines="none" *ngIf="emailCtrl.touched && emailCtrl.errors?.pattern">
@@ -52,7 +50,7 @@
         <ion-col size-sm="6" offset-sm="3">
           <ion-item>
             <ion-label position="floating">Password</ion-label>
-            <ion-input  required type="password" [(ngModel)]="userForRegister.password" name="password"
+            <ion-input required type="password" [(ngModel)]="userForRegister.password" name="password"
               #passwordCtrl="ngModel">
             </ion-input>
           </ion-item>
@@ -90,8 +88,12 @@
           </ion-item>
         </ion-col>
       </ion-row>
-      <ion-button [disabled]="!form.valid || passwordCtrl.value != confirmPasswordCtrl.value" type="submit" color="primary" expand="block" class="register-button">Register
+      <ion-button [disabled]="!form.valid || passwordCtrl.value != confirmPasswordCtrl.value" type="submit"
+        color="primary" expand="block" class="register-button">Register
       </ion-button>
     </ion-grid>
   </form>
+  <div class="loginLink">
+    <span [routerLink]="['/login']">Already have an account? Log in</span>
+  </div>
 </ion-content>

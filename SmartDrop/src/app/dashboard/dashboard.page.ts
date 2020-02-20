@@ -10,6 +10,8 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { CurrentState } from '../models/currentState';
 import { ViewChild } from '@angular/core';
 import { IrrigationSystem } from '../models/irrigationSystem';
+import { LoginService } from '../core/authentication/login/login.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -32,6 +34,8 @@ export class DashboardPage implements OnInit {
     public scheduleService: ScheduleService,
     private alertController: AlertController,
     public toastController: ToastController,
+    public loginService: LoginService,
+    public route: Router
   ) { }
 
   ngOnInit() {
@@ -135,5 +139,9 @@ export class DashboardPage implements OnInit {
     });
   }
 
+  logout() {
+    this.loginService.logout();
+    this.route.navigate(['/login']);
+  }
 
 }

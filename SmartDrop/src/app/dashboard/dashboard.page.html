@@ -1,5 +1,10 @@
 <ion-header no-border>
   <ion-toolbar color="primary">
+    <!-- <ion-buttons slot="primary">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-buttons> -->
     <ion-title class="title">
       Smart drop
     </ion-title>
@@ -10,7 +15,8 @@
   <ion-item class="boardSelect">
     <ion-label>Board</ion-label>
     <ion-select [(ngModel)]="currentIrrigationSystem" #system (ionChange)="selectBoard(system.value.systemId)">
-      <ion-select-option *ngFor="let irSystem of irrigationSystems" [value]="irSystem">{{irSystem.seriesKey}}</ion-select-option>
+      <ion-select-option *ngFor="let irSystem of irrigationSystems" [value]="irSystem">{{irSystem.seriesKey}}
+      </ion-select-option>
     </ion-select>
   </ion-item>
   <ion-grid>
@@ -54,6 +60,11 @@
           irrigation</ion-button>
         <ion-button *ngIf="currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger"
           expand="block">Stop irrigation</ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-button (click)="logout()" color="danger" expand="block">Logout</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
