@@ -5,7 +5,7 @@ import { AlertController, ToastController, ModalController } from '@ionic/angula
 import { Zone } from '../models/zone.model';
 import { ModalZonePage } from './modal-zone/modal-zone.page';
 import { ZoneForUpdate } from '../models/zoneForUpdate.model';
-
+import { Storage } from '@ionic/storage';
 @Component({
   selector: 'app-schedule',
   templateUrl: 'schedule.page.html',
@@ -15,7 +15,7 @@ export class SchedulePage implements OnInit {
 
   // tslint:disable-next-line: new-parens
   public schedule: Schedule = new Schedule();
-  public systemId = 1012;
+  public systemId;
 
   public dualKnobs = { lower: 15, upper: 15 };
   public temperatureUpdatedState = true;
@@ -26,11 +26,15 @@ export class SchedulePage implements OnInit {
     public scheduleService: ScheduleService,
     private alertController: AlertController,
     public toastController: ToastController,
-    public modalController: ModalController
+    public modalController: ModalController,
+    public storage: Storage,
   ) { }
 
   ngOnInit() {
-
+    this.storage.get('irrigationSystemId').then(id => {
+      this.systemId = id;
+      console.log(this.systemId);
+    });
   }
 
   ionViewWillEnter() {
@@ -67,10 +71,12 @@ export class SchedulePage implements OnInit {
   }
 
   UpdateSchedule() {
-    this.scheduleService.UpdateSchedule(this.systemId, this.schedule).subscribe(
-      x => console.log('Observer got a next value: ' + x),
-      err => this.presentToast('An error occured. Try again later'),
-      () => this.presentToast('Succefully updated'));
+    if (this.systemId !== null && this.schedule !== null) {
+      this.scheduleService.UpdateSchedule(this.systemId, this.schedule).subscribe(
+        x => console.log('Observer got a next value: ' + x),
+        err => this.presentToast('An error occured. Try again later'),
+        () => this.presentToast('Succefully updated'));
+    }
   }
 
   async presentToast(message: string) {

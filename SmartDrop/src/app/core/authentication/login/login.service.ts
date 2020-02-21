@@ -4,7 +4,7 @@ import { UserForCreation } from 'src/app/models/userForCreation';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { UserForLogin } from 'src/app/models/userForLogin';
-import {Storage} from '@ionic/storage';
+import { Storage } from '@ionic/storage';
 @Injectable({
   providedIn: 'root'
 })
@@ -20,12 +20,12 @@ export class LoginService {
   }
 
   logout() {
-    this.storage.clear().then( () => {
+    this.storage.clear().then(() => {
       console.log('cleared');
     });
     this.storage.ready().then(() => {
       console.log(localStorage.getItem('token'));
     });
   }
-
 }
+

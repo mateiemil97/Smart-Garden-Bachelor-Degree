@@ -3,16 +3,13 @@ import { Measurement } from '../models/measurement.model';
 import { DashboardService } from './service/dashboard.service';
 import { ScheduleService } from '../schedule/services/schedule.service';
 import { Zone } from '../models/zone.model';
-import { environment } from '../../environments/environment';
-import { mergeMap, delay } from 'rxjs/operators';
 import { ChangeIrigationState } from '../models/changeIrigationState';
 import { AlertController, ToastController } from '@ionic/angular';
 import { CurrentState } from '../models/currentState';
-import { ViewChild } from '@angular/core';
 import { IrrigationSystem } from '../models/irrigationSystem';
 import { LoginService } from '../core/authentication/login/login.service';
 import { Router } from '@angular/router';
-
+import { Storage } from '@ionic/storage';
 @Component({
   selector: 'app-dashboard',
   templateUrl: 'dashboard.page.html',
@@ -29,28 +26,35 @@ export class DashboardPage implements OnInit {
 
   currentIrrigationSystem: IrrigationSystem;
 
+  userId: number;
+
   constructor(
     public dashboardService: DashboardService,
     public scheduleService: ScheduleService,
     private alertController: AlertController,
     public toastController: ToastController,
     public loginService: LoginService,
-    public route: Router
+    public route: Router,
+    public storage: Storage
   ) { }
 
   ngOnInit() {
-    this.dashboardService.GetSystemsByUser(environment.userId).subscribe(system => {
-      this.irrigationSystems = system;
-      console.log(this.irrigationSystems);
-      this.currentIrrigationSystem = this.irrigationSystems[0];
+    this.storage.get('userId').then((id) => {
+      this.userId = id;
+      this.dashboardService.GetSystemsByUser(this.userId).subscribe(system => {
+        this.irrigationSystems = system;
+        console.log(this.irrigationSystems);
+        this.currentIrrigationSystem = this.irrigationSystems[0];
+        this.storage.set('irrigationSystemId', this.currentIrrigationSystem.systemId);
+      });
     });
   }
 
   ionViewWillEnter() {
-     this.getTemperature(this.currentIrrigationSystem.systemId);
      this.currentMoisture = [];
      this.getZones(this.currentIrrigationSystem.systemId);
      this.getCurrentState(this.currentIrrigationSystem.systemId);
+     this.getTemperature(this.currentIrrigationSystem.systemId);
   }
 
   getTemperature(systemId: number) {
@@ -74,6 +78,7 @@ export class DashboardPage implements OnInit {
   }
 
   selectBoard(systemId: number) {
+    this.storage.set('irrigationSystemId', systemId);
     this.currentMoisture = [];
     this.getTemperature(systemId);
     this.getZones(systemId);
