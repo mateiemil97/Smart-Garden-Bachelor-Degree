@@ -23,9 +23,6 @@ export class LoginService {
     this.storage.clear().then(() => {
       console.log('cleared');
     });
-    this.storage.ready().then(() => {
-      console.log(localStorage.getItem('token'));
-    });
   }
 }
 

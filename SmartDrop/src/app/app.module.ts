@@ -9,12 +9,14 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { IonicStorageModule } from '@ionic/storage';
+import { LoginService } from './core/authentication/login/login.service';
+import { Interceptor } from './guards/interceptor';
 
 
 @NgModule({
@@ -32,6 +34,12 @@ import { IonicStorageModule } from '@ionic/storage';
   providers: [
     StatusBar,
     SplashScreen,
+    LoginService,
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: Interceptor,
+    //   multi: true
+    // },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

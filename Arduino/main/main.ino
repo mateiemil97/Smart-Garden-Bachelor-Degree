@@ -66,7 +66,7 @@ const String  api = "https://smart-garden.conveyor.cloud/api";
 const String fingerPrint = "82:88:7C:B6:41:71:8B:04:67:A5:10:C2:34:40:24:04:78:A6:7E:55"; 
 
 HTTPClient http;
-WiFiClient cli;
+//WiFiClient cli;
 
 bool systemState;
 
@@ -82,9 +82,9 @@ unsigned long currentTime = millis();
 
 Zone zones[2];
 
-//WifiConnect wifi = WifiConnect("INTERNET","c6c202emov");
+ WifiConnect wifi = WifiConnect("DIGI_ce10a8","989d31ef");
 
- WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
+ //WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
 
 
 void setup() {
@@ -104,7 +104,7 @@ void setup() {
   moistureTimeTrigger = millis();
   
   // registered = CheckForRegisteredBoard(series);
-  board = GetBoardByBoardSeries("AAAA");
+  board = GetBoardByBoardSeries("BBBB");
   Serial.print("Id:");
   Serial.println(board.id);
   Serial.print("Registered:");
@@ -113,93 +113,90 @@ void setup() {
 
 
 void loop() {
+  WiFiClient cli;
+
   timeClient.update();
   int currentTimeFromServer = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60));
   
   schedule = GetScheduleBySystem(board.id);
   Serial.println(schedule.temperatureMin);
   int seconds = TransformTimeInSeconds(schedule.startTime);
-//   ReadMoisture();
-//
-//  if (WiFi.status() == WL_CONNECTED && board.registered) { //Check WiFi connection status
-//  currentTime = millis();
-//   systemState = true; //CheckForRemoteStateChanges(board.id);
-//   Serial.print("System state");
-//   Serial.println(systemState);
-//  
-//   temperature = ReadTemperature();
-//
-//   
-//   
-//   
-////   Serial.print("tempTrigger");
-////   Serial.println(temperatureTimeTrigger);
-//
-//   if(systemState == true)
-//   {
-//      digitalWrite(RELAYS_PUMP_PIN,HIGH); 
-//   }
-//   else if(systemState == false)
-//   {
-//      digitalWrite(RELAYS_PUMP_PIN,LOW);
-//   }
-//
-////   if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST))
-////      {
-////        PostSensorValue(board.id,"Temperature","D0",temperature);
-////        temperatureTimeTrigger = millis();
-////      }
-////   else
-////     {
-////      Serial.println("time not elapsed");
-////     }
-////     // Serial.println("aaaaaaaaaaaanfksdgmsdn bdsf blf dbf bklf");
-////     
-//      
-//    //check for moisture
-//   
-//   if(systemState == true)
-//   {
-//    for(int i=0;i<2;i++) {
-//      // Serial.print("previouse-moisture");
-//     //  Serial.println(previousMoisture);
-//     //  Serial.print("moistureTrigger");    
-//           if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON))
-//            {
-//              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
-//              if(i==1){
-//              moistureTimeTrigger = millis();
-//              }
-//            }
-//         else
-//           {
-//            Serial.println("moisture time not elapsed");
-//           }
-//     }
-//    }
-//       
-//       else if(systemState == false)
-//       {
-//        for(int i=0;i<2;i++) {
-//          if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF))
-//            {
-//              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
-//              if(i==1){
-//              moistureTimeTrigger = millis();
-//              }
-//            }
-//         else
-//           {
-//            Serial.println("moisture time not elapsed");
-//           }
-//         }
-//       }
-//   }
+  ReadMoisture();
+
+ if (WiFi.status() == WL_CONNECTED && board.registered) { //Check WiFi connection status
+  currentTime = millis();
+  systemState = CheckForRemoteStateChanges(board.id);
+  Serial.print("System state");
+   Serial.println(systemState);
+  
+   temperature = ReadTemperature();
+   Serial.println(temperature);
+  
+  Serial.print("tempTrigger");
+  Serial.println(temperatureTimeTrigger);
+  if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST))
+     {
+       PostSensorValue(board.id,"Temperature","D0",temperature);
+       temperatureTimeTrigger = millis();
+     }
+   else
+    {
+     Serial.println("time not elapsed");
+     }
+
+  if(systemState == true)
+   {
+      digitalWrite(RELAYS_PUMP_PIN,HIGH); 
+   }
+   else if(systemState == false)
+   {
+      digitalWrite(RELAYS_PUMP_PIN,LOW);
+   }
+   
+   //check for moisture
+  
+  if(systemState == true)
+   {
+   for(int i=0;i<2;i++) {
+       Serial.print("previouse-moisture");
+       //Serial.println(previousMoisture);
+      Serial.print("moistureTrigger");    
+            if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON))
+            {
+              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
+              if(i==1){
+              moistureTimeTrigger = millis();
+              }
+            }
+         else
+           {
+            Serial.println("moisture time not elapsed");
+           }
+     }
+    }
+       
+       else if(systemState == false)
+       {
+        for(int i=0;i<2;i++) {
+          if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF))
+            {
+              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
+             if(i==1){
+              moistureTimeTrigger = millis();
+              }
+            }
+         else
+          {
+           Serial.println("moisture time not elapsed");
+          }
+         }
+      }
+  }
 
 
   
 
-  delay(1000);
+ delay(1000);
   }
 
 
