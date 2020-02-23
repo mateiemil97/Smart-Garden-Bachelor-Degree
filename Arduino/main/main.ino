@@ -25,7 +25,7 @@ const long utcOffsetInSeconds = 7200;
 
 
 #define RELAYS_WATER_SWITCH_P0_PIN 4
-#define RELAYS_WATER_SWITCH_P1_PIN 0
+#define RELAYS_WATER_SWITCH_P1_PIN 13
 
 #define TEMPERATURE_INTERVAL_TIME_POST 60000
 #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 30000
@@ -55,9 +55,14 @@ struct Schedule
   int temperatureMin;
   int temperatureMax;
   bool manual;
-  const char* startTime;
+  char* startTime;
 };
 
+  int temperatureMin;
+  int temperatureMax;
+  bool manual;
+  const char* startTime;
+  
 const String series = "AAAA";
 bool registered; //if user registered system from app
 Board board;
@@ -88,6 +93,7 @@ Zone zones[2];
 
 
 void setup() {
+  
   wifi.Connect();
   Serial.begin(9600);
   //serial with uno
@@ -99,6 +105,8 @@ void setup() {
   pinMode(MOISTURE_SENSOR_PIN,INPUT);
   pinMode(TEMPERATURE_SENSOR_PIN ,INPUT);
   pinMode(RELAYS_PUMP_PIN,OUTPUT);
+  pinMode(RELAYS_WATER_SWITCH_P0_PIN,OUTPUT);
+  pinMode(RELAYS_WATER_SWITCH_P1_PIN,OUTPUT);
 
   temperatureTimeTrigger = 0;
   moistureTimeTrigger = millis();
@@ -109,28 +117,39 @@ void setup() {
   Serial.println(board.id);
   Serial.print("Registered:");
   Serial.println(board.registered);
+
+
+
+  digitalWrite(13,HIGH);
+  digitalWrite(15,HIGH);
 }
 
 
 void loop() {
-  WiFiClient cli;
+ 
+ // timeClient.update();
+ // int currentTimeFromServer = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60));
+    Serial.println(ESP.getFreeHeap());
 
-  timeClient.update();
-  int currentTimeFromServer = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60));
-  
-  schedule = GetScheduleBySystem(board.id);
+//  int seconds = TransformTimeInSeconds(schedule.startTime);
+    ReadMoisture();
+//
+ if (WiFi.status() == WL_CONNECTED) //&& board.registered)  //Check WiFi connection status
+ {
+  GetScheduleBySystem(board.id);
   Serial.println(schedule.temperatureMin);
-  int seconds = TransformTimeInSeconds(schedule.startTime);
-  ReadMoisture();
-
- if (WiFi.status() == WL_CONNECTED && board.registered) { //Check WiFi connection status
   currentTime = millis();
+  
   systemState = CheckForRemoteStateChanges(board.id);
   Serial.print("System state");
-   Serial.println(systemState);
+  Serial.println(systemState);
   
-   temperature = ReadTemperature();
-   Serial.println(temperature);
+  GetZonesBySystemId(board.id);
+  
+  
+  
+  temperature = ReadTemperature();
+  Serial.println(temperature);
   
   Serial.print("tempTrigger");
   Serial.println(temperatureTimeTrigger);
@@ -146,11 +165,17 @@ void loop() {
 
   if(systemState == true)
    {
-      digitalWrite(RELAYS_PUMP_PIN,HIGH); 
+      digitalWrite(RELAYS_PUMP_PIN,HIGH);
+      digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,zones[0].waterSwitch);
+      digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,zones[1].waterSwitch); 
+      Serial.print("Zone 1:");
+      Serial.println(zones[1].waterSwitch);
    }
    else if(systemState == false)
    {
       digitalWrite(RELAYS_PUMP_PIN,LOW);
+      digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
+       digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW); 
    }
    
    //check for moisture
@@ -180,24 +205,20 @@ void loop() {
         for(int i=0;i<2;i++) {
           if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF))
             {
-              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
+             PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
              if(i==1){
               moistureTimeTrigger = millis();
               }
-            }
+           }
          else
           {
-           Serial.println("moisture time not elapsed");
+          Serial.println("moisture time not elapsed");
           }
          }
-      }
+     }
   }
 
-
-  
-
- delay(1000);
-  }
+}
 
 
 //function to post sensors value
@@ -315,9 +336,9 @@ Board GetBoardByBoardSeries(String series)
       JsonObject& root = JSONbuffer.parseObject(payload);
       Serial.println(payload);
       // Parameters
-      board.registered = root["registered"]; 
-      board.id = root["irigationSystemId"];
-      int a = root["irigationSystemId"];
+      board.registered = (bool)root["registered"]; 
+      board.id = (int)root["irigationSystemId"];
+      int a = (int)root["irigationSystemId"];
       Serial.println(board.id);
     }
     else 
@@ -337,7 +358,7 @@ void GetZonesBySystemId(int systemId)
  
       String payload = http.getString();
       Serial.println(httpCode);
-
+      Serial.println(payload);
       const size_t capacity = JSON_ARRAY_SIZE(2) + 2*JSON_OBJECT_SIZE(3) + 120;
       DynamicJsonBuffer jsonBuffer(capacity);
            
@@ -359,33 +380,40 @@ void GetZonesBySystemId(int systemId)
     }
     http.end(); //Free the resources
 }
-Schedule GetScheduleBySystem(int systemId)
+void GetScheduleBySystem(int systemId)
   {
-    Schedule sch;
     http.begin(api+"/systems/"+systemId+"/schedule",fingerPrint); //Specify the URL
-    int httpCode = http.GET();             
-      if (httpCode > 0) { //Check for the returning code
-   
+    int httpCode = http.GET();
+        Serial.print("code:");    
+        Serial.println(httpCode);     
+      if (httpCode == 200) { //Check for the returning code
         String payload = http.getString();
-        Serial.println(httpCode);
+        Serial.println(payload);
   
         const size_t capacity = JSON_OBJECT_SIZE(7) + 238;
         DynamicJsonBuffer jsonBuffer(capacity);
              
         JsonObject& root = jsonBuffer.parseObject(payload);
   
+
+        Serial.println("temperatureMin");
+       Serial.println((int)root["temperatureMin"]);
+        Serial.println("temperatureMax");
+        Serial.println((int)root["temperatureMax"]);
+        Serial.println("Manual");
+        Serial.println((bool)root["manual"]);
         
-        sch.startTime = root["start"]; // "2019-12-02T21:51:00"
-        sch.temperatureMin = root["temperatureMin"]; // 22
-        sch.temperatureMax = root["temperatureMax"]; // 32
-        sch.manual = root["manual"]; // true
-      }
+        startTime = root["start"]; // "2019-12-02T21:51:00"
+        temperatureMin = (int)root["temperatureMin"]; // 22
+        temperatureMax = (int)root["temperatureMax"]; // 32
+        manual = (bool)root["manual"]; // true
+       }
+      
       else 
       {
         Serial.println("Error on HTTP request");
       }
       http.end(); //Free the resources
-      return sch;
   }
   int TransformTimeInSeconds(String date)
   {
