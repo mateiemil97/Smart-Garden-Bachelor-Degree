@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>My account</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-card>
+          <ion-card-header style="padding-bottom: 0px;">
+            <ion-card-title style="padding-left:17px; font-size:22px;">My boards</ion-card-title>
+          </ion-card-header>
+          
+          <ion-card-content>
+            <label style="margin-top:20px !important;" *ngIf="irrigationSystems.length == 0">You don't have boards registered. Add one!</label>
+            <ion-list *ngFor="let sys of irrigationSystems">
+              <ion-item>
+                <ion-label class="ion-text-wrap">
+                  <p class="board-name">{{sys.name}}</p>
+                  <span>Series: {{sys.seriesKey}}</span>
+                </ion-label>
+                <ion-buttons>
+                  <ion-button class="icon" slot="icon-only">
+                    <ion-icon name="trash"></ion-icon>
+                  </ion-button>
+                </ion-buttons>
+              </ion-item>
+            </ion-list>
+            <ion-button style="margin-top:20px" expand="block"  background-color="primary">Add board</ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-button (click)="logout()" color="danger" expand="block">Logout</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

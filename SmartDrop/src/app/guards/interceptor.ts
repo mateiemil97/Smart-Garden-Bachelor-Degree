@@ -29,7 +29,7 @@ export class Interceptor implements HttpInterceptor {
                             err => {
                                 if (err.status === 401) {
                                     this.loginSeervice.logout();
-                                  //  this.route.navigate(['/login']);
+                                    this.route.navigate(['/login']);
                                 }
                             }
                         )

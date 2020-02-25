@@ -31,7 +31,6 @@ export class DashboardPage implements OnInit {
   constructor(
     public dashboardService: DashboardService,
     public scheduleService: ScheduleService,
-    private alertController: AlertController,
     public toastController: ToastController,
     public loginService: LoginService,
     public route: Router,
@@ -53,7 +52,6 @@ export class DashboardPage implements OnInit {
   ionViewWillEnter() {
      this.currentMoisture = [];
      this.getZones(this.currentIrrigationSystem.systemId);
-     this.getCurrentState(this.currentIrrigationSystem.systemId);
      this.getTemperature(this.currentIrrigationSystem.systemId);
   }
 
@@ -64,7 +62,7 @@ export class DashboardPage implements OnInit {
     });
   }
 
-  getZones(systemId: number) {
+  getZones(systemIds: number) {
     this.scheduleService.GetZones(this.currentIrrigationSystem.systemId).subscribe(
       zones => {
         zones.forEach(element => {
@@ -85,68 +83,12 @@ export class DashboardPage implements OnInit {
     this.getCurrentState(systemId);
   }
 
-  updateIrigationState(irrigationState: ChangeIrigationState, systemId: number) {
-    this.dashboardService.ChangeIrigationState(systemId, irrigationState).subscribe(
-      x => console.log('Observer got a next value: ' + x),
-      err => this.presentToast('An error occured. Try again later'),
-      () => {
-        this.presentToast(this.currentState.working ? 'Succefully turned off irrigation' : 'Succefully turned on irrigation');
-        this.getCurrentState(systemId);
-      });
-  }
-
-  async presentIrrigationStateUpdateAlertConfirm() {
-    const alert = await this.alertController.create({
-      header: 'Confirm!',
-      message: this.currentState.working ? 'Turn off irrigation?' : 'Turn on irrigation?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
-        }, {
-          text: 'Okay',
-          handler: () => {
-
-            if (this.currentState.working === true) {
-              this.changeIrigationState.working = false;
-              this.changeIrigationState.manual = false;
-            } else if (this.currentState.working === false) {
-              this.changeIrigationState.working = true;
-              this.changeIrigationState.manual = true;
-            }
-            this.updateIrigationState(this.changeIrigationState, this.currentIrrigationSystem.systemId);
-          }
-        }
-      ]
-    });
-    await alert.present();
-  }
-  async presentToast(message: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2000,
-      buttons: [
-        {
-          text: 'Close',
-          role: 'cancel',
-        }
-      ]
-    }
-    );
-    toast.present();
-  }
-
+  // for dashboard
   getCurrentState(systemId: number) {
     this.dashboardService.GetSystemState(systemId).subscribe(state => {
       this.currentState = state;
       console.log(this.currentState);
     });
-  }
-
-  logout() {
-    this.loginService.logout();
-    this.route.navigate(['/login']);
   }
 
 }
