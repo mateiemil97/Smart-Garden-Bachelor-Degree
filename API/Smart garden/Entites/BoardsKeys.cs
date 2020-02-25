@@ -20,6 +20,7 @@ namespace Smart_garden.Entites
 
         [Required]
         public bool Registered { get; set; }
+       
 
         public IrigationSystem IrigationSystem { get; set; }
 

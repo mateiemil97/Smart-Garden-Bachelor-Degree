@@ -56,6 +56,7 @@ namespace Smart_garden.Controllers
 
             boardFromRepo.Registered = board.Registered;
             
+            
             _unitOfWork.BoardsKeyRepository.Update(boardFromRepo);
 
             if (!_unitOfWork.Save())

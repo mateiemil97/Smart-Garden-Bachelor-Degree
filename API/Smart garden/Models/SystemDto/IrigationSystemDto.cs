@@ -10,5 +10,6 @@ namespace Smart_garden.Models.SystemDto
         public int Id { get; set; }
         public string SeriesKey { get; set; }
         public int UserId { get; set; }
+        public int Name { get; set; }
     }
 }

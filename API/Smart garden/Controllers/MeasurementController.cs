@@ -38,7 +38,7 @@ namespace Smart_garden.Controllers
         }
 
         [HttpGet("temperature")]
-        public IActionResult GetTemperatureValueBySystem(int systemId, int sensorId)
+        public IActionResult GetLatestTemperatureValueBySystem(int systemId, int sensorId)
         {
             var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
             if (!system)
@@ -69,7 +69,7 @@ namespace Smart_garden.Controllers
 
             measurement.SensorId = sensor.Id;
             measurement.DateTime = DateTime.UtcNow.ToLocalTime();
-
+            measurement.Value = (int)measurement.Value;
 
             var measurementMapped = _mapper.Map<Measurement>(measurement);
             _unitOfWork.MeasurementRepository.Create(measurementMapped);

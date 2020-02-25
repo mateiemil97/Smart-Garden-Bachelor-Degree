@@ -25,7 +25,8 @@ namespace Smart_garden.Repository.SystemRepository
                     {
                         UserId = user.Id,
                         SystemId = sys.Id,
-                        SeriesKey = boardKeys.SeriesKey
+                        SeriesKey = boardKeys.SeriesKey,
+                        Name = sys.Name
                     }
                 );
             return system;

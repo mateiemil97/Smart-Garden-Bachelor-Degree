@@ -21,6 +21,8 @@ namespace Smart_garden.Entites
         [ForeignKey("User")]
         public int UserId { get; set; }
 
+        [MaxLength(50)]
+        public string Name { get; set; }
 
         public User User { get; set; }
         public ICollection<Sensor> Sensors { get; set; }

@@ -43,6 +43,9 @@ namespace Smart_garden.Migrations
 
                     b.Property<int>("BoardKeyId");
 
+                    b.Property<string>("Name")
+                        .HasMaxLength(50);
+
                     b.Property<int>("UserId");
 
                     b.HasKey("Id");

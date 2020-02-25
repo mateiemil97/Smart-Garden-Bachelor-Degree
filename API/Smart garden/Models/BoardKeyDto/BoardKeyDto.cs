@@ -10,5 +10,6 @@ namespace Smart_garden.Models.BoardKeyDto
         public int Id { get; set; }
         public string SeriesKey { get; set; }
         public bool Registered { get; set; }
+        
     }
 }
