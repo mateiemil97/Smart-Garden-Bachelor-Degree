@@ -15,18 +15,20 @@ namespace Smart_garden.Entites
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
-        [MaxLength(20)]
-        public string SeriesKey { get; set; }
+        [ForeignKey("BoardKey")]
+        public int BoardKeyId { get; set; }
 
         [ForeignKey("User")]
         public int UserId { get; set; }
 
+        [MaxLength(50)]
+        public string Name { get; set; }
 
         public User User { get; set; }
         public ICollection<Sensor> Sensors { get; set; }
         public ICollection<SystemState> SystemState = new List<SystemState>();
         public ICollection<Schedule> Schedule = new List<Schedule>();
+        public BoardsKeys BoardKey { get; set; }
 
 
 

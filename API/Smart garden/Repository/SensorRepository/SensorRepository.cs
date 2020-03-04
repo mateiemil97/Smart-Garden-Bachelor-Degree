@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Remotion.Linq.Clauses;
 using Smart_garden.Entites;
+using Smart_garden.Migrations;
 using Smart_garden.Models.SensorDto;
 
 namespace Smart_garden.Repository.SensorRepository
@@ -30,7 +31,7 @@ namespace Smart_garden.Repository.SensorRepository
                         IrigationSystemId = systems.Id,
                         SensorId = sensor.Id,
                         Type = sensor.Type,
-                        Value = sensor.Value
+                        Port = sensor.PortId
                     }
                 );
             return sensors;
@@ -41,16 +42,47 @@ namespace Smart_garden.Repository.SensorRepository
             var sensor = (from sys in _context.IrigationSystem
                     join sns in _context.Sensor
                         on sys.Id equals sns.SystemId
-                    where sns.SystemId == sys.Id && sns.Id == sensorId
+                    where sns.SystemId == sys.Id 
                     select new Sensor
                     {
                         Id = sns.Id,
                         SystemId = sys.Id,
                         Type = sns.Type,
-                        Value = sns.Value
+                        PortId = sns.PortId
                     }
                 );
             return sensor;
         }
+
+//        public Sensor GetLatestSensorValueByType(int systemId, string type)
+//        {
+//            var measurement = (from sys in _context.IrigationSystem
+//                join sns in _context.Sensor
+//                    on sys.Id equals sns.SystemId
+//                where sns.Type == type
+//                //orderby sns.DateTime descending
+//                select sns).Take(1).SingleOrDefault();
+//
+//            return measurement;
+//        }
+
+        public Sensor GetSensorById(int id)
+        {
+            var sensor = _context.Sensor.FirstOrDefault(sns => sns.Id == id);
+            return sensor;
+        }
+
+        public Sensor GetSensorBySystemAndPortName(int systemId, string portName)
+        {
+            var sensor = (from sys in _context.IrigationSystem
+                    join sns in _context.Sensor on sys.Id equals sns.SystemId
+                    join port in _context.SensorPort on sns.PortId equals port.Id
+                    where sys.Id == systemId && port.Port == portName
+                    select sns
+                ).FirstOrDefault();
+            return sensor;
+        }
+
+
     }
 }

@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>
+      Remote
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-button *ngIf="!currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" expand="block">
+          Start
+          irrigation</ion-button>
+        <ion-button *ngIf="currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger"
+          expand="block">Stop irrigation</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

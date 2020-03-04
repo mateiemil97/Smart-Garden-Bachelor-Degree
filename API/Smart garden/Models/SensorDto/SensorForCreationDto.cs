@@ -9,6 +9,7 @@ namespace Smart_garden.Models.SensorDto
     {
         public int SystemId { get; set; }
         public string Type { get; set; }
-        public float Value { get; set; }
+        public int PortId { get; set; }
+        
     }
 }

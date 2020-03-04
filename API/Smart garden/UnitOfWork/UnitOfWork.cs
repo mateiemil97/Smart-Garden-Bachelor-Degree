@@ -5,8 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Smart_garden.Entites;
 using Smart_garden.Repository;
+using Smart_garden.Repository.BoardsKeyRepository;
+using Smart_garden.Repository.MeasurementRepository;
+using Smart_garden.Repository.ScheduleRepository;
+using Smart_garden.Repository.SensorPortRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
+using Smart_garden.Repository.SystemStateRepository;
+using Smart_garden.Repository.ZoneRepository;
 
 namespace Smart_garden.UnitOfWork
 {
@@ -18,22 +24,37 @@ namespace Smart_garden.UnitOfWork
         public IRepository<User> UserGenericRepository { get; }
 
         public ISensorRepository SensorRepository { get; }
-
+        public ISystemStateRepository SystemStateRepository { get; }
+        public IBoardsKeysRepository BoardsKeyRepository { get; }
+        public IScheduleRepository ScheduleRepository { get; }
+        public IZoneRepository ZoneRepository { get; }
+        public  ISensorPortRepository SensorPortRepository { get; }
+        public IMeasurementRepository MeasurementRepository { get; }
         public UnitOfWork(
             SmartGardenContext context,
             IRepository<User> userRepository,
             IIrigationSystemRepository irigationSystemRepository,
-            ISensorRepository sensorRepository
-             
-            )
+            ISensorRepository sensorRepository,
+            ISystemStateRepository systemStateRepository,
+            IBoardsKeysRepository boardsKeysRepository,
+            IScheduleRepository scheduleRepository,
+            IZoneRepository zoneRepository,
+            ISensorPortRepository sensorPortRepository,
+            IMeasurementRepository measurementRepository
+        )
         {
             _context = context;
             UserGenericRepository = userRepository;
             IrigationSystemRepository = irigationSystemRepository;
             SensorRepository = sensorRepository;
+            SystemStateRepository = systemStateRepository;
+            BoardsKeyRepository = boardsKeysRepository;
+            ScheduleRepository = scheduleRepository;
+            ZoneRepository = zoneRepository;
+            SensorPortRepository = sensorPortRepository;
+            MeasurementRepository = measurementRepository;
         }
 
-        
         public bool Save()
         {
             return (_context.SaveChanges() >= 1);

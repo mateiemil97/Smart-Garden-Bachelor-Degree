@@ -1,15 +1,26 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Text;
+using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Smart_garden.Entites;
 using Smart_garden.Repository;
+using Smart_garden.Repository.BoardsKeyRepository;
+using Smart_garden.Repository.MeasurementRepository;
+using Smart_garden.Repository.ScheduleRepository;
+using Smart_garden.Repository.SensorPortRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
+using Smart_garden.Repository.SystemStateRepository;
+using Smart_garden.Repository.ZoneRepository;
 using Smart_garden.UnitOfWork;
 
 namespace Smart_garden
@@ -26,6 +37,11 @@ namespace Smart_garden
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            //Inject settings
+
+            // services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddDbContext<SmartGardenContext>(connection =>
                 connection.UseSqlServer(Configuration.GetConnectionString("Connection")));
@@ -36,7 +52,16 @@ namespace Smart_garden
 
             services.AddDefaultIdentity<User>().AddEntityFrameworkStores<SmartGardenContext>();
 
-            IMapper mapper = mappingConfig.CreateMapper();
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
+            });
+            
+        IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
             // Intialize repositories
@@ -47,12 +72,47 @@ namespace Smart_garden
 
             services.AddScoped<IRepository<Sensor>, Repository<Sensor>>();
             services.AddScoped<ISensorRepository, SensorRepository>();
-
+            services.AddScoped<ISystemStateRepository, SystemStateRepository>();
+            services.AddScoped<IBoardsKeysRepository, BoardsKeysRepository>();
+            services.AddScoped<IScheduleRepository, ScheduleRepository>();
+            services.AddScoped<IZoneRepository,ZoneRepository>();
+            services.AddScoped<ISensorPortRepository, SensorPortRepository>();
+            services.AddScoped<IMeasurementRepository, MeasurementRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("cors",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
 
+            //Jwt Authentication
 
+            var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"].ToString());
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x => {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = false;
+                x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,7 +127,7 @@ namespace Smart_garden
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            app.UseCors("cors");
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseMvc();

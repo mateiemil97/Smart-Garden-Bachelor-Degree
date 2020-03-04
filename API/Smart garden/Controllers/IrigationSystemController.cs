@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Smart_garden.Entites;
+using Smart_garden.Models.BoardKeyDto;
 using Smart_garden.Models.SystemDto;
 using Smart_garden.UnitOfWork;
 
@@ -32,6 +35,7 @@ namespace Smart_garden.Controllers
             return Ok(systemMapped);
         }
 
+       
         [HttpGet]
         public IActionResult GetAllSystems()
         {
@@ -42,7 +46,9 @@ namespace Smart_garden.Controllers
             return Ok(systemsMapped);
         }
 
-        [HttpGet("system/users/{userid}")]
+
+
+        [HttpGet("users/{userid}")]
          public IActionResult GetSystemByUser(int userid)
          {
              var user = _unitOfWork.IrigationSystemRepository.ExistUser(userid);
@@ -52,7 +58,7 @@ namespace Smart_garden.Controllers
                 return BadRequest();
             }
 
-            var systemsByUser = _unitOfWork.IrigationSystemRepository.GetSystemByUser(userid);
+            var systemsByUser = _unitOfWork.IrigationSystemRepository.GetSystemsByUser(userid);
 
             if (systemsByUser == null)
             {
@@ -62,7 +68,8 @@ namespace Smart_garden.Controllers
             return Ok(systemsByUser);
         }
 
-         [HttpPost("system/users", Name = "system")]
+
+        [HttpPost("system/users", Name = "system")]
          public IActionResult CreateSystem([FromBody] IrigationSystemForCreationDto system)
          {
              var user = _unitOfWork.IrigationSystemRepository.ExistUser(system.UserId);
@@ -91,5 +98,31 @@ namespace Smart_garden.Controllers
 
                 return CreatedAtRoute("system", irigationSystemForCreation);
          }
+
+//         [HttpDelete("{id}")]
+//         public IActionResult Delete(int id)
+//         {
+//             var irrigationSystem = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(id);
+//
+//             if (!irrigationSystem)
+//             {
+//                 return NotFound("Irrigation system not found");
+//             }
+//
+//             var series = _unitOfWork.BoardsKeyRepository.GetSeriesBySystem(id);
+//
+//             if (series == null)
+//             {
+//                 return NotFound("Series key not found");
+//             }
+//
+//             var seriesKey = new BoardKeyForUpdateDto()
+//             {
+//                 Registered = false
+//             };
+//             _mapper.Map<BoardsKeys>(seriesKey);
+//             _unitOfWork.BoardsKeyRepository.Update(seriesKey);
+
+         // }
     }
 }

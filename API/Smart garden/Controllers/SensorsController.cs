@@ -59,6 +59,21 @@ namespace Smart_garden.Controllers
             return Ok(sensorFromRepo);
         }
 
+//        [HttpGet("{systemId}/measurements/{measurementType}")]
+//        public IActionResult GetSensorValueByType(int systemId, string measurementType)
+//        {
+//            var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
+//            if (!system)
+//            {
+//                return BadRequest("Irigation system not found");
+//            }
+//
+//            var measurement = _unitOfWork.SensorRepository.GetLatestSensorValueByType(systemId, measurementType);
+//            var mappedMeasurement = _mapper.Map<SensorDto>(measurement);
+//
+//            return Ok(mappedMeasurement);
+//        }
+
         [HttpPost("{systemid}/sensors", Name = "sensor")]
 
         public IActionResult CreateSensor([FromBody] SensorForCreationDto sensor, int systemid)
@@ -84,7 +99,7 @@ namespace Smart_garden.Controllers
         }
 
         [HttpDelete("{systemid}/sensors/{sensorid}")]
-        public IActionResult GetSensor(int systemid,int sensorid)
+        public IActionResult DeleteSensor(int systemid,int sensorid)
         {
 
             var systemRepo = _unitOfWork.IrigationSystemRepository.Exist(systemid);
