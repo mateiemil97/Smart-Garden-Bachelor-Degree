@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smart_garden.Entites;
 
 namespace Smart_garden.Migrations
 {
     [DbContext(typeof(SmartGardenContext))]
-    partial class SmartGardenContextModelSnapshot : ModelSnapshot
+    [Migration("20200301223822_UpdateDatabase1")]
+    partial class UpdateDatabase1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -178,11 +180,17 @@ namespace Smart_garden.Migrations
                         .IsRequired()
                         .HasMaxLength(50);
 
+                    b.Property<string>("NormalizedUserName");
+
                     b.Property<string>("PasswordHash");
 
                     b.Property<string>("PhoneNumber");
 
+                    b.Property<bool>("PhoneNumberConfirmed");
+
                     b.Property<string>("SecurityStamp");
+
+                    b.Property<string>("UserName");
 
                     b.HasKey("Id");
 

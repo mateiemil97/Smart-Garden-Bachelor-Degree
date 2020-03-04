@@ -84,5 +84,10 @@ namespace Smart_garden.Repository.SystemRepository
         }).SingleOrDefault();
             return data;
         }
+
+        public void DeleteIrrigationSystem(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

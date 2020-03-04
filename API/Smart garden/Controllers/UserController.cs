@@ -75,7 +75,6 @@ namespace Smart_garden.Controllers
                 Email = user.Email,
                 Country = user.Country,
                 City = user.City,
-                UserName = user.FirstName +  user.LastName
             };
 
             try

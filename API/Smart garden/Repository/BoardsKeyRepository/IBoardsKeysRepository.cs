@@ -9,5 +9,6 @@ namespace Smart_garden.Repository.BoardsKeyRepository
     public interface IBoardsKeysRepository: IRepository<BoardsKeys>
     {
         object GetSystemBySeries(string series);
+        object GetSeriesBySystem(int id);
     }
 }

@@ -30,5 +30,20 @@ namespace Smart_garden.Repository.BoardsKeyRepository
                 }).FirstOrDefault();
             return system;
         }
+
+        public object GetSeriesBySystem(int id)
+        {
+            var system = (from brdKey in _context.BoardKey
+                    join sys in _context.IrigationSystem
+                        on brdKey.Id equals sys.BoardKeyId
+                    select new
+                    {
+                        Id = brdKey.Id,
+                        Registered = brdKey.Registered,
+                        SeriesKey = brdKey.SeriesKey
+                    }
+                ).FirstOrDefault();
+            return system;
+        }
     }
 }
