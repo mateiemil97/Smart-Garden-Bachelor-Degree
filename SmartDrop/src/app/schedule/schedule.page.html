@@ -11,11 +11,14 @@
       <ion-row>
         <ion-col offset-md="3" size-md="6">
           <ion-card>
+            <ion-card-header>
+              <ion-card-title>Time interval for automatic irrigation</ion-card-title>
+            </ion-card-header>
           <ion-row>
             <ion-col style="padding-bottom: 0;">
               <ion-card>
                 <ion-item>
-                  <ion-label>Irigation start time</ion-label>
+                  <ion-label>Begin</ion-label>
                   <ion-datetime (ionChange)="UpdateSchedule()" display-format="HH:mm" picker-format="HH:mm"
                     [(ngModel)]="schedule.start" name="start"></ion-datetime>
                 </ion-item>
@@ -26,7 +29,7 @@
             <ion-col style="padding-top: 0;">
               <ion-card>
                 <ion-item>
-                  <ion-label>Irigation last start time</ion-label>
+                  <ion-label>End</ion-label>
                   <ion-datetime (ionChange)="UpdateSchedule()" display-format="HH:mm" picker-format="HH:mm"
                     [(ngModel)]="schedule.stop" name="stop"></ion-datetime>
                 </ion-item>
@@ -41,7 +44,7 @@
       <ion-col offset-md="3" size-md="6">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Temperature start irrigation: {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C
+            <ion-card-title>Temperature range for start irrigation: {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C
             </ion-card-title>
           </ion-card-header>
           <ion-card-content>
