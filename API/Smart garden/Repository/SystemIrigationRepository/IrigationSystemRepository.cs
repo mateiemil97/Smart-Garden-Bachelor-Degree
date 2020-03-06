@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Smart_garden.Entites;
 using Smart_garden.Models.CompositesObjects;
+using Smart_garden.Models.ZoneDto;
 
 namespace Smart_garden.Repository.SystemRepository
 {
@@ -66,22 +70,26 @@ namespace Smart_garden.Repository.SystemRepository
                 };
             return system;
         }
-
-        public DataForArduino GetDataForArduino(int systemId)
+     
+        public IEnumerable<DataForArduino> GetDataForArduino(int systemId)
         {
             var data = (from sys in _context.IrigationSystem
                 join sch in _context.Schedule
                     on sys.Id equals sch.SystemId
+
+                join remote in _context.SystemState
+                    on sys.Id equals remote.SystemId
                 where sys.Id == systemId
                 select new DataForArduino()
                 {
-                    Manual = sch.Manual,
-                    CurrentTime = DateTime.Now,
+                    Manual = remote.Manual,
+                    Working = remote.Working,
                     Start = sch.Start,
                     Stop = sch.Stop,
                     TemperatureMax = sch.TemperatureMax,
-                    TemperatureMin = sch.TemperatureMin
-        }).SingleOrDefault();
+                    TemperatureMin = sch.TemperatureMin,
+
+                });
             return data;
         }
 
