@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Smart_garden.Models.ZoneDto;
 
 namespace Smart_garden.Models.CompositesObjects
 {
@@ -12,8 +13,8 @@ namespace Smart_garden.Models.CompositesObjects
         public float TemperatureMin { get; set; }
         public float TemperatureMax { get; set; }
         public bool Manual { get; set; }
-        public DateTime CurrentTime { get; set; } 
+        public bool Working { get; set; }
+        private ICollection<ZoneDtoForArduino> Zone { get; set; }
 
-        
     }
 }

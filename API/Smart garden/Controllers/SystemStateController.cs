@@ -55,30 +55,22 @@ namespace Smart_garden.Controllers
         }
 
         [HttpPut("systemState")]
-        public IActionResult UpdateSystemState(int systemId, [FromBody] ScheduleSystemStateForUpdate schStateForUpdate)
+        public IActionResult UpdateSystemState(int systemId, [FromBody] SystemStateForUpdateDto SystemStateForUpdate)
         {
             var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
             if (!system)
             {
                 return NotFound("Irrigation system not found");
             }
-
-            var schedule = _unitOfWork.ScheduleRepository.GetSchedule(systemId);
-            if (schedule == null)
-            {
-                return NotFound("Schedule not found");
-            }
-
-            schedule.Manual = schStateForUpdate.Manual;
-            _unitOfWork.ScheduleRepository.Update(schedule);
-
+            
             var systemState = _unitOfWork.SystemStateRepository.GetCurrentState(systemId);
             if (systemState == null)
             {
                 return NotFound("System state not found");
             }
 
-            systemState.Working = schStateForUpdate.Manual;
+            systemState.Working = SystemStateForUpdate.Working;
+            systemState.Manual = SystemStateForUpdate.Manual;
             _unitOfWork.SystemStateRepository.Update(systemState);
 
             if (!_unitOfWork.Save())

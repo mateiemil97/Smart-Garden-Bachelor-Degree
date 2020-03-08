@@ -19,6 +19,7 @@ namespace Smart_garden.Entites
         public int SystemId { get; set; }
 
         public bool Working { get; set; }
+        public bool Manual { get; set; }
         public DateTime DateTime { get; set; }
 
         public IrigationSystem System { get; set; }

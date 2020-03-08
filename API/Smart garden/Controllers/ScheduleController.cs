@@ -96,7 +96,6 @@ namespace Smart_garden.Controllers
                 schedule.TemperatureMax = scheduleForUpdate.TemperatureMax;
                 schedule.Start = scheduleForUpdate.Start;
                 schedule.Stop = scheduleForUpdate.Stop;
-                schedule.Manual = scheduleForUpdate.Manual;
                 _unitOfWork.ScheduleRepository.Update(schedule);
             }
             else

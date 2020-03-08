@@ -35,9 +35,10 @@ namespace Smart_garden
             //            CreateMap<SensorForCreationDto, Sensor>().ForMember(dest => dest.Value, src => src.MapFrom(value =>
             //                 Math.Round(value.Value, 1)));
             CreateMap<SensorForCreationDto, Sensor>();
-           CreateMap<SystemStateForCreationDto, SystemState>();
+            CreateMap<SystemStateForCreationDto, SystemState>();
             CreateMap<SystemState, SystemStateDto>();
-
+            
+            CreateMap<SystemStateForUpdateDto, SystemState>();
             CreateMap<BoardsKeys, BoardKeyForUpdateDto>();
             CreateMap<BoardsKeys, BoardKeyDto>();
 
@@ -49,7 +50,7 @@ namespace Smart_garden
             CreateMap<ZoneForCreationDto,Zone>();
 
             CreateMap<Zone, ZoneDtoForArduino>();
-            
+            CreateMap<ZoneDto, ZoneDtoForArduino>();
             CreateMap<ZoneSensorComposite, SensorForCreationDto>()
                 .ForMember(dest => dest.SystemId, src => src.MapFrom(id => id.SystemId))
                 .ForMember(dest => dest.Type, src => src.MapFrom(type => type.Type))

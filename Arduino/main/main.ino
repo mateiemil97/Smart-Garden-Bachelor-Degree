@@ -25,7 +25,7 @@ const long utcOffsetInSeconds = 7200;
 
 
 #define RELAYS_WATER_SWITCH_P0_PIN 4
-#define RELAYS_WATER_SWITCH_P1_PIN 13
+#define RELAYS_WATER_SWITCH_P1_PIN 15
 
 #define TEMPERATURE_INTERVAL_TIME_POST 60000
 #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 30000
@@ -54,26 +54,27 @@ struct Schedule
 {
   int temperatureMin;
   int temperatureMax;
-  bool manual;
-  char* startTime;
+  const char* beginTime;
+  const char* endTime;
 };
 
-  int temperatureMin;
-  int temperatureMax;
+struct SystemState
+{
   bool manual;
-  const char* startTime;
-  
-const String series = "AAAA";
-bool registered; //if user registered system from app
-Board board;
+  bool working;
+};
 
 const String  api = "https://smart-garden.conveyor.cloud/api";
 const String fingerPrint = "82:88:7C:B6:41:71:8B:04:67:A5:10:C2:34:40:24:04:78:A6:7E:55"; 
 
+const String series = "BBBB";
+bool registered; //if user registered system from app
+Board board;
+
 HTTPClient http;
 //WiFiClient cli;
 
-bool systemState;
+SystemState systemState;
 
 float temperature;
 unsigned long temperatureTimeTrigger;
@@ -83,15 +84,18 @@ unsigned long moistureTimeTrigger;
 
 Schedule schedule;
 
-unsigned long currentTime = millis();
+//unsigned long currentTime = millis();
 
 Zone zones[2];
+
+SystemState localSystemState;
+SystemState SystemStateFromDb;
 
  WifiConnect wifi = WifiConnect("DIGI_ce10a8","989d31ef");
 
  //WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
 
-
+bool manualIrrigation;
 void setup() {
   
   wifi.Connect();
@@ -111,113 +115,195 @@ void setup() {
   temperatureTimeTrigger = 0;
   moistureTimeTrigger = millis();
   
-  // registered = CheckForRegisteredBoard(series);
-  board = GetBoardByBoardSeries("BBBB");
+  //registered = CheckForRegisteredBoard(series);
+  board = GetBoardByBoardSeries(series);
   Serial.print("Id:");
   Serial.println(board.id);
   Serial.print("Registered:");
   Serial.println(board.registered);
 
-
-
   digitalWrite(13,HIGH);
   digitalWrite(15,HIGH);
+
+  localSystemState.working = false;
+  
 }
 
 
 void loop() {
+  
+ ReadMoisture();
  
- // timeClient.update();
- // int currentTimeFromServer = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60));
-    Serial.println(ESP.getFreeHeap());
 
-//  int seconds = TransformTimeInSeconds(schedule.startTime);
-    ReadMoisture();
-//
  if (WiFi.status() == WL_CONNECTED) //&& board.registered)  //Check WiFi connection status
  {
-  GetScheduleBySystem(board.id);
-  Serial.println(schedule.temperatureMin);
-  currentTime = millis();
+  GetScheduleZonesState(board.id);
+  timeClient.update();
+ 
+  int currentTimeFromServer = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60));
   
-  systemState = CheckForRemoteStateChanges(board.id);
-  Serial.print("System state");
-  Serial.println(systemState);
+  int currentTime = millis();
   
-  GetZonesBySystemId(board.id);
-  
+
+  Serial.print("System state working: ");
+  Serial.println(SystemStateFromDb.working);
+  Serial.print("System state manual: ");
+  Serial.println(SystemStateFromDb.manual);
+  Serial.print("System state local : ");
+  Serial.println(localSystemState.working);
   
   
   temperature = ReadTemperature();
   Serial.println(temperature);
+
+  //automation code
   
-  Serial.print("tempTrigger");
-  Serial.println(temperatureTimeTrigger);
-  if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST))
+  if((currentTimeFromServer >= TransformTimeInSeconds(schedule.beginTime)) && (currentTimeFromServer <= TransformTimeInSeconds(schedule.endTime)))
+  {
+    Serial.println("A intrat in primul if --> verifica timpul : ");
+    if(temperature >= schedule.temperatureMin && temperature <= schedule.temperatureMax)
+    {
+      Serial.println("A intrat in al 2 lea if --> verifica temperatura : ");
+      int countSwitchOn = 0;
+      if(moisture[0].value <= zones[0].startMoisture || moisture[0].value <= zones[0].stopMoisture )
+      {
+        digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,zones[0].waterSwitch);
+        if(zones[0].waterSwitch == true)
+          countSwitchOn++;
+        Serial.print("Count switch on zone 1 : ");
+        Serial.println(countSwitchOn);
+      }
+      if(moisture[1].value <= zones[1].startMoisture || moisture[1].value <= zones[1].stopMoisture )
+      {
+        digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,zones[1].waterSwitch);
+        if(zones[1].waterSwitch == true)
+          countSwitchOn++;
+        Serial.print("Count switch on zone 2 : ");
+        Serial.println(countSwitchOn);
+      }
+      if(countSwitchOn > 0)
+      {
+        digitalWrite(RELAYS_PUMP_PIN,HIGH);
+        localSystemState.working = true;
+        Serial.println("Porneste pompa ");
+        Serial.print("LocalState dupa pornirea pompei");
+        Serial.println(localSystemState.working);
+       //send notification (stateNotification)
+       //send working == on 
+      }
+    }
+    else if(temperature < schedule.temperatureMin || temperature > schedule.temperatureMax && localSystemState.working == true)
+    {
+      Serial.println("Temperatura necorespunzatoare");
+      digitalWrite(RELAYS_PUMP_PIN,LOW);
+      digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
+      digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW); 
+      localSystemState.working = false;
+    }
+  } else if(currentTimeFromServer > TransformTimeInSeconds(schedule.endTime) || currentTimeFromServer < TransformTimeInSeconds(schedule.beginTime) && localSystemState.working == true && SystemStateFromDb.manual == false)
+  {
+    digitalWrite(RELAYS_PUMP_PIN,LOW);
+    digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
+    digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW); 
+    localSystemState.working = false;
+  } 
+
+  //verificare daca s-a atins umiditatea si se inchid switcj urile
+  if(localSystemState.working == true && systemState.manual == false)
+  {
+    Serial.println("Se verifica daca s-a atins umiditatea");
+    int countSwitchOff = 0;
+    if(moisture[0].value > zones[0].stopMoisture || zones[0].waterSwitch == false)
      {
+        digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
+        countSwitchOff++;
+      }
+      if(moisture[1].value > zones[1].startMoisture || zones[1].waterSwitch == false)
+      {
+        digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW);
+        countSwitchOff++;
+      }
+      if(countSwitchOff == 2)
+      {
+        digitalWrite(RELAYS_PUMP_PIN,LOW);
+        localSystemState.working = false;
+        //send notification (stateNotification)
+         //send working == false (stateNotification)
+      }
+  }
+// end automation code
+
+  //send temperature to db
+  
+  if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST))
+  {
        PostSensorValue(board.id,"Temperature","D0",temperature);
        temperatureTimeTrigger = millis();
-     }
-   else
-    {
-     Serial.println("time not elapsed");
-     }
+  }
 
-  if(systemState == true)
+  //check for moisture and send it to db
+  
+  if(SystemStateFromDb.working == true)
    {
-      digitalWrite(RELAYS_PUMP_PIN,HIGH);
+     for(int i=0;i<2;i++) {
+      Serial.print("previouse-moisture");
+         //Serial.println(previousMoisture);
+      Serial.print("moistureTrigger");    
+        if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON))
+        {
+          PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
+          if(i==1){
+            moistureTimeTrigger = millis();
+          }
+        }
+        else
+        {
+          Serial.println("moisture time not elapsed");
+        }
+     }
+   } 
+   else if(SystemStateFromDb.working == false)
+   {
+    for(int i=0;i<2;i++) {
+      if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF))
+      {
+        PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
+        if(i==1){
+        moistureTimeTrigger = millis();
+        }
+      }
+    }
+  }
+
+  
+  if(SystemStateFromDb.working == true && SystemStateFromDb.manual == true)
+   {
       digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,zones[0].waterSwitch);
       digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,zones[1].waterSwitch); 
+      digitalWrite(RELAYS_PUMP_PIN,HIGH);
       Serial.print("Zone 1:");
       Serial.println(zones[1].waterSwitch);
+      manualIrrigation = true;
    }
-   else if(systemState == false)
+   else if(SystemStateFromDb.working == false && manualIrrigation == true)
    {
       digitalWrite(RELAYS_PUMP_PIN,LOW);
       digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
-       digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW); 
+      digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW); 
+      manualIrrigation = false;
    }
-   
-   //check for moisture
-  
-  if(systemState == true)
-   {
-   for(int i=0;i<2;i++) {
-       Serial.print("previouse-moisture");
-       //Serial.println(previousMoisture);
-      Serial.print("moistureTrigger");    
-            if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON))
-            {
-              PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
-              if(i==1){
-              moistureTimeTrigger = millis();
-              }
-            }
-         else
-           {
-            Serial.println("moisture time not elapsed");
-           }
-     }
-    }
-       
-       else if(systemState == false)
-       {
-        for(int i=0;i<2;i++) {
-          if((currentTime - moistureTimeTrigger >= MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF))
-            {
-             PostSensorValue(board.id,"Moisture",moisture[i].port,moisture[i].value);
-             if(i==1){
-              moistureTimeTrigger = millis();
-              }
-           }
-         else
-          {
-          Serial.println("moisture time not elapsed");
-          }
-         }
-     }
-  }
 
+  //GetScheduleBySystem(board.id);
+  //Serial.println(schedule.temperatureMin);
+
+  Serial.print("Time from server:");
+  Serial.println(currentTimeFromServer);
+  Serial.print("Time from app start:");
+  Serial.println(TransformTimeInSeconds(schedule.beginTime));
+  Serial.print("Time from app end:");
+  Serial.println(schedule.endTime); 
+  Serial.println("Inainte de if");
+ }
 }
 
 
@@ -251,15 +337,13 @@ void PostSensorValue(int systemId,String type, String port, float value)
 }
 
 void ReadMoisture() {
-  
-  //timer0_write(ESP.getCycleCount() + 40000000L);
+  Serial.print("Intra in Read moisture pe intrerupere");
   const size_t capacity = JSON_ARRAY_SIZE(3) + 3*JSON_OBJECT_SIZE(2) + 215;
   DynamicJsonBuffer jsonBuffer(capacity);
   
   JsonArray& root = jsonBuffer.parseArray(s);
-  Serial.println("citireeeee");
 
-  Serial.println(moisture[0].port);
+ Serial.print(moisture[0].port);
  Serial.println(moisture[0].value);
    if (root.success()){
     moisture[0].port = "A0";
@@ -272,6 +356,7 @@ void ReadMoisture() {
    Serial.println("---------------------xxxxx--------------------");
 
   }
+  //next=ESP.getCycleCount()+8000000L;
  
 }
 
@@ -285,41 +370,38 @@ float ReadTemperature()
 
   sensors.requestTemperatures(); 
 
-  //print the temperature in Celsius
-  //Serial.print("Temperature: ");
- // Serial.print(sensors.getTempCByIndex(0));
- // Serial.println("C");
   return sensors.getTempCByIndex(0);
 }
 
-bool CheckForRemoteStateChanges(int systemId)
-{
-  bool working = 0;
-  
-  http.begin(api+"/systems/"+systemId+"/currentState",fingerPrint); //Specify the URL
-  int httpCode = http.GET();             
-    if (httpCode > 0) { //Check for the returning code
- 
-        String payload = http.getString();
-        Serial.println(httpCode);
-        
-
-      const int capacity = JSON_OBJECT_SIZE(3) + 103;;
-      StaticJsonBuffer<capacity> JSONbuffer;
-      JsonObject& root = JSONbuffer.parseObject(payload);
-      
-      // Parameters
-      working = root["working"]; 
-      // Serial.println(working);
-    }
-    else 
-    {
-      Serial.println("Error on HTTP request");
-    }
-    http.end(); //Free the resources
-    
-    return working;
-}
+//SystemState CheckForRemoteStateChanges(int systemId)
+//{
+//  SystemState state;
+//  
+//  http.begin(api+"/systems/"+systemId+"/currentState",fingerPrint); //Specify the URL
+//  int httpCode = http.GET();             
+//    if (httpCode > 0) { //Check for the returning code
+// 
+//        String payload = http.getString();
+//        Serial.println(httpCode);
+//        
+//
+//      const int capacity = JSON_OBJECT_SIZE(4) + 132;;
+//      StaticJsonBuffer<capacity> JSONbuffer;
+//      JsonObject& root = JSONbuffer.parseObject(payload);
+//      
+//      // Parameters
+//      state.working = root["working"];
+//      state.manual = root["manual"];
+//      // Serial.println(working);
+//    }
+//    else 
+//    {
+//      Serial.println("Error on HTTP request");
+//    }
+//    http.end(); //Free the resources
+//    
+//    return state;
+//}
 
 Board GetBoardByBoardSeries(String series)
 {
@@ -350,71 +432,110 @@ Board GetBoardByBoardSeries(String series)
     return board;
 }
 
-void GetZonesBySystemId(int systemId)
-{
-  http.begin(api+"/systems/"+systemId+"/zones/arduino",fingerPrint); //Specify the URL
-  int httpCode = http.GET();             
-    if (httpCode > 0) { //Check for the returning code
- 
-      String payload = http.getString();
-      Serial.println(httpCode);
-      Serial.println(payload);
-      const size_t capacity = JSON_ARRAY_SIZE(2) + 2*JSON_OBJECT_SIZE(3) + 120;
-      DynamicJsonBuffer jsonBuffer(capacity);
-           
-      JsonArray& root = jsonBuffer.parseArray(payload);
-      
-      JsonObject& root_0 = root[0];
-      zones[0].startMoisture = root_0["moistureStart"]; 
-      zones[0].stopMoisture = root_0["moistureStop"]; 
-      zones[0].waterSwitch = root_0["waterSwitch"]; 
-      
-      JsonObject& root_1 = root[1];
-      zones[1].startMoisture = root_1["moistureStart"]; 
-      zones[1].stopMoisture = root_1["moistureStop"];
-      zones[1].waterSwitch = root_1["waterSwitch"];
-    }
-    else 
-    {
-      Serial.println("Error on HTTP request");
-    }
-    http.end(); //Free the resources
-}
-void GetScheduleBySystem(int systemId)
+//void GetZonesBySystemId(int systemId)
+//{
+//  http.begin(api+"/systems/"+systemId+"/zones/arduino",fingerPrint); //Specify the URL
+//  int httpCode = http.GET();             
+//    if (httpCode > 0) { //Check for the returning code
+// 
+//      String payload = http.getString();
+//      Serial.println(httpCode);
+//      Serial.println(payload);
+//      const size_t capacity = JSON_ARRAY_SIZE(2) + 2*JSON_OBJECT_SIZE(3) + 120;
+//      DynamicJsonBuffer jsonBuffer(capacity);
+//           
+//      JsonArray& root = jsonBuffer.parseArray(payload);
+//      
+//      JsonObject& root_0 = root[0];
+//      zones[0].startMoisture = root_0["moistureStart"]; 
+//      zones[0].stopMoisture = root_0["moistureStop"]; 
+//      zones[0].waterSwitch = root_0["waterSwitch"]; 
+//      
+//      JsonObject& root_1 = root[1];
+//      zones[1].startMoisture = root_1["moistureStart"]; 
+//      zones[1].stopMoisture = root_1["moistureStop"];
+//      zones[1].waterSwitch = root_1["waterSwitch"];
+//    }
+//    else 
+//    {
+//      Serial.println("Error on HTTP request");
+//    }
+//    http.end(); //Free the resources
+//}
+//void GetScheduleBySystem(int systemId)
+//  {
+//    http.begin(api+"/systems/"+systemId+"/schedule",fingerPrint); //Specify the URL
+//    int httpCode = http.GET();
+//        Serial.print("code:");    
+//        Serial.println(httpCode);     
+//      if (httpCode == 200) { //Check for the returning code
+//        String payload = http.getString();
+//        Serial.println(payload);
+//  
+//        const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_ARRAY_SIZE(2) + JSON_OBJECT_SIZE(2) + 2*JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(6)+548;
+//        DynamicJsonBuffer jsonBuffer(capacity);
+//             
+//        JsonObject& root = jsonBuffer.parseObject(payload);
+//        
+//        schedule.beginTime = root["start"]; // "2019-12-02T21:51:00"
+//        schedule.endTime = root["stop"]; // "2019-12-02T21:51:00"
+//        schedule.temperatureMin = (int)root["temperatureMin"]; // 22
+//        schedule.temperatureMax = (int)root["temperatureMax"]; // 32
+//       }
+//      
+//      else 
+//      {
+//        Serial.println("Error on HTTP request");
+//      }
+//      http.end(); //Free the resources
+//  }
+
+
+  void GetScheduleZonesState(int systemId)
   {
-    http.begin(api+"/systems/"+systemId+"/schedule",fingerPrint); //Specify the URL
+    http.begin(api+"/systems/"+systemId+"/arduino",fingerPrint); //Specify the URL
     int httpCode = http.GET();
         Serial.print("code:");    
         Serial.println(httpCode);     
       if (httpCode == 200) { //Check for the returning code
+       
         String payload = http.getString();
+        Serial.println("payload");
         Serial.println(payload);
-  
-        const size_t capacity = JSON_OBJECT_SIZE(7) + 238;
+        const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_ARRAY_SIZE(2) + JSON_OBJECT_SIZE(2) + 2*JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(6)+548;
         DynamicJsonBuffer jsonBuffer(capacity);
-             
         JsonObject& root = jsonBuffer.parseObject(payload);
-  
 
-        Serial.println("temperatureMin");
-       Serial.println((int)root["temperatureMin"]);
-        Serial.println("temperatureMax");
-        Serial.println((int)root["temperatureMax"]);
-        Serial.println("Manual");
-        Serial.println((bool)root["manual"]);
+        if(root.success()){
+       
+        JsonObject& schState = root["dataForArduino"][0];
+       
+        schedule.beginTime = schState["start"]; // "2019-12-02T21:51:00"
+        schedule.endTime = schState["stop"]; // "2019-12-02T21:51:00"
+        schedule.temperatureMin = (int)schState["temperatureMin"]; // 22
+        schedule.temperatureMax = (int)schState["temperatureMax"]; // 32
+        SystemStateFromDb.working = schState["working"];
+        SystemStateFromDb.manual = schState["manual"];
         
-        startTime = root["start"]; // "2019-12-02T21:51:00"
-        temperatureMin = (int)root["temperatureMin"]; // 22
-        temperatureMax = (int)root["temperatureMax"]; // 32
-        manual = (bool)root["manual"]; // true
+        JsonObject& zonesMapped_0 = root["zonesMapped"][0];
+        zones[0].startMoisture = zonesMapped_0["moistureStart"]; 
+        zones[0].stopMoisture = zonesMapped_0["moistureStop"]; 
+        zones[0].waterSwitch = zonesMapped_0["waterSwitch"]; 
+        
+        JsonObject& zonesMapped_1 = root["zonesMapped"][1];
+        zones[1].startMoisture = zonesMapped_1["moistureStart"]; 
+        zones[1].stopMoisture = zonesMapped_1["moistureStop"];
+        zones[1].waterSwitch = zonesMapped_1["waterSwitch"];
        }
-      
+      }
       else 
       {
         Serial.println("Error on HTTP request");
       }
       http.end(); //Free the resources
   }
+
+  
   int TransformTimeInSeconds(String date)
   {
      //Extract date

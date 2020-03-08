@@ -24,27 +24,26 @@ namespace Smart_garden.Entites
         public DbSet<Measurement> Measurement { get; set; }
         public DbSet<Zone> Zone { get; set; }
 
-//        protected override void OnModelCreating(ModelBuilder modelBuilder)
-//        {
-//            base.OnModelCreating(modelBuilder);
-//            modelBuilder.Entity<User>()
-//                .Ignore(c => c.AccessFailedCount)
-//                .Ignore(c => c.LockoutEnabled)
-//                .Ignore(c => c.TwoFactorEnabled)
-//                .Ignore(c => c.ConcurrencyStamp)
-//                .Ignore(c => c.LockoutEnd)
-//                .Ignore(c => c.UserName)
-//                .Ignore(c => c.NormalizedUserName)
-//                .Ignore(c => c.NormalizedEmail)
-//                .Ignore(c => c.EmailConfirmed)
-//                .Ignore(c => c.TwoFactorEnabled)
-//                .Ignore(c => c.LockoutEnd)
-//                .Ignore(c => c.AccessFailedCount)
-//                .Ignore(c => c.PhoneNumberConfirmed);
-//
-//
-//            modelBuilder.Entity<User>().ToTable("Users");//to change the name of table.
-//
-//        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>()
+                .Ignore(c => c.AccessFailedCount)
+                .Ignore(c => c.LockoutEnabled)
+                .Ignore(c => c.TwoFactorEnabled)
+                .Ignore(c => c.ConcurrencyStamp)
+                .Ignore(c => c.LockoutEnd)
+                .Ignore(c => c.UserName)
+                .Ignore(c => c.NormalizedUserName)
+                .Ignore(c => c.EmailConfirmed)
+                .Ignore(c => c.TwoFactorEnabled)
+                .Ignore(c => c.LockoutEnd)
+                .Ignore(c => c.AccessFailedCount)
+                .Ignore(c => c.PhoneNumberConfirmed);
+
+
+            modelBuilder.Entity<User>().ToTable("Users");//to change the name of table.
+
+        }
     }
 }

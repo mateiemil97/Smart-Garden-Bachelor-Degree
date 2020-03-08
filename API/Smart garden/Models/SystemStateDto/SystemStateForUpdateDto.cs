@@ -5,12 +5,9 @@ using System.Threading.Tasks;
 
 namespace Smart_garden.Models.SystemStateDto
 {
-    public class SystemStateDto
+    public class SystemStateForUpdateDto
     {
-        public int Id { get; set; }
         public bool Working { get; set; }
         public bool Manual { get; set; }
-
-        public DateTime DateTime { get; set; }
     }
 }
