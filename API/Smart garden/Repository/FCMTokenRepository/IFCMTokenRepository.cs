@@ -9,5 +9,6 @@ namespace Smart_garden.Repository.FCMTokenRepository
     public interface IFCMTokenRepository: IRepository<FCMToken>
     {
         IQueryable<FCMToken> GetTokenByIrrigationSystem(int id);
+        void DeleteTokenByIrrigationSystemId(int id);
     }
 }

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import {Storage} from '@ionic/storage';
+import { Storage } from '@ionic/storage';
 import { IrrigationSystem } from '../models/irrigationSystem';
 import { DashboardService } from '../dashboard/service/dashboard.service';
 import { LoginService } from '../core/authentication/login/login.service';
 import { Router } from '@angular/router';
+import { MyAccountService } from './my-account.service';
 @Component({
   selector: 'app-myaccount',
   templateUrl: './myaccount.page.html',
@@ -13,12 +14,13 @@ export class MyaccountPage implements OnInit {
 
 
   irrigationSystems: IrrigationSystem[] = [];
-
+  irrigationSystemsForDelete: IrrigationSystem[] = [];
   constructor(
-    private  storage: Storage,
+    private storage: Storage,
     private dashboardService: DashboardService,
     private loginService: LoginService,
-    private route: Router
+    private route: Router,
+    private myAccoutService: MyAccountService
   ) { }
 
   ngOnInit() {
@@ -32,8 +34,19 @@ export class MyaccountPage implements OnInit {
   }
 
   logout() {
-    this.loginService.logout();
-    this.route.navigate(['/login']);
+    this.storage.get('userId').then((id) => {
+      console.log(id);
+      this.dashboardService.GetSystemsByUser(id).subscribe(system => {
+        this.irrigationSystemsForDelete = system;
+        this.irrigationSystemsForDelete.forEach(element => {
+          console.log('log out' + element.systemId);
+          this.myAccoutService.deleteFCMToken(element.systemId).subscribe();
+        });
+      });
+      this.loginService.logout();
+      this.route.navigate(['/login']);
+    });
+
   }
 
 }

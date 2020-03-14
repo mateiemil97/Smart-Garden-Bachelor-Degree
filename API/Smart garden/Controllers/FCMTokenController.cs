@@ -12,7 +12,7 @@ namespace Smart_garden.Controllers
 {
     //FCM = Firebase Cloud Messages
 
-    [Route("api/systems/{systemId}")]
+    [Route("api/systems")]
     public class FCMTokenController: Controller
     {
         private IUnitOfWork _unitOfWork;
@@ -44,8 +44,8 @@ namespace Smart_garden.Controllers
             return Ok(token);
         }
 
-        [HttpPost(Name="token")]
-        public IActionResult SaveFCMToken(int irrigationSystem, [FromBody] FCMTokenForCreateDto token)
+        [HttpPost("{irrigationSystemId}/fcmtoken", Name="token")]
+        public IActionResult SaveFCMToken(int irrigationSystemId, [FromBody] FCMTokenForCreateDto token)
         {
             var tokenMapped = _mapper.Map<FCMToken>(token);
 
@@ -55,6 +55,25 @@ namespace Smart_garden.Controllers
                 return StatusCode(500);
 
             return Created("token", tokenMapped);
+
+        }
+
+        [HttpDelete("{irrigationSystemId}/fcmtoken")]
+        public IActionResult DeleteFCMToken(int irrigationSystemId)
+        {
+            var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(irrigationSystemId);
+
+            if (!system)
+            {
+                return NotFound("Irrigation system not found");
+            }
+
+            _unitOfWork.FCMTokenRepository.DeleteTokenByIrrigationSystemId(irrigationSystemId);
+
+            if (!_unitOfWork.Save())
+                return StatusCode(500);
+
+            return NoContent();
 
         }
     }

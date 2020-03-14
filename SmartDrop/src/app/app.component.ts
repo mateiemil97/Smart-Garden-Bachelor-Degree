@@ -27,16 +27,16 @@ export class AppComponent {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
 
-      this.fcm.getToken().then(token => {
-        console.log(token);
-      });
+      // this.fcm.getToken().then(token => {
+      //   console.log(token);
+      // });
 
-      this.fcm.onTokenRefresh().subscribe(token => {
-        console.log(token);
-      });
+      // this.fcm.onTokenRefresh().subscribe(token => {
+      //   console.log(token);
+      // });
 
       this.fcm.onNotification().subscribe(data => {
-        console.log(data);
+        // console.log(data);
         if (data.wasTapped) {
           console.log('Received in background');
          // this.router.navigate([data.landing_page, data.price]);

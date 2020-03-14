@@ -58,7 +58,6 @@ namespace Smart_garden.UnitOfWork
             MeasurementRepository = measurementRepository;
             FCMTokenRepository = fcmTokenRepository;
         }
-
         public bool Save()
         {
             return (_context.SaveChanges() >= 1);

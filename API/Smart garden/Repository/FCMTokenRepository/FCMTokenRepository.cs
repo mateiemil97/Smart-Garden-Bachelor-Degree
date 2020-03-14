@@ -29,5 +29,11 @@ namespace Smart_garden.Repository.FCMTokenRepository
                 });
             return token;
         }
+
+
+        public void DeleteTokenByIrrigationSystemId(int id)
+        {
+            this._context.Remove(this._context.FCMToken.FirstOrDefault(token => token.SystemId == id));
+        }
     }
 }
