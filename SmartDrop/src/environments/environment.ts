@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  url: 'https://localhost:44362/api',
+  url: 'https://smart-garden.conveyor.cloud/api',
   systemId: 1012,
   userId: 1002
 };

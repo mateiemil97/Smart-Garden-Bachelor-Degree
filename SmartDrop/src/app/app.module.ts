@@ -17,6 +17,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IonicStorageModule } from '@ionic/storage';
 import { LoginService } from './core/authentication/login/login.service';
 import { Interceptor } from './guards/interceptor';
+import { FCM } from '@ionic-native/fcm/ngx';
 
 
 @NgModule({
@@ -29,12 +30,14 @@ import { Interceptor } from './guards/interceptor';
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    
   ],
   providers: [
     StatusBar,
     SplashScreen,
     LoginService,
+    FCM,
     // {
     //   provide: HTTP_INTERCEPTORS,
     //   useClass: Interceptor,

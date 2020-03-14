@@ -5,6 +5,7 @@ import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import * as jwt_decode from 'jwt-decode';
+import { FCM } from '@ionic-native/fcm/ngx';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +20,8 @@ export class LoginPage implements OnInit {
   constructor(
     private loginService: LoginService,
     private storage: Storage,
-    private router: Router
+    private router: Router,
+    private fcm: FCM
   ) { }
 
   ngOnInit() {
@@ -39,6 +41,9 @@ export class LoginPage implements OnInit {
 
         this.router.navigate(['/tabs/dashboard']);
         console.log('login');
+        this.fcm.getToken().then(token => {
+          console.log('tokenNotification:' + token);
+        });
       },
       err => {
         if (err.status === 400) {

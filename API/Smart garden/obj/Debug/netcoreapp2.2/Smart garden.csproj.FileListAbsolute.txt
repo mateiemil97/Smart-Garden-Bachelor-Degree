@@ -30,3 +30,6 @@ D:\Licenta\API\Smart garden\bin\Debug\netcoreapp2.2\Smart garden.runtimeconfig.d
 D:\Licenta\API\Smart garden\bin\Debug\netcoreapp2.2\Smart garden.dll
 D:\Licenta\API\Smart garden\bin\Debug\netcoreapp2.2\Smart garden.pdb
 D:\Licenta\API\Smart garden\obj\Debug\netcoreapp2.2\Smart garden.RazorTargetAssemblyInfo.cache
+D:\Licenta\API\Smart garden\bin\Debug\netcoreapp2.2\PushNotification.dll
+D:\Licenta\API\Smart garden\bin\Debug\netcoreapp2.2\PushNotification.pdb
+D:\Licenta\API\Smart garden\obj\Debug\netcoreapp2.2\Smart garden.csproj.CopyComplete

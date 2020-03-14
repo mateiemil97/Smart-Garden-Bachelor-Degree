@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Smart_garden.Entites;
 using Smart_garden.Repository;
 using Smart_garden.Repository.BoardsKeyRepository;
+using Smart_garden.Repository.FCMTokenRepository;
 using Smart_garden.Repository.MeasurementRepository;
 using Smart_garden.Repository.ScheduleRepository;
 using Smart_garden.Repository.SensorPortRepository;
@@ -26,6 +27,7 @@ namespace Smart_garden.UnitOfWork
         IZoneRepository ZoneRepository { get; }
         ISensorPortRepository SensorPortRepository { get; }
         IMeasurementRepository MeasurementRepository { get; }
+        IFCMTokenRepository FCMTokenRepository { get; }
         bool Save();
     }
 }

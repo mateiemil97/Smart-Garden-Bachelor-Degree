@@ -560,3 +560,42 @@ Board GetBoardByBoardSeries(String series)
    // Serial.println(totalSeconds);
     return totalSeconds;
   }
+
+
+  void SendNotification(String token, String message)
+{
+  Serial.println("making POST request");
+  String contentType = "application/json";
+
+  const int capacity = JSON_OBJECT_SIZE(2) + 2*JSON_OBJECT_SIZE(5)+628;
+  StaticJsonBuffer<capacity> JSONbuffer;
+  
+  JsonObject& root = jsonBuffer.createObject();
+  JsonObject& notification = root.createNestedObject("notification");
+  
+  notification["title"] = "SmartDropNotification";
+  notification["body"] = message;
+  notification["sound"] = "default";
+  notification["click_action"] = "FCM_PLUGIN_ACTIVITY";
+  notification["icon"] = "fcm_push_icon";
+  
+  JsonObject& data = root.createNestedObject("data");
+  root["to"] = token;
+  root["priority"] = "high";
+  root["restricted_package_name"] = "";
+
+  char JSONmessageBuffer[capacity];
+  JSONencoder.prettyPrintTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
+  
+  http.begin(api/push-notification,fingerPrint);      //Specify request destination
+    http.addHeader("Content-Type", "application/json");  //Specify content-type header
+ 
+    int httpCode = http.POST(JSONmessageBuffer);   //Send the request
+    String payload = http.getString();                                        //Get the response payload
+ 
+    Serial.println(httpCode);   //Print HTTP return code
+    Serial.println(payload);    //Print request response payload
+
+    http.end();  //Close connection
+    
+}
