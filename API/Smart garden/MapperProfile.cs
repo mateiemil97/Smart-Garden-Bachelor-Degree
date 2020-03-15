@@ -8,6 +8,7 @@ using Smart_garden.Entites;
 using Smart_garden.Models;
 using Smart_garden.Models.BoardKeyDto;
 using Smart_garden.Models.CompositesObjects;
+using Smart_garden.Models.FCMTokenDto;
 using Smart_garden.Models.MeasurementDto;
 using Smart_garden.Models.ScheduleDto;
 using Smart_garden.Models.SensorDto;
@@ -67,7 +68,9 @@ namespace Smart_garden
 
             CreateMap<MeasurementForCreationDto, Measurement>();
             CreateMap<Measurement,MeasurementDto>();
-            
+
+            CreateMap<FCMTokenForCreateDto, FCMToken>();
+
         }
     }
 }

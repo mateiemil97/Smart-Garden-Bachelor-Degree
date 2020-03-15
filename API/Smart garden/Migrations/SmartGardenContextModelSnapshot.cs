@@ -35,6 +35,24 @@ namespace Smart_garden.Migrations
                     b.ToTable("BoardKey");
                 });
 
+            modelBuilder.Entity("Smart_garden.Entites.FCMToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("SystemId");
+
+                    b.Property<string>("Token");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SystemId")
+                        .IsUnique();
+
+                    b.ToTable("FCMToken");
+                });
+
             modelBuilder.Entity("Smart_garden.Entites.IrigationSystem", b =>
                 {
                     b.Property<int>("Id")
@@ -216,6 +234,14 @@ namespace Smart_garden.Migrations
                         .IsUnique();
 
                     b.ToTable("Zone");
+                });
+
+            modelBuilder.Entity("Smart_garden.Entites.FCMToken", b =>
+                {
+                    b.HasOne("Smart_garden.Entites.IrigationSystem", "IrigationSystem")
+                        .WithOne("FCMToken")
+                        .HasForeignKey("Smart_garden.Entites.FCMToken", "SystemId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Smart_garden.Entites.IrigationSystem", b =>

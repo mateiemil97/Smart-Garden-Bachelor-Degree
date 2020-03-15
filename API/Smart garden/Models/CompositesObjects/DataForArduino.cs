@@ -14,6 +14,7 @@ namespace Smart_garden.Models.CompositesObjects
         public float TemperatureMax { get; set; }
         public bool Manual { get; set; }
         public bool Working { get; set; }
+        public string FCMToken { get; set; }
         private ICollection<ZoneDtoForArduino> Zone { get; set; }
 
     }

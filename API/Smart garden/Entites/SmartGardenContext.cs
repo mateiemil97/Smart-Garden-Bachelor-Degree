@@ -23,7 +23,7 @@ namespace Smart_garden.Entites
         public DbSet<SensorPort> SensorPort { get; set; }
         public DbSet<Measurement> Measurement { get; set; }
         public DbSet<Zone> Zone { get; set; }
-
+        public DbSet<FCMToken> FCMToken { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

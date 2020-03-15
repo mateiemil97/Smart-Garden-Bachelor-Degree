@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using Smart_garden.Entites;
 using Smart_garden.Repository;
 using Smart_garden.Repository.BoardsKeyRepository;
+using Smart_garden.Repository.FCMTokenRepository;
 using Smart_garden.Repository.MeasurementRepository;
 using Smart_garden.Repository.ScheduleRepository;
 using Smart_garden.Repository.SensorPortRepository;
@@ -43,6 +45,9 @@ namespace Smart_garden
             // services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            var assembly = Assembly.Load("PushNotification");
+            services.AddMvc().AddApplicationPart(assembly).AddControllersAsServices();
+            services.AddHttpClient();
             services.AddDbContext<SmartGardenContext>(connection =>
                 connection.UseSqlServer(Configuration.GetConnectionString("Connection")));
 
@@ -61,7 +66,7 @@ namespace Smart_garden
                 options.Password.RequiredLength = 6;
             });
             
-        IMapper mapper = mappingConfig.CreateMapper();
+            IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
             // Intialize repositories
@@ -78,7 +83,7 @@ namespace Smart_garden
             services.AddScoped<IZoneRepository,ZoneRepository>();
             services.AddScoped<ISensorPortRepository, SensorPortRepository>();
             services.AddScoped<IMeasurementRepository, MeasurementRepository>();
-
+            services.AddScoped<IFCMTokenRepository, FCMTokenRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
 
             services.AddCors(options =>

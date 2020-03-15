@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { UserForLogin } from 'src/app/models/userForLogin';
 import { Storage } from '@ionic/storage';
+import { FCMToken } from 'src/app/models/FCMToken';
 @Injectable({
   providedIn: 'root'
 })
@@ -23,6 +24,10 @@ export class LoginService {
     this.storage.clear().then(() => {
       console.log('cleared');
     });
+  }
+
+  postToken(fcmToken: FCMToken): Observable<any> {
+    return this.http.post(`${environment.url}/systems/${fcmToken.systemId}/fcmtoken`, fcmToken);
   }
 }
 

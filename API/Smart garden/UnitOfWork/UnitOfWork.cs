@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Smart_garden.Entites;
 using Smart_garden.Repository;
 using Smart_garden.Repository.BoardsKeyRepository;
+using Smart_garden.Repository.FCMTokenRepository;
 using Smart_garden.Repository.MeasurementRepository;
 using Smart_garden.Repository.ScheduleRepository;
 using Smart_garden.Repository.SensorPortRepository;
@@ -30,6 +31,7 @@ namespace Smart_garden.UnitOfWork
         public IZoneRepository ZoneRepository { get; }
         public  ISensorPortRepository SensorPortRepository { get; }
         public IMeasurementRepository MeasurementRepository { get; }
+        public IFCMTokenRepository FCMTokenRepository { get; }
         public UnitOfWork(
             SmartGardenContext context,
             IRepository<User> userRepository,
@@ -40,7 +42,8 @@ namespace Smart_garden.UnitOfWork
             IScheduleRepository scheduleRepository,
             IZoneRepository zoneRepository,
             ISensorPortRepository sensorPortRepository,
-            IMeasurementRepository measurementRepository
+            IMeasurementRepository measurementRepository,
+            IFCMTokenRepository fcmTokenRepository
         )
         {
             _context = context;
@@ -53,8 +56,8 @@ namespace Smart_garden.UnitOfWork
             ZoneRepository = zoneRepository;
             SensorPortRepository = sensorPortRepository;
             MeasurementRepository = measurementRepository;
+            FCMTokenRepository = fcmTokenRepository;
         }
-
         public bool Save()
         {
             return (_context.SaveChanges() >= 1);

@@ -4458,6 +4458,21 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XPath.XDocument.dll": {}
         }
+      },
+      "PushNotification/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v2.2",
+        "dependencies": {
+          "Microsoft.AspNetCore.Mvc.ViewFeatures": "2.2.0",
+          "Microsoft.Extensions.Http": "2.2.0",
+          "Newtonsoft.Json": "11.0.2"
+        },
+        "compile": {
+          "bin/placeholder/PushNotification.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/PushNotification.dll": {}
+        }
       }
     }
   },
@@ -12235,6 +12250,11 @@
         "system.xml.xpath.xdocument.4.3.0.nupkg.sha512",
         "system.xml.xpath.xdocument.nuspec"
       ]
+    },
+    "PushNotification/1.0.0": {
+      "type": "project",
+      "path": "../PushNotification/PushNotification.csproj",
+      "msbuildProject": "../PushNotification/PushNotification.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -12245,7 +12265,8 @@
       "Microsoft.AspNetCore.Razor.Design >= 2.2.0",
       "Microsoft.EntityFrameworkCore >= 2.2.4",
       "Microsoft.EntityFrameworkCore.SqlServer >= 2.2.0",
-      "Microsoft.NETCore.App >= 2.2.0"
+      "Microsoft.NETCore.App >= 2.2.0",
+      "PushNotification >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -12277,7 +12298,11 @@
       },
       "frameworks": {
         "netcoreapp2.2": {
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\Licenta\\API\\PushNotification\\PushNotification.csproj": {
+              "projectPath": "D:\\Licenta\\API\\PushNotification\\PushNotification.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

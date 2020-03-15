@@ -29,6 +29,7 @@ namespace Smart_garden.Entites
         public ICollection<SystemState> SystemState = new List<SystemState>();
         public ICollection<Schedule> Schedule = new List<Schedule>();
         public BoardsKeys BoardKey { get; set; }
+        public FCMToken FCMToken { get; set; }
 
 
 
