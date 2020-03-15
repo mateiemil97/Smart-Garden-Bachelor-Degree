@@ -12,6 +12,9 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-item class="boardSelect">
     <ion-label>Board</ion-label>
     <ion-select [(ngModel)]="currentIrrigationSystem" #system (ionChange)="selectBoard(system.value.systemId)">

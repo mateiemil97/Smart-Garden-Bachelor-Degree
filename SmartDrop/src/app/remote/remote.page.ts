@@ -94,5 +94,15 @@ export class RemotePage implements OnInit {
       });
   }
 
+  doRefresh(refresher) {
+    console.log('Begin async operation', refresher);
+
+    setTimeout(() => {
+      console.log('Async operation has ended');
+      this.getCurrentState(this.currentIrrigationSystemId);
+      refresher.target.complete();
+    }, 2000);
+  }
+
 
 }

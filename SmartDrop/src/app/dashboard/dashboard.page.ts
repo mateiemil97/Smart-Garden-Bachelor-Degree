@@ -50,9 +50,9 @@ export class DashboardPage implements OnInit {
   }
 
   ionViewWillEnter() {
-     this.currentMoisture = [];
-     this.getZones(this.currentIrrigationSystem.systemId);
-     this.getTemperature(this.currentIrrigationSystem.systemId);
+    this.currentMoisture = [];
+    this.getZones(this.currentIrrigationSystem.systemId);
+    this.getTemperature(this.currentIrrigationSystem.systemId);
   }
 
   getTemperature(systemId: number) {
@@ -89,6 +89,18 @@ export class DashboardPage implements OnInit {
       this.currentState = state;
       console.log(this.currentState);
     });
+  }
+
+  doRefresh(refresher) {
+    console.log('Begin async operation', refresher);
+
+    setTimeout(() => {
+      console.log('Async operation has ended');
+      this.currentMoisture = [];
+      this.getZones(this.currentIrrigationSystem.systemId);
+      this.getTemperature(this.currentIrrigationSystem.systemId);
+      refresher.target.complete();
+    }, 2000);
   }
 
 }
