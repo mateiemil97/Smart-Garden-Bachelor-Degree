@@ -39,7 +39,7 @@ namespace PushNotification.Controller
                 {
                     notification = new Notification()
                     {
-                        title = notification.Title,
+                        title = "Smart drop",
                         body = notification.Body,
                         sound = "default",
                         clickAction = "FCM_PLUGIN_ACTIVITY",

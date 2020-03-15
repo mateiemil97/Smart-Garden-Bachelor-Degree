@@ -79,16 +79,20 @@ namespace Smart_garden.Repository.SystemRepository
 
                 join remote in _context.SystemState
                     on sys.Id equals remote.SystemId
-                where sys.Id == systemId
+                join tkn in _context.FCMToken
+                    on sys.Id equals tkn.SystemId into tk
+                from tkn in tk.DefaultIfEmpty()
+                    
+                        where sys.Id == systemId
                 select new DataForArduino()
                 {
                     Manual = remote.Manual,
                     Working = remote.Working,
                     Start = sch.Start,
                     Stop = sch.Stop,
+                    FCMToken = (tkn == null ? String.Empty : tkn.Token),
                     TemperatureMax = sch.TemperatureMax,
                     TemperatureMin = sch.TemperatureMin,
-
                 });
             return data;
         }

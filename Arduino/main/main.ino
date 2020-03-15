@@ -21,9 +21,8 @@ const long utcOffsetInSeconds = 7200;
 //PIN 
 #define TEMPERATURE_SENSOR_PIN 2
 #define MOISTURE_SENSOR_PIN A0
+
 #define RELAYS_PUMP_PIN 5
-
-
 #define RELAYS_WATER_SWITCH_P0_PIN 4
 #define RELAYS_WATER_SWITCH_P1_PIN 15
 
@@ -48,6 +47,7 @@ struct Zone
   int startMoisture;
   int stopMoisture;
   bool waterSwitch;
+  const char* name;
 };
 
 struct Schedule
@@ -63,6 +63,8 @@ struct SystemState
   bool manual;
   bool working;
 };
+const char* FCMToken;
+
 
 const String  api = "https://smart-garden.conveyor.cloud/api";
 const String fingerPrint = "82:88:7C:B6:41:71:8B:04:67:A5:10:C2:34:40:24:04:78:A6:7E:55"; 
@@ -91,9 +93,9 @@ Zone zones[2];
 SystemState localSystemState;
 SystemState SystemStateFromDb;
 
- WifiConnect wifi = WifiConnect("DIGI_ce10a8","989d31ef");
+ //WifiConnect wifi = WifiConnect("DIGI_ce10a8","989d31ef");
 
- //WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
+ WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
 
 bool manualIrrigation;
 void setup() {
@@ -122,8 +124,6 @@ void setup() {
   Serial.print("Registered:");
   Serial.println(board.registered);
 
-  digitalWrite(13,HIGH);
-  digitalWrite(15,HIGH);
 
   localSystemState.working = false;
   
@@ -132,7 +132,13 @@ void setup() {
 
 void loop() {
   
- ReadMoisture();
+ //ReadMoisture();
+
+    moisture[0].port = "A0";
+    moisture[0].value = 20;
+    
+    moisture[1].port = "A1";
+    moisture[1].value = 20; 
  
 
  if (WiFi.status() == WL_CONNECTED) //&& board.registered)  //Check WiFi connection status
@@ -158,7 +164,7 @@ void loop() {
 
   //automation code
   
-  if((currentTimeFromServer >= TransformTimeInSeconds(schedule.beginTime)) && (currentTimeFromServer <= TransformTimeInSeconds(schedule.endTime)))
+  if((currentTimeFromServer >= TransformTimeInSeconds(schedule.beginTime)) && (currentTimeFromServer <= TransformTimeInSeconds(schedule.endTime)) && localSystemState.working == false )
   {
     Serial.println("A intrat in primul if --> verifica timpul : ");
     if(temperature >= schedule.temperatureMin && temperature <= schedule.temperatureMax)
@@ -175,7 +181,7 @@ void loop() {
       }
       if(moisture[1].value <= zones[1].startMoisture || moisture[1].value <= zones[1].stopMoisture )
       {
-        digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,zones[1].waterSwitch);
+        digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,true);
         if(zones[1].waterSwitch == true)
           countSwitchOn++;
         Serial.print("Count switch on zone 2 : ");
@@ -188,8 +194,8 @@ void loop() {
         Serial.println("Porneste pompa ");
         Serial.print("LocalState dupa pornirea pompei");
         Serial.println(localSystemState.working);
-       //send notification (stateNotification)
-       //send working == on 
+        SendNotification(FCMToken, "Irigarea automata a inceput");
+        UpdateWorking(false,true,board.id);
       }
     }
     else if(temperature < schedule.temperatureMin || temperature > schedule.temperatureMax && localSystemState.working == true)
@@ -199,6 +205,8 @@ void loop() {
       digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
       digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW); 
       localSystemState.working = false;
+      SendNotification(FCMToken, "Irigarea s-a oprit din cauza temperaturii nonconforme");
+      UpdateWorking(false,false,board.id);
     }
   } else if(currentTimeFromServer > TransformTimeInSeconds(schedule.endTime) || currentTimeFromServer < TransformTimeInSeconds(schedule.beginTime) && localSystemState.working == true && SystemStateFromDb.manual == false)
   {
@@ -206,7 +214,18 @@ void loop() {
     digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
     digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW); 
     localSystemState.working = false;
+    SendNotification(FCMToken, "Irigarea a luat sfarsit.");
+    UpdateWorking(false,false,board.id);
   } 
+  else if(SystemStateFromDb.working == false && SystemStateFromDb.working == false && manualIrrigation == false && localSystemState.working == true)
+ {
+    digitalWrite(RELAYS_PUMP_PIN,LOW);
+    digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
+    digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW); 
+    manualIrrigation = false;
+    localSystemState.working = false;
+    SendNotification(FCMToken, "Irigarea automata a fost oprita manual");
+ }
 
   //verificare daca s-a atins umiditatea si se inchid switcj urile
   if(localSystemState.working == true && systemState.manual == false)
@@ -218,17 +237,17 @@ void loop() {
         digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
         countSwitchOff++;
       }
-      if(moisture[1].value > zones[1].startMoisture || zones[1].waterSwitch == false)
+      if(moisture[1].value > zones[1].stopMoisture || zones[1].waterSwitch == false)
       {
-        digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW);
+        digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,false);
         countSwitchOff++;
       }
       if(countSwitchOff == 2)
       {
         digitalWrite(RELAYS_PUMP_PIN,LOW);
         localSystemState.working = false;
-        //send notification (stateNotification)
-         //send working == false (stateNotification)
+        SendNotification(FCMToken, "Irigarea a luat sfarsit");
+        UpdateWorking(false,false,board.id);
       }
   }
 // end automation code
@@ -276,22 +295,25 @@ void loop() {
   }
 
   
-  if(SystemStateFromDb.working == true && SystemStateFromDb.manual == true)
+  if(SystemStateFromDb.working == true && SystemStateFromDb.manual == true && localSystemState.working == false )
    {
       digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,zones[0].waterSwitch);
       digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,zones[1].waterSwitch); 
       digitalWrite(RELAYS_PUMP_PIN,HIGH);
       Serial.print("Zone 1:");
-      Serial.println(zones[1].waterSwitch);
       manualIrrigation = true;
+      localSystemState.working = true;
+      SendNotification(FCMToken, "Irigarea manuala a inceput");
    }
-   else if(SystemStateFromDb.working == false && manualIrrigation == true)
+   else if(SystemStateFromDb.working == false && manualIrrigation == true && localSystemState.working == true)
    {
       digitalWrite(RELAYS_PUMP_PIN,LOW);
       digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
       digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW); 
       manualIrrigation = false;
+      SendNotification(FCMToken, "Irigarea manuala a luat sfarsit");
    }
+   
 
   //GetScheduleBySystem(board.id);
   //Serial.println(schedule.temperatureMin);
@@ -355,9 +377,7 @@ void ReadMoisture() {
    root.prettyPrintTo(Serial);
    Serial.println("---------------------xxxxx--------------------");
 
-  }
-  //next=ESP.getCycleCount()+8000000L;
- 
+  } 
 }
 
 float ReadTemperature()
@@ -502,7 +522,7 @@ Board GetBoardByBoardSeries(String series)
         String payload = http.getString();
         Serial.println("payload");
         Serial.println(payload);
-        const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_ARRAY_SIZE(2) + JSON_OBJECT_SIZE(2) + 2*JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(6)+548;
+        const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_ARRAY_SIZE(2) + JSON_OBJECT_SIZE(2) + 2*JSON_OBJECT_SIZE(4) + JSON_OBJECT_SIZE(8)+816;
         DynamicJsonBuffer jsonBuffer(capacity);
         JsonObject& root = jsonBuffer.parseObject(payload);
 
@@ -516,16 +536,19 @@ Board GetBoardByBoardSeries(String series)
         schedule.temperatureMax = (int)schState["temperatureMax"]; // 32
         SystemStateFromDb.working = schState["working"];
         SystemStateFromDb.manual = schState["manual"];
+        FCMToken = schState["fcmToken"];
+
         
         JsonObject& zonesMapped_0 = root["zonesMapped"][0];
         zones[0].startMoisture = zonesMapped_0["moistureStart"]; 
         zones[0].stopMoisture = zonesMapped_0["moistureStop"]; 
         zones[0].waterSwitch = zonesMapped_0["waterSwitch"]; 
-        
+        zones[0].name = zonesMapped_0["name"]; 
         JsonObject& zonesMapped_1 = root["zonesMapped"][1];
         zones[1].startMoisture = zonesMapped_1["moistureStart"]; 
         zones[1].stopMoisture = zonesMapped_1["moistureStop"];
         zones[1].waterSwitch = zonesMapped_1["waterSwitch"];
+        zones[1].name = zonesMapped_1["name"]; 
        }
       }
       else 
@@ -563,39 +586,54 @@ Board GetBoardByBoardSeries(String series)
 
 
   void SendNotification(String token, String message)
-{
-  Serial.println("making POST request");
-  String contentType = "application/json";
-
-  const int capacity = JSON_OBJECT_SIZE(2) + 2*JSON_OBJECT_SIZE(5)+628;
-  StaticJsonBuffer<capacity> JSONbuffer;
-  
-  JsonObject& root = jsonBuffer.createObject();
-  JsonObject& notification = root.createNestedObject("notification");
-  
-  notification["title"] = "SmartDropNotification";
-  notification["body"] = message;
-  notification["sound"] = "default";
-  notification["click_action"] = "FCM_PLUGIN_ACTIVITY";
-  notification["icon"] = "fcm_push_icon";
-  
-  JsonObject& data = root.createNestedObject("data");
-  root["to"] = token;
-  root["priority"] = "high";
-  root["restricted_package_name"] = "";
-
-  char JSONmessageBuffer[capacity];
-  JSONencoder.prettyPrintTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
-  
-  http.begin(api/push-notification,fingerPrint);      //Specify request destination
+  {
+    Serial.println("making POST request for sending notification");
+    String contentType = "application/json";
+    
+    const int capacity = JSON_OBJECT_SIZE(2)+212;
+    StaticJsonBuffer<capacity> JSONbuffer;
+    JsonObject& JSONencoder = JSONbuffer.createObject();
+    
+    JSONencoder["body"] = message;
+    JSONencoder["to"] = token;
+    
+    char JSONmessageBuffer[capacity];
+    JSONencoder.prettyPrintTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
+      
+    http.begin(api+"/push-notification",fingerPrint);      //Specify request destination
     http.addHeader("Content-Type", "application/json");  //Specify content-type header
- 
+  
     int httpCode = http.POST(JSONmessageBuffer);   //Send the request
     String payload = http.getString();                                        //Get the response payload
- 
+  
     Serial.println(httpCode);   //Print HTTP return code
     Serial.println(payload);    //Print request response payload
-
+  
     http.end();  //Close connection
+  }
+
+  void UpdateWorking(bool manual, bool working,int systemId)
+  {
+    String contentType = "application/json";
     
-}
+    const int capacity = JSON_OBJECT_SIZE(2)+65;
+    StaticJsonBuffer<capacity> JSONbuffer;
+    JsonObject& JSONencoder = JSONbuffer.createObject();
+    
+    JSONencoder["working"] = working;
+    JSONencoder["manual"] = manual;
+    
+    char JSONmessageBuffer[capacity];
+    JSONencoder.prettyPrintTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
+      
+    http.begin(api+"/systems/"+systemId+"/systemState",fingerPrint);      //Specify request destination
+    http.addHeader("Content-Type", "application/json");  //Specify content-type header
+  
+    int httpCode = http.PUT(JSONmessageBuffer);   //Send the request
+    String payload = http.getString();                                        //Get the response payload
+  
+    Serial.println(httpCode);   //Print HTTP return code
+    Serial.println(payload);    //Print request response payload
+  
+    http.end();  //Close connection
+  }
