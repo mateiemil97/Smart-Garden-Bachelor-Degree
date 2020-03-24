@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Statistics</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <ion-item>
+    <ion-label>Selecteaza un senzor</ion-label>
+    <ion-select [(ngModel)]="currentSensor" #sensor>
+      <ion-select-option *ngFor="let sns of sensors" [value]="sns">{{sns.name? sns.name : sns.type}}</ion-select-option>
+    </ion-select>
+  </ion-item>
+  <ion-segment [disabled]="!currentSensor" [(ngModel)]="dayMonth" (ionChange)="segmentChanged($event)">
+    <ion-segment-button value="day">
+      <ion-label>Zi</ion-label>
+    </ion-segment-button>
+    <ion-segment-button name="month" value="month">
+      <ion-label>Luna</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+  <ion-item [disabled]="!currentSensor" placeholder="Selecteaza un senzor">
+    <ion-label *ngIf="dayMonth === 'month'">Luna</ion-label>
+    <ion-label *ngIf="dayMonth === 'day'">Zi</ion-label>
+    <ion-datetime *ngIf="dayMonth === 'month'" displayFormat="MM-YYYY" placeholder="Selecteaza o luna"></ion-datetime>
+    <ion-datetime *ngIf="dayMonth === 'day'" displayFormat="D-M-YYYY" placeholder="Selecteaza o zi"></ion-datetime>
+  </ion-item>
+ 
+  <canvas style="margin-top:40px" baseChart [datasets]="chartData" [labels]="chartLabels" [options]="chartOptions" [colors]="chartColors"
+    [legend]="showLegend" [chartType]="chartType">
+  </canvas>
+    
+</ion-content>

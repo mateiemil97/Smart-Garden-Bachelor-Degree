@@ -17,6 +17,10 @@ const routes: Routes = [
     path: 'login',
     loadChildren: () => import('./core/authentication/login/login.module').then( m => m.LoginPageModule)
   },
+  {
+    path: 'statistics',
+    loadChildren: () => import('./statistics/statistics.module').then( m => m.StatisticsPageModule)
+  },
   // {
   //   path: 'myaccount',
   //   loadChildren: () => import('./myaccount/myaccount.module').then( m => m.MyaccountPageModule)

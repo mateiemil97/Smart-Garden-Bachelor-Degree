@@ -52,6 +52,52 @@ namespace Smart_garden.Controllers
             return Ok(mappedMeasurement);
         }
 
+        [HttpGet("{sensorId}/statistics/day")]
+        public IActionResult GetMeasurementForStatistics([FromQuery(Name = "date")] DateTime dateTime, int systemId, int sensorId)
+        {
+            var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
+            if (!system)
+            {
+                return NotFound("Irrigation system not found");
+            }
+
+            var sensor = _unitOfWork.SensorRepository.Exist(sensorId);
+            if (sensor == null)
+            {
+                return NotFound("Irrigation system not found");
+            }
+
+            var measurements = _unitOfWork.MeasurementRepository.GetMeasurementForStatisticsByDay(systemId, sensorId,dateTime);
+            if (measurements == null)
+            {
+                return NotFound("No measurements");
+            }
+            return Ok(measurements);
+        }
+
+        [HttpGet("{sensorId}/statistics/month")]
+        public IActionResult GetMeasurementForStatisticsByMonth([FromQuery(Name = "date")] DateTime dateTime, int systemId, int sensorId)
+        {
+            var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
+            if (!system)
+            {
+                return NotFound("Irrigation system not found");
+            }
+
+            var sensor = _unitOfWork.SensorRepository.Exist(sensorId);
+            if (sensor == null)
+            {
+                return NotFound("Irrigation system not found");
+            }
+
+            var measurements = _unitOfWork.MeasurementRepository.GetMeasurementForStatisticsByMonth(systemId, sensorId, dateTime);
+            if (measurements == null)
+            {
+                return NotFound("No measurements");
+            }
+            return Ok(measurements);
+        }
+
         [HttpPost("{port}",Name = "measurement")]
         public IActionResult PostMeasurement(int systemId, [FromBody] MeasurementForCreationDto measurement, string port)
         {

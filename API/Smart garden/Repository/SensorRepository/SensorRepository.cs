@@ -83,6 +83,22 @@ namespace Smart_garden.Repository.SensorRepository
             return sensor;
         }
 
+        public IQueryable<SensorInfoForStatistics> GetInfoForStatistics(int systemId)
+        {
+            var info = (from sns in _context.Sensor
+                    join zone in _context.Zone on sns.Id equals zone.SensorId into snsZone
+                    from zone in snsZone.DefaultIfEmpty()
+                    where sns.SystemId == systemId
+                    select new SensorInfoForStatistics()
+                    {
+                        SensorId = sns.Id,
+                        Type = sns.Type,
+                        Name = zone.Name
+                    }
+                );
+            return info;
+        }
+
 
     }
 }
