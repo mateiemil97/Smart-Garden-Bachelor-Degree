@@ -1,5 +1,5 @@
 export class SensorsForStatistics {
-    systemId: number;
+    sensorId: number;
     type: string;
     name: string;
 }

@@ -6,6 +6,7 @@ import { WeekDay } from '@angular/common';
 import { SensorsForStatistics } from '../models/SensorsForStatistics';
 import { StatisticsService } from './statistics.service';
 import { Storage } from '@ionic/storage';
+import { MeasurementsForGraphic } from '../models/measurementsForGraphic';
 
 @Component({
   selector: 'app-statistics',
@@ -17,20 +18,35 @@ export class StatisticsPage implements OnInit {
   sensors: SensorsForStatistics[] = [];
   currentSensor: SensorsForStatistics;
   dayMonth: string;
+  values: MeasurementsForGraphic[] = [];
+  systemId: number;
+  date: string;
   constructor(
     private http: HttpClient,
     private statisticsService: StatisticsService,
     private storage: Storage
-  ) { }
+  ) {
+  }
 
-  
-  periodType = 'day';
+  ngOnInit() {
+    this.storage.get('irrigationSystemId').then(id => {
+      this.systemId = id;
+      this.statisticsService.GetSensors(id).subscribe(item => {
+        this.sensors = item;
+        console.log(this.sensors);
+      });
+    });
+    this.dayMonth = 'day';
 
-  chartData: ChartDataSets[] = [{ data: [], label: 'Stock price' }];
+  }
+
+  // tslint:disable-next-line: member-ordering
+  chartData: ChartDataSets[] = [{ data: [], label: '' }];
+  // tslint:disable-next-line: member-ordering
   chartLabels: Label[];
-
   // Options
-  chartOptions = {
+  // tslint:disable-next-line: member-ordering
+  chartOptionsMoisture = {
     scales: {
       yAxes: [{
         ticks: {
@@ -40,16 +56,14 @@ export class StatisticsPage implements OnInit {
         }
       }],
       xAxes: [{
-        type: 'time',
-        time: {
-          unit: this.dayMonth === 'month' ? 'month' : 'day'
-        }
+        type: 'time'
       }]
     },
     responsive: true,
+    maintainAspectRatio: false,
     title: {
       display: true,
-      text: 'Historic Stock price'
+      text: 'Istoric umiditate sol'
     },
     pan: {
       // enabled: true,
@@ -60,38 +74,62 @@ export class StatisticsPage implements OnInit {
       mode: 'xy'
     },
   };
+
+  //chart options for temperature
+
+  // tslint:disable-next-line: member-ordering
+   chartOptionsTemperature = {
+    scales: {
+      yAxes: [{
+        ticks: {
+          max: 60,
+          min: -5,
+          stepSize: 5
+        }
+      }],
+      xAxes: [{
+        type: 'time'
+      }]
+    },
+    responsive: true,
+    title: {
+      display: true,
+      text: 'Istoric temperatura in °C'
+    },
+    maintainAspectRatio: false,
+    pan: {
+      // enabled: true,
+      mode: 'xy'
+    },
+    zoom: {
+      enabled: false,
+      mode: 'xy'
+    },
+  };
+
+
+  // tslint:disable-next-line: member-ordering
   chartColors: Color[] = [
     {
-      borderColor: '#000000',
-      backgroundColor: '#ff00ff'
+      borderColor: '#79ae39',
+      // backgroundColor: '#ff00ff'
     }
   ];
+  // tslint:disable-next-line: member-ordering
   chartType = 'line';
-  showLegend = false;
-  // For search
-  stock = '';
-
-  ngOnInit() {
-    this.storage.get('irrigationSystemId').then(id => {
-      this.statisticsService.GetSensors(id).subscribe(item => {
-        this.sensors = item;
-        console.log(this.sensors);
-      });
-    });
-    this.dayMonth = 'day';
-  }
 
 
-  getData() {
-    this.http.get(`https://financialmodelingprep.com/api/v3/historical-price-full/${this.stock}?from=2018-03-12&to=2019-03-12`).subscribe(res => {
-      const history = res['historical'];
 
+  public getData() {
+    const dateSplited = this.date.split('T');
+    this.statisticsService.GetStatisticData(this.systemId, this.currentSensor.sensorId, this.dayMonth, dateSplited[0]).subscribe(res => {
+      this.values = res;
       this.chartLabels = [];
       this.chartData[0].data = [];
 
-      for (const entry of history) {
-        this.chartLabels.push(entry.date);
-        this.chartData[0].data.push(entry.close);
+      for (const entry of this.values) {
+        this.chartLabels.push(entry.dateTime);
+        this.chartData[0].data.push(entry.value);
       }
     });
   }
