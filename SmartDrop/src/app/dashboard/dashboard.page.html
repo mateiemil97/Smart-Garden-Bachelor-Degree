@@ -12,10 +12,13 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-item class="boardSelect">
-    <ion-label>Board</ion-label>
+    <ion-label>Sistem</ion-label>
     <ion-select [(ngModel)]="currentIrrigationSystem" #system (ionChange)="selectBoard(system.value.systemId)">
-      <ion-select-option *ngFor="let irSystem of irrigationSystems" [value]="irSystem">{{irSystem.seriesKey}}
+      <ion-select-option *ngFor="let irSystem of irrigationSystems" [value]="irSystem">{{irSystem.name}}
       </ion-select-option>
     </ion-select>
   </ion-item>
@@ -26,7 +29,7 @@
           <ion-card-header>
             <ion-row class="nameRow">
               <ion-col>
-                <ion-label class="temperatureLabel">Temperature</ion-label>
+                <ion-label class="temperatureLabel">Temperatura</ion-label>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -47,7 +50,7 @@
               <ion-card-title>{{moisture.zone}}</ion-card-title>
             </ion-card-header>
             <ion-card-content class="moistCardTextInfo">
-              Moisture {{moisture.value}}% <br> {{moisture.dateTime | date: 'd/MMM/y, H:mm:ss'}}
+              Umiditata solului {{moisture.value}}% <br> {{moisture.dateTime | date: 'd/MMM/y, H:mm:ss'}}
             </ion-card-content>
           </ion-card>
         </div>

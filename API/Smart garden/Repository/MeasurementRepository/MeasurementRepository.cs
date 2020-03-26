@@ -64,5 +64,36 @@ namespace Smart_garden.Repository.BoardsKeyRepository
             return temperature;
         }
 
+
+        public IQueryable<MeasurementForStatisticsDto> GetMeasurementForStatisticsByDay(int systemId, int sensorId, DateTime dateTime)
+        {
+            var measurements = (from sys in _context.IrigationSystem
+                    join sns in _context.Sensor on sys.Id equals sns.SystemId
+                    join measure in _context.Measurement on sns.Id equals measure.SensorId
+                    where (measure.DateTime.Day == dateTime.Day && measure.DateTime.Month == dateTime.Month && measure.DateTime.Year == dateTime.Year)  && measure.SensorId == sensorId
+                    select new MeasurementForStatisticsDto()
+                    {
+                        Value = measure.Value,
+                        DateTime = measure.DateTime
+                    }
+                );
+            return measurements;
+        }
+
+        public IQueryable<MeasurementForStatisticsDto> GetMeasurementForStatisticsByMonth(int systemId, int sensorId, DateTime dateTime)
+        {
+            var measurements = (from sys in _context.IrigationSystem
+                    join sns in _context.Sensor on sys.Id equals sns.SystemId
+                    join measure in _context.Measurement on sns.Id equals measure.SensorId
+                    where (measure.DateTime.Month == dateTime.Month && measure.DateTime.Year == dateTime.Year) && measure.SensorId == sensorId
+                    select new MeasurementForStatisticsDto()
+                    {
+                        Value = measure.Value,
+                        DateTime = measure.DateTime
+                    }
+                );
+            return measurements;
+        }
+
     }
 }

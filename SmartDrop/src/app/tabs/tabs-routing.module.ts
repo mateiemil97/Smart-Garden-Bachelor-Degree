@@ -42,6 +42,17 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'statistics',
+        canActivate: [AuthGuard],
+        children: [
+          {
+            path: '',
+            loadChildren: () =>
+              import('../statistics/statistics.module').then(m => m.StatisticsPageModule)
+          }
+        ]
+      },
+      {
         path: 'myaccount',
         canActivate: [AuthGuard],
         children: [
@@ -72,4 +83,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class TabsPageRoutingModule {}
+export class TabsPageRoutingModule { }

@@ -45,7 +45,7 @@ export class RemotePage implements OnInit {
   async presentIrrigationStateUpdateAlertConfirm() {
     const alert = await this.alertController.create({
       header: 'Confirm!',
-      message: this.currentState.working ? 'Turn off irrigation?' : 'Turn on irrigation?',
+      message: this.currentState.working ? 'Opreste irigarea?' : 'Pornire irigarea manuala?',
       buttons: [
         {
           text: 'Cancel',
@@ -89,9 +89,19 @@ export class RemotePage implements OnInit {
       x => console.log('Observer got a next value: ' + x),
       err => this.presentToast('An error occured. Try again later'),
       () => {
-        this.presentToast(this.currentState.working ? 'Succefully turned off irrigation' : 'Succefully turned on irrigation');
+        this.presentToast(this.currentState.working ? 'Irigarea a fost oprita cu succes' : 'Irigarea a fost pornita cu succes');
         this.getCurrentState(systemId);
       });
+  }
+
+  doRefresh(refresher) {
+    console.log('Begin async operation', refresher);
+
+    setTimeout(() => {
+      console.log('Async operation has ended');
+      this.getCurrentState(this.currentIrrigationSystemId);
+      refresher.target.complete();
+    }, 2000);
   }
 
 

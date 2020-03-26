@@ -15,6 +15,6 @@ namespace Smart_garden.Repository.SensorRepository
         Sensor GetSensorById(int id);
 
         Sensor GetSensorBySystemAndPortName(int systemId, string portName);
-
+        IQueryable<SensorInfoForStatistics> GetInfoForStatistics(int systemId);
     }
 }

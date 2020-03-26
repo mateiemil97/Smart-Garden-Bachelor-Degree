@@ -11,5 +11,8 @@ namespace Smart_garden.Repository.MeasurementRepository
     {
         MeasurementDto GetLatestMeasurementValueByType(int systemId, int sensorId);
         MeasurementDto GetLatestMeasurementOfTemperature(int systemId);
+        IQueryable<MeasurementForStatisticsDto> GetMeasurementForStatisticsByDay(int systemId, int sensorId, DateTime dateTime); 
+        IQueryable<MeasurementForStatisticsDto> GetMeasurementForStatisticsByMonth(int systemId, int sensorId, DateTime dateTime);
+
     }
 }

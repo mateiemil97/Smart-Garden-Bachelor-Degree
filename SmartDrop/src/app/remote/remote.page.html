@@ -7,14 +7,16 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-grid>
     <ion-row>
       <ion-col offset-md="3" size-md="6">
         <ion-button *ngIf="!currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" expand="block">
-          Start
-          irrigation</ion-button>
+          Porneste irigarea</ion-button>
         <ion-button *ngIf="currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger"
-          expand="block">Stop irrigation</ion-button>
+          expand="block">Opreste irigarea</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>

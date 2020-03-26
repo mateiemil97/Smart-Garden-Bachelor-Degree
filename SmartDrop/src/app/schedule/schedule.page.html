@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>
-      Zones and schedule
+      Zone si program
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -12,13 +12,13 @@
         <ion-col offset-md="3" size-md="6">
           <ion-card>
             <ion-card-header>
-              <ion-card-title>Time interval for automatic irrigation</ion-card-title>
+              <ion-card-title>Intervalul orar al irigarii automate</ion-card-title>
             </ion-card-header>
           <ion-row>
             <ion-col style="padding-bottom: 0;">
               <ion-card>
                 <ion-item>
-                  <ion-label>Begin</ion-label>
+                  <ion-label>Start</ion-label>
                   <ion-datetime (ionChange)="UpdateSchedule()" display-format="HH:mm" picker-format="HH:mm"
                     [(ngModel)]="schedule.start" name="start"></ion-datetime>
                 </ion-item>
@@ -29,7 +29,7 @@
             <ion-col style="padding-top: 0;">
               <ion-card>
                 <ion-item>
-                  <ion-label>End</ion-label>
+                  <ion-label>Stop</ion-label>
                   <ion-datetime (ionChange)="UpdateSchedule()" display-format="HH:mm" picker-format="HH:mm"
                     [(ngModel)]="schedule.stop" name="stop"></ion-datetime>
                 </ion-item>
@@ -44,13 +44,11 @@
       <ion-col offset-md="3" size-md="6">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Temperature range for start irrigation: {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C
+            <ion-card-title>Intervalul temperaturii in care se iriga: {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C
             </ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <ion-label>Irrigation start at {{schedule.start | date:'HH:mm'}} if temperature value is between
-              {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C,
-              otherwise irrigation will be reschedueled after 30 min
+            <ion-label>Irigarea incepe la  {{schedule.start | date:'HH:mm'}} daca valoarea temperaturii este intre
             </ion-label>
             <ion-range (ionFocus)="updateTemperatureConfirmation()" [(ngModel)]="dualKnobs" name="dualKnobs"
               dualKnobs="true" color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
@@ -78,7 +76,7 @@
             <ion-card-title>
               <ion-row>
                 <ion-col size=5>
-                  Zone: {{zone.name}}
+                  Zona: {{zone.name}}
                 </ion-col>
                 <ion-col offset="4">
                   <ion-toggle (ionFocus)="updateMoistureConfirmation(zone)" [(ngModel)]="zone.waterSwitch"
@@ -88,13 +86,13 @@
             </ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <ion-label>Start moisture {{zone.moistureStart}}%</ion-label>
+            <ion-label>Umiditatea minima a solului {{zone.moistureStart}}%</ion-label>
             <ion-range color="tertiary" (ionFocus)="updateMoistureConfirmation(zone)" pin="true" max=100 min=0 step=10
               snaps=true ticks=true [(ngModel)]="zone.moistureStart">
               <ion-icon class="drop" size="small" slot="start" name="water"></ion-icon>
               <ion-icon class="drop" slot="end" name="water"></ion-icon>
             </ion-range>
-            <ion-label>Stop moisture {{zone.moistureStop}}%</ion-label>
+            <ion-label>Umiditatea maxima a solului {{zone.moistureStop}}%</ion-label>
             <ion-range (ionFocus)="updateMoistureConfirmation(zone)" color="tertiary" pin="true" max=100 min=0 step=10
               snaps=true ticks=true [(ngModel)]="zone.moistureStop">
               <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>

@@ -74,8 +74,8 @@ export class SchedulePage implements OnInit {
     if (this.systemId !== null && this.schedule !== null) {
       this.scheduleService.UpdateSchedule(this.systemId, this.schedule).subscribe(
         x => console.log('Observer got a next value: ' + x),
-        err => this.presentToast('An error occured. Try again later'),
-        () => this.presentToast('Succefully updated'));
+        err => this.presentToast('A aparut o eroare. Incercati mai tarziu'),
+        () => this.presentToast('Program updatat cu succes'));
     }
   }
 
@@ -99,7 +99,7 @@ export class SchedulePage implements OnInit {
       x => console.log('Observer got a next value: ' + x),
       err => this.presentToast('An error occured. Try again later'),
       () => {
-        this.presentToast('Succefully updated');
+        this.presentToast('Program updatat cu succes');
       }
     );
   }
@@ -107,7 +107,7 @@ export class SchedulePage implements OnInit {
   async presentMoistureUpdateAlertConfirm(zoneId: number, zone: Zone) {
     const alert = await this.alertController.create({
       header: 'Confirm!',
-      message: 'Change zone details?',
+      message: 'Schimbarea detaliilor zonei?',
       buttons: [
         {
           text: 'Cancel',
@@ -141,7 +141,7 @@ export class SchedulePage implements OnInit {
   async presentTemperatureUpdateAlertConfirm() {
     const alert = await this.alertController.create({
       header: 'Confirm!',
-      message: 'Change temperature range?',
+      message: 'Schimbarea intervalului temperaturii?',
       buttons: [
         {
           text: 'Cancel',
@@ -178,14 +178,14 @@ export class SchedulePage implements OnInit {
   async presentAlertDeleteZone(zone: Zone) {
     const alert = await this.alertController.create({
       header: 'Confirm!',
-      message: 'Delete ' + zone.name + ' zone?',
+      message: 'Stergere zona' + zone.name + '?',
       buttons: [
         {
-          text: 'No',
+          text: 'Nu',
           role: 'cancel',
           cssClass: 'secondary',
         }, {
-          text: 'Yes',
+          text: 'Da',
           handler: () => {
             this.DeleteZone(zone.id);
             const index = this.zones.indexOf(zone, 0);
