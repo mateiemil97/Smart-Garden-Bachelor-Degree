@@ -91,11 +91,47 @@ namespace Smart_garden.Controllers
             }
 
             var measurements = _unitOfWork.MeasurementRepository.GetMeasurementForStatisticsByMonth(systemId, sensorId, dateTime);
+
             if (measurements == null)
             {
                 return NotFound("No measurements");
             }
-            return Ok(measurements);
+
+            int j = 1;
+            var average = new List<MeasurementForStatisticsDto>();
+            DateTime date = new DateTime();
+            while (j <= 31)
+            {
+                float sum = 0;
+                int count = 0;
+                bool isMeasure = false;
+                foreach (var measure in measurements)
+                {
+                    if (measure.DateTime.Day == j)
+                    {
+                        sum += measure.Value;
+                        count++;
+                        date = measure.DateTime;
+                        isMeasure = true;
+                    }
+                }
+
+                if (isMeasure)
+                {
+                    MeasurementForStatisticsDto measureForReturn = new MeasurementForStatisticsDto()
+                    {
+                        DateTime = date,
+                        Value = sum / count
+                    };
+
+                    average.Add(measureForReturn);
+                }
+                j++;
+            }
+
+            
+         
+            return Ok(average);
         }
 
         [HttpPost("{port}",Name = "measurement")]

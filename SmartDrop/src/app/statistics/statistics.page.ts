@@ -78,7 +78,7 @@ export class StatisticsPage implements OnInit {
   //chart options for temperature
 
   // tslint:disable-next-line: member-ordering
-   chartOptionsTemperature = {
+  chartOptionsTemperature = {
     scales: {
       yAxes: [{
         ticks: {
@@ -112,7 +112,7 @@ export class StatisticsPage implements OnInit {
   chartColors: Color[] = [
     {
       borderColor: '#79ae39',
-      // backgroundColor: '#ff00ff'
+      //backgroundColor: '#79ae39'
     }
   ];
   // tslint:disable-next-line: member-ordering
@@ -126,17 +126,32 @@ export class StatisticsPage implements OnInit {
       this.values = res;
       this.chartLabels = [];
       this.chartData[0].data = [];
+      console.log(this.values);
 
       for (const entry of this.values) {
-        this.chartLabels.push(entry.dateTime);
-        this.chartData[0].data.push(entry.value);
+        if (this.dayMonth === 'month') {
+          const val = entry.dateTime.split('T');
+          this.chartLabels.push(val[0]);
+          this.chartData[0].data.push(entry.value);
+        } else {
+          this.chartLabels.push(entry.dateTime);
+          this.chartData[0].data.push(entry.value);
+        }
       }
     });
   }
 
   typeChanged(e) {
-    const on = e.detail.checked;
-    this.chartType = on ? 'line' : 'bar';
+    this.chartData[0].data = [];
+    console.log(this.values);
+    this.getData();
+    if (e === 'month') {
+      this.chartType = 'bar';
+      this.chartColors = [{ backgroundColor: '#79ae39' }];
+    } else {
+      this.chartType = 'line';
+      this.chartColors = [{ backgroundColor: '' }];
+    }
+    console.log(this.chartType);
   }
-
 }

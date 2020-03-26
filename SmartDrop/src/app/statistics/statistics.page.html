@@ -12,7 +12,7 @@
       <ion-select-option *ngFor="let sns of sensors" [value]="sns">{{sns.name? sns.name : sns.type}}</ion-select-option>
     </ion-select>
   </ion-item>
-  <ion-segment [disabled]="!currentSensor" [(ngModel)]="dayMonth">
+  <ion-segment (ionChange)='typeChanged(dayMonth)' [disabled]="!currentSensor" [(ngModel)]="dayMonth">
     <ion-segment-button value="day">
       <ion-label>Zi</ion-label>
     </ion-segment-button>
@@ -23,24 +23,19 @@
   <ion-item [disabled]="!currentSensor" placeholder="Selecteaza un senzor">
     <ion-label *ngIf="dayMonth === 'month'">Luna</ion-label>
     <ion-label *ngIf="dayMonth === 'day'">Zi</ion-label>
-    <ion-datetime (ionBlur)="getData()" [(ngModel)]="date" name="date" *ngIf="dayMonth === 'month'" displayFormat="MM-YYYY" placeholder="Selecteaza o luna" ></ion-datetime>
-    <ion-datetime (ionBlur)="getData()" [(ngModel)]="date" name="date" *ngIf="dayMonth === 'day'" displayFormat="D-M-YYYY" placeholder="Selecteaza o zi"></ion-datetime>
+    <ion-datetime (ionBlur)="getData()" [(ngModel)]="date" name="date" *ngIf="dayMonth === 'month'"
+      displayFormat="MM-YYYY" placeholder="Selecteaza o luna"></ion-datetime>
+    <ion-datetime (ionBlur)="getData()" [(ngModel)]="date" name="date" *ngIf="dayMonth === 'day'"
+      displayFormat="D-M-YYYY" placeholder="Selecteaza o zi"></ion-datetime>
   </ion-item>
- 
-  <canvas  *ngIf="currentSensor?.type==='Moisture'" baseChart 
-  [datasets]="chartData" 
-  [labels]="chartLabels" 
-  [options]="chartOptionsMoisture" 
-  [colors]="chartColors"
-  [chartType]="chartType">
+
+
+  <canvas *ngIf="currentSensor?.type==='Moisture'" baseChart [datasets]="chartData" [labels]="chartLabels"
+    [options]="chartOptionsMoisture" [colors]="chartColors" [chartType]="chartType">
   </canvas>
-  
-  <canvas  baseChart *ngIf="currentSensor?.type==='Temperature'"
-  [datasets]="chartData" 
-  [labels]="chartLabels" 
-  [options]="chartOptionsTemperature" 
-  [colors]="chartColors"
-  [chartType]="chartType">
+
+  <canvas baseChart *ngIf="currentSensor?.type==='Temperature'" [datasets]="chartData" [labels]="chartLabels"
+    [options]="chartOptionsTemperature" [colors]="chartColors" [chartType]="chartType">
   </canvas>
 
 </ion-content>
