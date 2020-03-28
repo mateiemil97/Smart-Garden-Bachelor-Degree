@@ -45,5 +45,13 @@ namespace Smart_garden.Repository.BoardsKeyRepository
                 ).FirstOrDefault();
             return system;
         }
+
+        public IQueryable<BoardsKeys> GetBoardKeyBySeries(string serie)
+        {
+            var boardInfo = from brd in _context.BoardKey
+                where brd.SeriesKey == serie
+                select brd;
+            return boardInfo;
+        }
     }
 }

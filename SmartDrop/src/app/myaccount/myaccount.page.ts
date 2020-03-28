@@ -5,6 +5,8 @@ import { DashboardService } from '../dashboard/service/dashboard.service';
 import { LoginService } from '../core/authentication/login/login.service';
 import { Router } from '@angular/router';
 import { MyAccountService } from './my-account.service';
+import { ModalController } from '@ionic/angular';
+import { AddIrrigationSystemModalComponent } from './add-irrigation-system-modal/add-irrigation-system-modal.component';
 @Component({
   selector: 'app-myaccount',
   templateUrl: './myaccount.page.html',
@@ -20,7 +22,8 @@ export class MyaccountPage implements OnInit {
     private dashboardService: DashboardService,
     private loginService: LoginService,
     private route: Router,
-    private myAccoutService: MyAccountService
+    private myAccoutService: MyAccountService,
+    private addIrrigationModal: ModalController
   ) { }
 
   ngOnInit() {
@@ -31,6 +34,13 @@ export class MyaccountPage implements OnInit {
       });
     });
     console.log(this.irrigationSystems);
+  }
+
+  async openAddIrrigationSystemModal() {
+    const modal = await this.addIrrigationModal.create({
+      component: AddIrrigationSystemModalComponent
+    });
+    return await modal.present();
   }
 
   logout() {

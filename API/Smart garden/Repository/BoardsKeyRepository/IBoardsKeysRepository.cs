@@ -10,5 +10,6 @@ namespace Smart_garden.Repository.BoardsKeyRepository
     {
         object GetSystemBySeries(string series);
         object GetSeriesBySystem(int id);
+        IQueryable<BoardsKeys> GetBoardKeyBySeries(string serie);
     }
 }

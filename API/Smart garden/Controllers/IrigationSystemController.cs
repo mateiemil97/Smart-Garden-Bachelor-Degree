@@ -81,16 +81,22 @@ namespace Smart_garden.Controllers
                  return BadRequest();
              }
 
-             var existSeries = _unitOfWork.IrigationSystemRepository.ExistSeries(system.SeriesKey);
+             var existSeries = this._unitOfWork.BoardsKeyRepository.GetBoardKeyBySeries(system.SeriesKey).FirstOrDefault();
 
-             if (existSeries)
+             if (existSeries == null)
              {
-                 return BadRequest("Already registered an irigation system with this series key");
+                 return NotFound("Series key not found");
+             }
+
+             if (existSeries.Registered == true)
+             {
+                 return BadRequest("Already registered an irigation system with this series");
              }
 
              var irigationSystemForCreation = _mapper.Map<Entites.IrigationSystem>(system);
-
-
+          //   irigationSystemForCreation.BoardKey = existSeries.Id;
+             existSeries.Registered = true;
+             _unitOfWork.BoardsKeyRepository.Update(existSeries);
              _unitOfWork.IrigationSystemRepository.Create(irigationSystemForCreation);
 
                 if (!_unitOfWork.Save())

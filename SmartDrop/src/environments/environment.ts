@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-   //url: 'https://smart-garden.conveyor.cloud/api',
+  // url: 'https://smart-garden.conveyor.cloud/api',
   // url: 'https://prod.liveshare.vsengsaas.visualstudio.com/join?F248BF3C2FD3FA888FB89C415822B5813F08/api',
   url: 'https://localhost:44362/api',
   systemId: 1012,

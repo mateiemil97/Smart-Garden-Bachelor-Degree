@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Adauga sistem de irigatii</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="dismissModal()" defaultHref="tabs/myaccount"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form #f="ngForm" (ngSubmit)="addIrrigationSystem(f)">
+    <ion-grid>
+      <ion-row>
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+          <ion-item>
+            <ion-label position="floating">Seria sistemului de irigatii</ion-label>
+            <ion-input placeholder="Ex: ABCCC" required [(ngModel)]="irrigationSystem.series" name="series"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+          <ion-item>
+            <ion-label position="floating">Dati un nume sistemului</ion-label>
+            <ion-input required [(ngModel)]="irrigationSystem.name" name="name"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-button [disabled]="!f.valid" type="submit" expand="full" color="primary">Adauga</ion-button>
+    </ion-grid>
+  </form>
+</ion-content>

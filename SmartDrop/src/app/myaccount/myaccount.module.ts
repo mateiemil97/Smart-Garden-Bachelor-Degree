@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { MyaccountPageRoutingModule } from './myaccount-routing.module';
 
 import { MyaccountPage } from './myaccount.page';
+import { AddIrrigationSystemModalComponent } from './add-irrigation-system-modal/add-irrigation-system-modal.component';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    MyaccountPageRoutingModule
+    MyaccountPageRoutingModule,
   ],
-  declarations: [MyaccountPage]
+  declarations: [MyaccountPage, AddIrrigationSystemModalComponent],
+  entryComponents: [AddIrrigationSystemModalComponent]
 })
 export class MyaccountPageModule {}
