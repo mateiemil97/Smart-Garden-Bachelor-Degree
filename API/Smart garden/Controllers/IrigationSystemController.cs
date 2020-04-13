@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Smart_garden.Entites;
@@ -135,9 +136,9 @@ namespace Smart_garden.Controllers
 
         [HttpGet("{systemId}/arduino")]
 
-        public IActionResult GetDataForArduino(int systemId)
+        public async Task<IActionResult> GetDataForArduino(int systemId)
         {
-            var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
+            var system =  _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
 
             if (!system)
                 return NotFound("Irrigation system not found");
@@ -146,7 +147,7 @@ namespace Smart_garden.Controllers
             var zones = _unitOfWork.ZoneRepository.GetZonesBySystem(systemId).ToList();
             var zonesMapped = _mapper.Map<IEnumerable<ZoneDtoForArduino>>(zones);
             
-            var dataForArduino = _unitOfWork.IrigationSystemRepository.GetDataForArduino(systemId);
+            var dataForArduino = await _unitOfWork.IrigationSystemRepository.GetDataForArduino(systemId);
 
             var dataToReturn = new
             {

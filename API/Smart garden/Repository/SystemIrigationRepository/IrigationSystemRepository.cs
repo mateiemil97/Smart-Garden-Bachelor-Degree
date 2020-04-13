@@ -71,9 +71,9 @@ namespace Smart_garden.Repository.SystemRepository
             return system;
         }
      
-        public IEnumerable<DataForArduino> GetDataForArduino(int systemId)
+        public async Task<IEnumerable<DataForArduino>> GetDataForArduino(int systemId)
         {
-            var data = (from sys in _context.IrigationSystem
+            var data = await (from sys in _context.IrigationSystem
                 join sch in _context.Schedule
                     on sys.Id equals sch.SystemId
 
@@ -82,18 +82,19 @@ namespace Smart_garden.Repository.SystemRepository
                 join tkn in _context.FCMToken
                     on sys.Id equals tkn.SystemId into tk
                 from tkn in tk.DefaultIfEmpty()
-                    
-                        where sys.Id == systemId
+
+                where sys.Id == systemId
                 select new DataForArduino()
                 {
                     Manual = remote.Manual,
                     Working = remote.Working,
                     Start = sch.Start,
                     Stop = sch.Stop,
+                    AutomationMode = remote.AutomationMode,
                     FCMToken = (tkn == null ? String.Empty : tkn.Token),
                     TemperatureMax = sch.TemperatureMax,
                     TemperatureMin = sch.TemperatureMin,
-                });
+                }).ToListAsync();
             return data;
         }
 

@@ -15,6 +15,7 @@ namespace Smart_garden.Models.CompositesObjects
         public bool Manual { get; set; }
         public bool Working { get; set; }
         public string FCMToken { get; set; }
+        public bool AutomationMode { get; set; }
         private ICollection<ZoneDtoForArduino> Zone { get; set; }
 
     }
