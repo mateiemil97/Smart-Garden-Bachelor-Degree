@@ -26,7 +26,8 @@ namespace Smart_garden.Repository.SystemStateRepository
                     {
                         systemState.Id,
                         systemState.Working,
-                        systemState.DateTime
+                        systemState.DateTime,
+                        systemState.AutomationMode
                     }
                 );
             return states;

@@ -71,6 +71,7 @@ namespace Smart_garden.Controllers
 
             systemState.Working = SystemStateForUpdate.Working;
             systemState.Manual = SystemStateForUpdate.Manual;
+            systemState.AutomationMode = SystemStateForUpdate.AutomationMode;
             _unitOfWork.SystemStateRepository.Update(systemState);
 
             if (!_unitOfWork.Save())

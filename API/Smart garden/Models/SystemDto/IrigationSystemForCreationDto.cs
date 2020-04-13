@@ -9,6 +9,6 @@ namespace Smart_garden.Models.SystemDto
     {
         public string SeriesKey { get; set; }
         public int UserId { get; set; }
-        public int Name { get; set; }
+        public string Name { get; set; }
     }
 }

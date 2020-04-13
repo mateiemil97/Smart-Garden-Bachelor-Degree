@@ -30,7 +30,7 @@
   </ion-item>
 
 
-  <canvas *ngIf="currentSensor?.type==='Moisture'" baseChart [datasets]="chartData" [labels]="chartLabels"
+  <canvas style="overflow-scroll:false" *ngIf="currentSensor?.type==='Moisture'" baseChart [datasets]="chartData" [labels]="chartLabels"
     [options]="chartOptionsMoisture" [colors]="chartColors" [chartType]="chartType">
   </canvas>
 

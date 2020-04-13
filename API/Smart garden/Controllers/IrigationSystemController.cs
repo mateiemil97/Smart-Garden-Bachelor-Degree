@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Smart_garden.Entites;
@@ -81,16 +82,22 @@ namespace Smart_garden.Controllers
                  return BadRequest();
              }
 
-             var existSeries = _unitOfWork.IrigationSystemRepository.ExistSeries(system.SeriesKey);
+             var existSeries = this._unitOfWork.BoardsKeyRepository.GetBoardKeyBySeries(system.SeriesKey).FirstOrDefault();
 
-             if (existSeries)
+             if (existSeries == null)
              {
-                 return BadRequest("Already registered an irigation system with this series key");
+                 return NotFound("Series key not found");
+             }
+
+             if (existSeries.Registered == true)
+             {
+                 return BadRequest("Already registered an irigation system with this series");
              }
 
              var irigationSystemForCreation = _mapper.Map<Entites.IrigationSystem>(system);
-
-
+          //   irigationSystemForCreation.BoardKey = existSeries.Id;
+             existSeries.Registered = true;
+             _unitOfWork.BoardsKeyRepository.Update(existSeries);
              _unitOfWork.IrigationSystemRepository.Create(irigationSystemForCreation);
 
                 if (!_unitOfWork.Save())
@@ -129,9 +136,9 @@ namespace Smart_garden.Controllers
 
         [HttpGet("{systemId}/arduino")]
 
-        public IActionResult GetDataForArduino(int systemId)
+        public async Task<IActionResult> GetDataForArduino(int systemId)
         {
-            var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
+            var system =  _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
 
             if (!system)
                 return NotFound("Irrigation system not found");
@@ -140,7 +147,7 @@ namespace Smart_garden.Controllers
             var zones = _unitOfWork.ZoneRepository.GetZonesBySystem(systemId).ToList();
             var zonesMapped = _mapper.Map<IEnumerable<ZoneDtoForArduino>>(zones);
             
-            var dataForArduino = _unitOfWork.IrigationSystemRepository.GetDataForArduino(systemId);
+            var dataForArduino = await _unitOfWork.IrigationSystemRepository.GetDataForArduino(systemId);
 
             var dataToReturn = new
             {

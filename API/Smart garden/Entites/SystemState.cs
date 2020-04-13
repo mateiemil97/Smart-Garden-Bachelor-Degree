@@ -22,6 +22,8 @@ namespace Smart_garden.Entites
         public bool Manual { get; set; }
         public DateTime DateTime { get; set; }
 
+        public bool AutomationMode { get; set; }
+
         public IrigationSystem System { get; set; }
     }
 }

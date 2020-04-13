@@ -10,7 +10,7 @@ namespace Smart_garden.Models.SystemStateDto
         public int Id { get; set; }
         public bool Working { get; set; }
         public bool Manual { get; set; }
-
+        public bool AutomationMode { get; set; }
         public DateTime DateTime { get; set; }
     }
 }

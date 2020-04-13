@@ -41,6 +41,34 @@
         </ion-card>
       </ion-col>
     </ion-row>
+   
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-item  >
+          <ion-label style="font-size: 20px;"*ngIf="currentState?.automationMode === true">Irigarea automata activata</ion-label>
+          <ion-button *ngIf="currentState?.automationMode === true" color="danger" (click)=presentIrrigationAutomatedStateUpdateAlertConfirm()>Dezactiveaza</ion-button>
+          <ion-label style="font-size: 20px;" *ngIf="currentState?.automationMode === false">Irigarea automata dezactivata</ion-label>
+          <ion-button *ngIf="currentState?.automationMode === false" color="primary" (click)=presentIrrigationAutomatedStateUpdateAlertConfirm()>Activeaza</ion-button>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-item *ngIf="currentState?.working === true">
+          <h3>Se iriga</h3>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-item *ngIf="currentState?.working === true">
+          <ion-label>Se iriga</ion-label>
+          <ion-progress-bar  reversed="true" type="indeterminate"></ion-progress-bar>
+        </ion-item>
+      </ion-col>
+    </ion-row>
 
     <ion-row>
       <ion-col offset-md="3" size-md="6">
@@ -54,6 +82,15 @@
             </ion-card-content>
           </ion-card>
         </div>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-button *ngIf="!currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" expand="block">
+          Porneste irigarea manual</ion-button>
+        <ion-button *ngIf="currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger"
+          expand="block">Opreste irigarea manual</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>

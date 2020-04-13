@@ -14,7 +14,7 @@ namespace Smart_garden.Repository.SystemRepository
         bool ExistSeries(string series); 
         bool ExistIrigationSystem(int id);
         IQueryable GetSystemBySeries(string series);
-        IEnumerable<DataForArduino> GetDataForArduino(int systemId);
+        Task<IEnumerable<DataForArduino>> GetDataForArduino(int systemId);
         void DeleteIrrigationSystem(int id);
     }
 }

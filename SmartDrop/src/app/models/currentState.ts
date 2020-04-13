@@ -3,4 +3,6 @@ export class CurrentState {
     working: boolean;
     dateTime: Date;
     manual: boolean;
+    automationMode: boolean;
+
 }

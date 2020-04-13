@@ -10,8 +10,8 @@ SoftwareSerial s(5,6);
   int moisturePertange_A0;
   int moisturePertange_A1;
 
-  int map_low =686;
-  int map_high =470;
+  int map_low =770;
+  int map_high =400;
 
 void setup() {
   s.begin(9600);
@@ -22,7 +22,7 @@ void setup() {
 
 void loop() {
   ReadMoisture();
-  //SendMoistureSerial();
+  SendMoistureSerial();
  }
 
 void ReadMoisture()
@@ -33,11 +33,10 @@ void ReadMoisture()
   moisturePertange_A0 = map(moistureA0,map_low,map_high,0,100);
   moisturePertange_A1 = map(moistureA1,map_low,map_high,0,100);
 
-  Serial.print("A0:");
-  Serial.println(moisturePertange_A0);
-  Serial.print("A1:");
-  Serial.println(moisturePertange_A1);
-  delay(2000);
+//  Serial.print("A0:");
+//  Serial.println(moisturePertange_A0);
+//  Serial.print("A1:");
+//  Serial.println(moisturePertange_A1);
 }
 
 void SendMoistureSerial()
@@ -54,5 +53,6 @@ void SendMoistureSerial()
   root_1["v"] = moisturePertange_A1;
     
   root.printTo(Serial);
+  Serial.println();
   root.printTo(s);  
 }
