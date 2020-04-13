@@ -31,17 +31,6 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'remote',
-        canActivate: [AuthGuard],
-        children: [
-          {
-            path: '',
-            loadChildren: () =>
-              import('../remote/remote.module').then(m => m.RemotePageModule)
-          }
-        ]
-      },
-      {
         path: 'statistics',
         canActivate: [AuthGuard],
         children: [
