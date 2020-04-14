@@ -163,8 +163,13 @@
   
   
   void loop() {
-    
-   ReadMoisture();  
+
+    moisture[0].port = "A0";
+    moisture[0].value = 50;
+
+    moisture[1].port = "A1";
+    moisture[1].value = 40;  
+  // ReadMoisture();  
   
    if (WiFi.status() == WL_CONNECTED) //&& board.registered)  //Check WiFi connection status
    {
@@ -255,7 +260,7 @@
       digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,HIGH); 
       manualIrrigation = false;
       localSystemState.working = false;
-      SendNotification(FCMToken, "Irigarea automata a fost oprita manual");
+      SendNotification(FCMToken, "Irigarea a fost oprita");
    }
   
     //verificare daca s-a atins umiditatea si se inchid switcj urile
@@ -276,7 +281,7 @@
         {
           digitalWrite(RELAYS_PUMP_PIN,HIGH);
           localSystemState.working = false;
-          //SendNotification(FCMToken, "Irigarea s-a incheiat. Umiditatea este in parametrii alesi.");
+          SendNotification(FCMToken, "Irigarea s-a incheiat. Umiditatea este in parametrii alesi.");
           UpdateWorking(false,false,SystemStateFromDb.automationMode,board.id);
         }
     }
@@ -306,8 +311,24 @@
         manualIrrigation = false;
         notificationMoistureMaxSent[0] = false;
         notificationMoistureMaxSent[1] = false;
-        SendNotification(FCMToken, "Irigarea manuala s-a incheiat");
+        SendNotification(FCMToken, "Irigarea s-a incheiat");
      }
+     else if(SystemStateFromDb.working == true && manualIrrigation == true && localSystemState.working == true && SystemStateFromDb.automationMode == false)
+     {
+          digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,!zones[0].waterSwitch);
+          digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,!zones[1].waterSwitch);        
+
+          if(zones[0].waterSwitch == false && zones[1].waterSwitch == false)
+          {
+            digitalWrite(RELAYS_PUMP_PIN,HIGH);
+            localSystemState.working = false;
+            SendNotification(FCMToken, "Irigarea s-a incheiat. Niciun robinet deschis.");
+            UpdateWorking(false,false,SystemStateFromDb.automationMode,board.id);  
+            delay(1000);
+          }
+    }
+    
+     //end manual irrigation
       Serial.print("Time from server:");
       Serial.println(currentTimeFromServer);
       Serial.print("Time from app start:");
@@ -354,6 +375,8 @@
         }
       }
     }
+
+    //Send notidication
       
       if(moisture[0].value < zones[0].startMoisture && localSystemState.working == false && notificationSent[0] == false)
       {
@@ -364,7 +387,7 @@
         Serial.print("Zone name :");
         Serial.println(notifText0);
         SendNotification(FCMToken,notifText0);
-      }
+      }     
     
        if(moisture[1].value < zones[1].startMoisture && localSystemState.working == false && notificationSent[1]==false)
         {
@@ -377,27 +400,27 @@
           SendNotification(FCMToken,notifText1);
         }
 
-//        if(moisture[0].value > zones[0].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[0] == false)
-//      {
-//        notificationMoistureMaxSent[0]=true;
-//        String text0 = "S-a atins umiditatea dorita in zona: ";
-//        String name0 = String(zones[0].name);
-//        String notifText0 = text0 + name0;
-//        Serial.print("Zone name :");
-//        Serial.println(notifText0);
-//        SendNotification(FCMToken,notifText0);
-//      }
-//    
-//       if(moisture[1].value > zones[1].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[1] == false)
-//        {
-//          notificationMoistureMaxSent[1]=true;
-//          String text1 = "S-a atins umiditatea doeita in zona: ";
-//          String name1 = String(zones[1].name);
-//          String notifText1 = text1 + name1;
-//          Serial.print("Zone name:");
-//          Serial.println(notifText1);
-//          SendNotification(FCMToken,notifText1);
-//        }
+        if(moisture[0].value > zones[0].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[0] == false)
+      {
+        notificationMoistureMaxSent[0]=true;
+        String text0 = "S-a atins umiditatea dorita in zona: ";
+        String name0 = String(zones[0].name);
+        String notifText0 = text0 + name0;
+        Serial.print("Zone name :");
+        Serial.println(notifText0);
+        SendNotification(FCMToken,notifText0);
+      }
+    
+       if(moisture[1].value > zones[1].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[1] == false)
+        {
+          notificationMoistureMaxSent[1]=true;
+          String text1 = "S-a atins umiditatea dorita in zona: ";
+          String name1 = String(zones[1].name);
+          String notifText1 = text1 + name1;
+          Serial.print("Zone name:");
+          Serial.println(notifText1);
+          SendNotification(FCMToken,notifText1);
+        }
         
    }
  }

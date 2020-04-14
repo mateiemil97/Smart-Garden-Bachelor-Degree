@@ -45,7 +45,7 @@ export class DashboardPage implements OnInit {
       this.userId = id;
       this.dashboardService.GetSystemsByUser(this.userId).subscribe(system => {
         this.irrigationSystems = system;
-        console.log(this.irrigationSystems);
+        //console.log(this.irrigationSystems);
         this.currentIrrigationSystem = this.irrigationSystems[0];
         this.storage.set('irrigationSystemId', this.currentIrrigationSystem.systemId);
         this.getCurrentState(this.irrigationSystems[0].systemId);
@@ -54,6 +54,7 @@ export class DashboardPage implements OnInit {
   }
 
   ionViewWillEnter() {
+    this.getCurrentState(this.currentIrrigationSystem.systemId);
     this.currentMoisture = [];
     this.getTemperature(this.currentIrrigationSystem.systemId);
   }
@@ -61,7 +62,7 @@ export class DashboardPage implements OnInit {
   getTemperature(systemId: number) {
     this.dashboardService.GetLatestTemperature(this.currentIrrigationSystem.systemId).subscribe((temp: Measurement) => {
       this.currentTemperature = temp;
-      console.log(this.currentTemperature);
+      //console.log(this.currentTemperature);
     });
   }
 
@@ -71,7 +72,7 @@ export class DashboardPage implements OnInit {
         zones.forEach(element => {
           this.dashboardService.GetLatestMeasurementValue(this.currentIrrigationSystem.systemId, element.sensorId).subscribe(moist => {
             this.currentMoisture.push(moist);
-            console.log(this.currentMoisture);
+           // console.log(this.currentMoisture);
           });
         });
       }
@@ -90,7 +91,7 @@ export class DashboardPage implements OnInit {
   getCurrentState(systemId: number) {
     this.dashboardService.GetSystemState(systemId).subscribe(state => {
       this.currentState = state;
-      console.log(this.currentState);
+      //console.log(this.currentState);
     });
   }
 
@@ -98,7 +99,7 @@ export class DashboardPage implements OnInit {
     console.log('Begin async operation', refresher);
 
     setTimeout(() => {
-      console.log('Async operation has ended');
+     // console.log('Async operation has ended');
       this.currentMoisture = [];
       this.getZones(this.currentIrrigationSystem.systemId);
       this.getTemperature(this.currentIrrigationSystem.systemId);
