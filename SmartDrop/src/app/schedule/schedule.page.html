@@ -8,12 +8,12 @@
 
 <ion-content class="content">
   <ion-grid>
-      <ion-row>
-        <ion-col offset-md="3" size-md="6">
-          <ion-card>
-            <ion-card-header>
-              <ion-card-title>Intervalul orar al irigarii automate</ion-card-title>
-            </ion-card-header>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Intervalul orar al irigarii automate</ion-card-title>
+          </ion-card-header>
           <ion-row>
             <ion-col style="padding-bottom: 0;">
               <ion-card>
@@ -38,17 +38,18 @@
           </ion-row>
         </ion-card>
 
-        </ion-col>
-      </ion-row>
+      </ion-col>
+    </ion-row>
     <ion-row>
       <ion-col offset-md="3" size-md="6">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Intervalul temperaturii in care se iriga: {{schedule.temperatureMin}}°C - {{schedule.temperatureMax}}°C
+            <ion-card-title>Intervalul temperaturii in care se iriga: {{schedule.temperatureMin}}°C -
+              {{schedule.temperatureMax}}°C
             </ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <ion-label>Irigarea incepe la  {{schedule.start | date:'HH:mm'}} daca valoarea temperaturii este intre
+            <ion-label>Irigarea incepe la {{schedule.start | date:'HH:mm'}} daca valoarea temperaturii este intre
             </ion-label>
             <ion-range (ionFocus)="updateTemperatureConfirmation()" [(ngModel)]="dualKnobs" name="dualKnobs"
               dualKnobs="true" color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
@@ -71,7 +72,7 @@
     </ion-row>
     <ion-row>
       <ion-col offset-md="3" size-md="6">
-        <h3 style="padding-left:20px;">Setare valori umiditate.Pentru irigarea manuala si automata</h3>
+        <h3 *ngIf="zones != 0" style="padding-left:20px;">Setare valori umiditate.Pentru irigarea manuala si automata</h3>
       </ion-col>
     </ion-row>
     <ion-row>
@@ -124,11 +125,14 @@
         </ion-card>
       </ion-col>
     </ion-row>
-    <ion-fab>
-      <ion-fab-button (click)="OpenModal()" vertical="bottom" horizontal="end" slot="fixed">
-        <ion-icon name="add"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
+    <ion-row>
+      <ion-col size="6" offset="3">
+        <ion-button (click)="OpenModal()" expand=block>
+          Adauga senzor
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
 
   </ion-grid>
 </ion-content>

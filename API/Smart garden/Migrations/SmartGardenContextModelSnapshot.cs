@@ -53,6 +53,27 @@ namespace Smart_garden.Migrations
                     b.ToTable("FCMToken");
                 });
 
+            modelBuilder.Entity("Smart_garden.Entites.GlobalVegetables", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<int>("StartMoisture");
+
+                    b.Property<int>("StopMoisture");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GlobalVegetableses");
+                });
+
             modelBuilder.Entity("Smart_garden.Entites.IrigationSystem", b =>
                 {
                     b.Property<int>("Id")
@@ -213,6 +234,29 @@ namespace Smart_garden.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Smart_garden.Entites.UserVegetables", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<int>("StartMoisture");
+
+                    b.Property<int>("StopMoisture");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserVegetableses");
+                });
+
             modelBuilder.Entity("Smart_garden.Entites.Zone", b =>
                 {
                     b.Property<int>("Id")
@@ -293,6 +337,14 @@ namespace Smart_garden.Migrations
                     b.HasOne("Smart_garden.Entites.IrigationSystem", "System")
                         .WithMany()
                         .HasForeignKey("SystemId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Smart_garden.Entites.UserVegetables", b =>
+                {
+                    b.HasOne("Smart_garden.Entites.User", "User")
+                        .WithMany("UserVegetableses")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

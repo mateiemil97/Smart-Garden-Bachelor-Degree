@@ -29,6 +29,6 @@ namespace Smart_garden.Entites
         public string City { get; set; }
 
         public  ICollection<IrigationSystem> System { get; set; } = new List<IrigationSystem>();
-
+        public ICollection<UserVegetables> UserVegetableses { get; set; } = new List<UserVegetables>();
     }
 }

@@ -28,8 +28,8 @@
   #define RELAYS_WATER_SWITCH_P1_PIN 15
   
   #define TEMPERATURE_INTERVAL_TIME_POST 60000
-  #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 300000
-  #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF 1800000
+  #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 120000
+  #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF 120000
   
   struct Board 
   { 
@@ -68,7 +68,7 @@
   const char* FCMToken;
   
   
-  const String  api = "http://192.168.1.103:45455/api";
+  const String  api = "http://192.168.1.6:45455/api";
   const String fingerPrint = "82:88:7C:B6:41:71:8B:04:67:A5:10:C2:34:40:24:04:78:A6:7E:55"; 
   
   const String series = "BBBB";
@@ -103,15 +103,15 @@
   SystemState localSystemState;
   SystemState SystemStateFromDb;
   
-   //WifiConnect wifi = WifiConnect("DIGI_ce10a8","989d31ef");
+   WifiConnect wifi = WifiConnect("DIGI_ce10a8","989d31ef");
   
-   WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
+   //WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
   
   bool manualIrrigation;
 
   void sendRequest() {
     if (request.readyState() == 0 || request.readyState() == 4) {
-      request.open("GET", "http://192.168.1.103:45455/api/systems/1013/arduino");
+      request.open("GET", "http://192.168.1.6:45455/api/systems/1013/arduino");
       request.send();
     }
   }
@@ -222,7 +222,7 @@
           localSystemState.working = true;
           notificationSent[0] = false;
           notificationSent[1] = false;
-          SendNotification(FCMToken, "Irigarea automata a inceput");
+         // SendNotification(FCMToken, "Irigarea automata a inceput");
           temperatureNotification = false;
           UpdateWorking(false,true,SystemStateFromDb.automationMode,board.id);
         }
@@ -237,7 +237,7 @@
         temperatureNotification = true;
         if(temperatureNotification == false)
         {
-          SendNotification(FCMToken, "Irigarea automata s-a oprit din cauza temperaturii nonconforme");
+          //SendNotification(FCMToken, "Irigarea automata s-a oprit din cauza temperaturii nonconforme");
         }
         UpdateWorking(false,false,SystemStateFromDb.automationMode,board.id);
       }
@@ -249,7 +249,7 @@
       digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,HIGH);
       digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,HIGH); 
       localSystemState.working = false;
-      SendNotification(FCMToken, "Irigarea automata s-a incheiat din cauza programului.");
+    //  SendNotification(FCMToken, "Irigarea automata s-a incheiat din cauza programului.");
       UpdateWorking(false,false,SystemStateFromDb.automationMode,board.id);
     } 
     else if(SystemStateFromDb.working == false && SystemStateFromDb.manual == false && manualIrrigation == false && localSystemState.working == true)
@@ -260,7 +260,7 @@
       digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,HIGH); 
       manualIrrigation = false;
       localSystemState.working = false;
-      SendNotification(FCMToken, "Irigarea a fost oprita");
+    //  SendNotification(FCMToken, "Irigarea a fost oprita");
    }
   
     //verificare daca s-a atins umiditatea si se inchid switcj urile
@@ -281,7 +281,7 @@
         {
           digitalWrite(RELAYS_PUMP_PIN,HIGH);
           localSystemState.working = false;
-          SendNotification(FCMToken, "Irigarea s-a incheiat. Umiditatea este in parametrii alesi.");
+        //  SendNotification(FCMToken, "Irigarea s-a incheiat. Umiditatea este in parametrii alesi.");
           UpdateWorking(false,false,SystemStateFromDb.automationMode,board.id);
         }
     }
@@ -301,7 +301,7 @@
         localSystemState.working = true;
         notificationSent[0] = false;
         notificationSent[1] = false;
-        SendNotification(FCMToken, "Irigarea manuala a inceput");
+       // SendNotification(FCMToken, "Irigarea manuala a inceput");
      }
      else if(SystemStateFromDb.working == false && manualIrrigation == true && localSystemState.working == true)
      {
@@ -311,7 +311,7 @@
         manualIrrigation = false;
         notificationMoistureMaxSent[0] = false;
         notificationMoistureMaxSent[1] = false;
-        SendNotification(FCMToken, "Irigarea s-a incheiat");
+       // SendNotification(FCMToken, "Irigarea s-a incheiat");
      }
      else if(SystemStateFromDb.working == true && manualIrrigation == true && localSystemState.working == true && SystemStateFromDb.automationMode == false)
      {
@@ -322,7 +322,7 @@
           {
             digitalWrite(RELAYS_PUMP_PIN,HIGH);
             localSystemState.working = false;
-            SendNotification(FCMToken, "Irigarea s-a incheiat. Niciun robinet deschis.");
+           // SendNotification(FCMToken, "Irigarea s-a incheiat. Niciun robinet deschis.");
             UpdateWorking(false,false,SystemStateFromDb.automationMode,board.id);  
             delay(1000);
           }

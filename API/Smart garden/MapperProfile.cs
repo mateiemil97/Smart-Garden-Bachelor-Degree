@@ -16,6 +16,7 @@ using Smart_garden.Models.SensorPortDto;
 using Smart_garden.Models.SystemDto;
 using Smart_garden.Models.SystemStateDto;
 using Smart_garden.Models.UserDto;
+using Smart_garden.Models.UserVegetablesDto;
 using Smart_garden.Models.ZoneDto;
 
 namespace Smart_garden
@@ -70,6 +71,10 @@ namespace Smart_garden
             CreateMap<Measurement,MeasurementDto>();
 
             CreateMap<FCMTokenForCreateDto, FCMToken>();
+
+            CreateMap<UserVegetables, UserVegetablesForGetDto>();
+            CreateMap<UserVegetablesForCreationDto, UserVegetables>();
+
 
         }
     }
