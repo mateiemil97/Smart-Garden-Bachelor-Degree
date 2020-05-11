@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Smart_garden.Entites;
+using Smart_garden.Models.ZoneDto;
 
 namespace Smart_garden.Repository.ZoneRepository
 {
@@ -17,24 +18,46 @@ namespace Smart_garden.Repository.ZoneRepository
             _context = context;
         }
 
-        public  IEnumerable<Zone> GetZonesBySystem(int systemId)
+        public  IEnumerable<ZoneDtoForGet> GetZonesBySystem(int systemId)
         {
             var zones = from zone in _context.Zone
                 join sns in _context.Sensor on zone.SensorId equals sns.Id
                 join sys in _context.IrigationSystem on sns.SystemId equals sys.Id
+                join veg in _context.UserVegetableses on zone.UserVegetableId equals veg.Id
                 where sys.Id == systemId
-                select zone;
+                select new ZoneDtoForGet()
+                {
+                    Id = zone.Id,
+                    MoistureStart = zone.MoistureStart,
+                    MoistureStop = zone.MoistureStop,
+                    Name = zone.Name,
+                    SensorId = zone.SensorId,
+                    UserVegetableId = zone.UserVegetableId,
+                    UserVegetableName = veg.Name,
+                    WaterSwitch = zone.WaterSwitch
+                };
 
             return zones;
         }
 
-        public Zone GetZoneBySystem(int systemId, int id)
+        public ZoneDtoForGet GetZoneBySystem(int systemId, int id)
         {
             var zoneToReturn = (from zone in _context.Zone
                 join sns in _context.Sensor on zone.SensorId equals sns.Id
                 join sys in _context.IrigationSystem on sns.SystemId equals sys.Id
+                join veg in _context.UserVegetableses on zone.UserVegetableId equals veg.Id
                 where sys.Id == systemId && zone.Id == id
-                select zone).FirstOrDefault();
+                select new ZoneDtoForGet()
+                {
+                    Id = zone.Id,
+                    MoistureStart = zone.MoistureStart,
+                    MoistureStop = zone.MoistureStop,
+                    Name = zone.Name,
+                    SensorId = zone.SensorId,
+                    UserVegetableId = zone.UserVegetableId,
+                    UserVegetableName = veg.Name,
+                    WaterSwitch = zone.WaterSwitch
+                }).FirstOrDefault();
 
             return zoneToReturn;
         }

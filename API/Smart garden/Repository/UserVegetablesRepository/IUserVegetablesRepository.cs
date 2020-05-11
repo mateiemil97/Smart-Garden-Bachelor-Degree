@@ -9,5 +9,6 @@ namespace Smart_garden.Repository.UserVegetablesRepository
     public interface IUserVegetablesRepository: IRepository<UserVegetables>
     {
         IQueryable<UserVegetables> GetUserVegetables(int userId);
+        IQueryable<UserVegetables> GetUserVegetable(int userId, int vegetableId);
     }
 }

@@ -272,12 +272,16 @@ namespace Smart_garden.Migrations
 
                     b.Property<int>("SensorId");
 
+                    b.Property<int>("UserVegetableId");
+
                     b.Property<bool>("WaterSwitch");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SensorId")
                         .IsUnique();
+
+                    b.HasIndex("UserVegetableId");
 
                     b.ToTable("Zone");
                 });
@@ -353,6 +357,11 @@ namespace Smart_garden.Migrations
                     b.HasOne("Smart_garden.Entites.Sensor", "Sensor")
                         .WithOne("Zone")
                         .HasForeignKey("Smart_garden.Entites.Zone", "SensorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Smart_garden.Entites.UserVegetables", "UserVegetables")
+                        .WithMany("Zone")
+                        .HasForeignKey("UserVegetableId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

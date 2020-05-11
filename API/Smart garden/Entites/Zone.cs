@@ -11,6 +11,7 @@ namespace Smart_garden.Entites
     {
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
         public int Id { get; set; }
 
         [Required]
@@ -21,6 +22,11 @@ namespace Smart_garden.Entites
         public int MoistureStart { get; set; }
         public int MoistureStop { get; set; }
         public bool WaterSwitch { get; set; }
+
+       [ForeignKey("UserVegetables")]
+       public int UserVegetableId { get; set; }
+
         public Sensor Sensor { get; set; }
+        public UserVegetables UserVegetables { get; set; }
     }
 }

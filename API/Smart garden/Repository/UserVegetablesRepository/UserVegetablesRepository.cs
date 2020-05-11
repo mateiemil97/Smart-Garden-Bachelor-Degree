@@ -33,5 +33,23 @@ namespace Smart_garden.Repository.UserVegetablesRepository
             return vegetables;
         }
 
+        IQueryable<UserVegetables> IUserVegetablesRepository.GetUserVegetable(int userId, int vegetableId)
+        {
+            var vegetable = (from v in _context.UserVegetableses
+                    join u in _context.User
+                        on v.UserId equals u.Id
+                    where u.Id == userId && v.Id == vegetableId
+                    select new UserVegetables()
+                    {
+                        Id = v.Id,
+                        Name = v.Name,
+                        StartMoisture = v.StartMoisture,
+                        StopMoisture = v.StopMoisture,
+                        UserId = u.Id
+                    }
+                );
+            return vegetable;
+        }
+
     }
 }

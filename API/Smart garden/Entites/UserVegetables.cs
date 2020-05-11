@@ -24,6 +24,8 @@ namespace Smart_garden.Entites
 
         [ForeignKey("User")]
         public int UserId { get; set; }
+
         public User User { get; set; }
+        public ICollection<Zone> Zone { get; set; }
     }
 }

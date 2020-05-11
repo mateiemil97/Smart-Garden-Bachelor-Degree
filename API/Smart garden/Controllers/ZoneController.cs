@@ -35,10 +35,8 @@ namespace Smart_garden.Controllers
             }
 
             var zonesFromRepo = _unitOfWork.ZoneRepository.GetZonesBySystem(systemId);
-
-            var zoneMapped = _mapper.Map<IEnumerable<ZoneDto>>(zonesFromRepo);
-
-            return Ok(zoneMapped);
+            
+            return Ok(zonesFromRepo);
         }
 
         [HttpGet("arduino")]
@@ -75,9 +73,8 @@ namespace Smart_garden.Controllers
                 return NotFound("Zone not found!");
             }
 
-            var zoneMapped = _mapper.Map<ZoneDto>(zoneFromRepo);
 
-            return Ok(zoneMapped);
+            return Ok(zoneFromRepo);
         }
 
         [HttpPost(Name="zone")]
@@ -133,7 +130,8 @@ namespace Smart_garden.Controllers
                 return NotFound("Zone not found!");
             }
 
-            _unitOfWork.ZoneRepository.Delete(zone);
+            var zoneForDelete = _mapper.Map<Zone>(zone);
+            _unitOfWork.ZoneRepository.Delete(zoneForDelete);
 
             var sensor = _unitOfWork.SensorRepository.GetSensorById(zone.SensorId);
             _unitOfWork.SensorRepository.Delete(sensor);
@@ -167,7 +165,8 @@ namespace Smart_garden.Controllers
             updateZone.MoistureStop = zone.MoistureStop;
             updateZone.WaterSwitch = zone.WaterSwitch;
 
-            _unitOfWork.ZoneRepository.Update(updateZone);
+            var zoneForUpdate = _mapper.Map<Zone>(updateZone);
+            _unitOfWork.ZoneRepository.Update(zoneForUpdate);
 
             if (!_unitOfWork.Save())
             {

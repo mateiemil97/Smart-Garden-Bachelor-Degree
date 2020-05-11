@@ -44,6 +44,28 @@ namespace Smart_garden.Controllers
             }
         }
 
+        [HttpGet("{userId}/vegetables/{id}")]
+        public IActionResult GetUserVegetable(int userId, int id)
+        {
+            try
+            {
+                var user = _unitOfWork.UserGenericRepository.Exist(userId);
+                if (user == null)
+                    return NotFound("User not found");
+
+                var vegetables = _unitOfWork.UserVegetablesRepository.GetUserVegetable(userId,id);
+                if (vegetables == null)
+                    return NotFound("Vegetables not found");
+                var vegetablesToReturn = _mapper.Map<IEnumerable<UserVegetablesForGetDto>>(vegetables);
+
+                return Ok(vegetablesToReturn);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Server error during getting the vegetables");
+            }
+        }
+
         [HttpPost("{userId}/vegetables",Name = "vegetable")]
         public IActionResult AddVegetables(int userId, [FromBody] UserVegetablesForCreationDto vegetable)
         {

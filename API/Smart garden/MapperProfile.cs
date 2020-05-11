@@ -50,6 +50,9 @@ namespace Smart_garden
 
             CreateMap<Zone, ZoneDto>();
             CreateMap<ZoneForCreationDto,Zone>();
+            CreateMap<ZoneDtoForGet, Zone>();
+
+            CreateMap<ZoneForUpdateDto, Zone>();
 
             CreateMap<Zone, ZoneDtoForArduino>();
             CreateMap<ZoneDto, ZoneDtoForArduino>();
