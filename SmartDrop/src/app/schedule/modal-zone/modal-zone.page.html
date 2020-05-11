@@ -7,54 +7,51 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content >
+<ion-content>
   <form #f="ngForm" (ngSubmit)="submit(f)">
     <ion-grid>
+      <ion-row>
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+          <ion-item>
+            <ion-label>Selecteaza tipul plantei</ion-label>
+            <ion-select [disabled]="ports == 0" required [(ngModel)]="vegetables.name" #vegetable name="vegetable">
+              <ion-select-option *ngFor="let vegetable of vegetables" [value]="vegetable.id">{{vegetable.name}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+      </ion-row>
       <ion-row class="ion-align-items-center">
         <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
           <ion-item>
-            <ion-label position="floating">Zone name</ion-label>
+            <ion-label position="floating">Dati un nume specific senzorului</ion-label>
             <ion-input [disabled]="ports == 0" required [(ngModel)]="zoneForCreate.name" name="name"></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
-
       <ion-row>
         <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
           <ion-item>
-            <ion-label *ngIf="ports != 0">Select sensor port</ion-label>
-            <ion-label *ngIf="ports == 0">No available ports</ion-label>
+            <ion-label *ngIf="ports != 0">Selecteaza portul senzorului</ion-label>
+            <ion-label *ngIf="ports == 0">Nu mai sunt porturi disponibile</ion-label>
             <ion-select [disabled]="ports == 0" required [(ngModel)]="zoneForCreate.port" #port name="port">
               <ion-select-option *ngFor="let port of ports" [value]="port.id">{{port.port}}</ion-select-option>
             </ion-select>
           </ion-item>
         </ion-col>
       </ion-row>
-      <ion-row>
-        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
-          <ion-label>Start moisture %</ion-label>
-          <ion-range [disabled]="ports == 0" [(ngModel)]="zoneForCreate.moistureStart" name="moistureStart" color="tertiary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
-            <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
-            <ion-icon slot="end" color="tertiary" name="water"></ion-icon>
-          </ion-range>
-        </ion-col>
-      </ion-row>
 
-      <ion-row>
-        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
-          <ion-label>Stop moisture %</ion-label>
-          <ion-range [disabled]="ports == 0" [(ngModel)]="zoneForCreate.moistureStop" name="moistureStop" color="tertiary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
-            <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
-            <ion-icon slot="end" color="tertiary" name="water"></ion-icon>
-          </ion-range>
-        </ion-col>
-      </ion-row>
     </ion-grid>
-    <ion-button [disabled]="ports == 0" expand="full" color="primary" type="submit">Add zone</ion-button>
+    <ion-button [disabled]="ports == 0" expand="block" color="primary" type="submit">Add zone</ion-button>
     <ion-label color="danger" *ngIf="ports==0">No available sensor port. Delete zone for creating new one</ion-label>
     <ion-label color="danger" *ngIf="!formValidation">All fields are required!</ion-label>
 
   </form>
+  <ion-row>
+    <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+      <h6>Daca planta nu se gaseste, adaug-o in 'Lista mea'.(Contul meu -> Lista plante)</h6>
+    </ion-col>
+  </ion-row>
 
 
 </ion-content>

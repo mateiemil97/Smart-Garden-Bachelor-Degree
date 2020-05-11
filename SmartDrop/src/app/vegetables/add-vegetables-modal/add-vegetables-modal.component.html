@@ -8,13 +8,13 @@
 </ion-header>
 
 <ion-content>
-  <form #f="ngForm" (ngSubmit)="addIrrigationSystem(f)">
+  <form #f="ngForm" (ngSubmit)="createVegetable()">
     
       <ion-row>
         <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
           <ion-item>
             <ion-label position="floating">Numele plantei</ion-label>
-            <ion-input placeholder="Ex: Cartof alb" required  >
+            <ion-input placeholder="Ex: Cartof alb" required  [(ngModel)]="vegetable.name" name="name">
             </ion-input>
           </ion-item>
         </ion-col>
@@ -22,7 +22,7 @@
       <ion-row>
         <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
           <ion-label>Umiditatea de start %</ion-label>
-          <ion-range [(ngModel)]="zoneForCreate.moistureStart" name="moistureStart"
+          <ion-range (ionChange)="change()" [(ngModel)]="vegetable.startMoisture" name="moistureStart"
             color="tertiary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
             <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
             <ion-icon slot="end" color="tertiary" name="water"></ion-icon>
@@ -33,7 +33,7 @@
       <ion-row>
         <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
           <ion-label>Umiditatea de stop %</ion-label>
-          <ion-range [(ngModel)]="zoneForCreate.moistureStop" name="moistureStop"
+          <ion-range [(ngModel)]="vegetable.stopMoisture" name="moistureStop"
             color="tertiary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
             <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
             <ion-icon slot="end" color="tertiary" name="water"></ion-icon>

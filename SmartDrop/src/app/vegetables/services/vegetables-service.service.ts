@@ -17,6 +17,10 @@ export class VegetablesServiceService {
     return this.http.get(`${environment.url}/${userId}/vegetables`);
   }
 
+  GetVegetable(userId: number, id: number): Observable<any> {
+    return this.http.get(`${environment.url}/${userId}/vegetables/${id}`);
+  }
+
   AddVegetable(userId: number, vegetable: VegetablesForCreationModel): Observable<any> {
     return this.http.post(`${environment.url}/${userId}/vegetables`, vegetable);
   }
@@ -24,5 +28,5 @@ export class VegetablesServiceService {
   DeleteVegetable(id: number): Observable<any> {
     return this.http.delete(`${environment.url}/vegetables/${id}`);
   }
-
+  
 }

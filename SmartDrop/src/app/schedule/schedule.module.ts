@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SchedulePage } from './schedule.page';
 import { ModalZonePage } from './modal-zone/modal-zone.page';
+import { EditMoistureModalComponent } from './edit-moisture-modal/edit-moisture-modal.component';
 @NgModule({
   imports: [
     IonicModule,
@@ -15,11 +16,13 @@ import { ModalZonePage } from './modal-zone/modal-zone.page';
   ],
   declarations: [
     SchedulePage,
-    ModalZonePage
+    ModalZonePage,
+    EditMoistureModalComponent
   ],
   entryComponents:
   [
-    ModalZonePage
+    ModalZonePage,
+    EditMoistureModalComponent
   ]
 })
 export class SchedulePageModule {}

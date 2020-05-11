@@ -72,59 +72,26 @@
     </ion-row>
     <ion-row>
       <ion-col offset-md="3" size-md="6">
-        <h3 *ngIf="zones != 0" style="padding-left:20px;">Setare valori umiditate.Pentru irigarea manuala si automata</h3>
+        <h3 *ngIf="zones != 0" style="padding-left:20px;">Zone</h3>
       </ion-col>
     </ion-row>
-    <ion-row>
-      <ion-col offset-md="3" size-md="6">
-        <ion-card *ngFor="let zone of zones">
-          <ion-card-header>
-            <ion-card-title>
-              <ion-row>
-                <ion-col size=5>
-                  Zona: {{zone.name}}
-                </ion-col>
-                <ion-col offset="4">
-                  <ion-toggle (ionFocus)="updateMoistureConfirmation(zone)" [(ngModel)]="zone.waterSwitch"
+      <ion-row>
+        <ion-col offset-md="3" size-md="6">
+          <ion-list *ngFor="let zone of zones">
+            <ion-item-sliding>
+              <ion-item-options side="end">
+                <ion-item-option (click)="openEditModal(zone)">Editeaza</ion-item-option>
+                <ion-item-option color="danger" (click)="presentAlertDeleteZone(zone)">Sterge</ion-item-option>
+              </ion-item-options>
+              <ion-item>
+                <ion-label>{{zone.userVegetableName}}: {{zone.name}}</ion-label>
+                <ion-toggle (ionChange)="updateSwitchState(zone.id,zone)" [(ngModel)]="zone.waterSwitch"
                     name="waterSwitch" color="primary"></ion-toggle>
-                </ion-col>
-              </ion-row>
-            </ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-label>Umiditatea minima a solului {{zone.moistureStart}}%</ion-label>
-            <ion-range color="tertiary" (ionFocus)="updateMoistureConfirmation(zone)" pin="true" max=100 min=0 step=10
-              snaps=true ticks=true [(ngModel)]="zone.moistureStart">
-              <ion-icon class="drop" size="small" slot="start" name="water"></ion-icon>
-              <ion-icon class="drop" slot="end" name="water"></ion-icon>
-            </ion-range>
-            <ion-label>Umiditatea maxima a solului {{zone.moistureStop}}%</ion-label>
-            <ion-range (ionFocus)="updateMoistureConfirmation(zone)" color="tertiary" pin="true" max=100 min=0 step=10
-              snaps=true ticks=true [(ngModel)]="zone.moistureStop">
-              <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
-              <ion-icon slot="end" color="tertiary" name="water"></ion-icon>
-            </ion-range>
-            <ion-row>
-              <ion-col size="2" offset="8">
-                <ion-buttons>
-                  <ion-button class="icon" slot="icon-only" (click)="presentAlertDeleteZone(zone)">
-                    <ion-icon name="trash"></ion-icon>
-                  </ion-button>
-                </ion-buttons>
-              </ion-col>
-              <ion-col size="2">
-                <ion-buttons>
-                  <ion-button class="icon" [disabled]=zone.changeState
-                    (click)="presentMoistureUpdateAlertConfirm(zone.id,zone)" slot="icon-only">
-                    <ion-icon color="primary" name="done-all"></ion-icon>
-                  </ion-button>
-                </ion-buttons>
-              </ion-col>
-            </ion-row>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
+              </ion-item>
+            </ion-item-sliding>
+          </ion-list>
+        </ion-col>
+      </ion-row>
     <ion-row>
       <ion-col size="6" offset="3">
         <ion-button (click)="OpenModal()" expand=block>

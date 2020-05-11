@@ -3,4 +3,8 @@ export class VegetablesForCreationModel {
     startMoisture: number;
     stopMoisture: number;
     userId: number;
+    /**
+     *
+     */
+
 }

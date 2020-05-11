@@ -4,6 +4,8 @@ export class ZoneForCreate {
     name?: string;
     type: string;
     waterSwitch: boolean;
+    userVegetableId: number;
+    portId: number;
     /**
      *
      */

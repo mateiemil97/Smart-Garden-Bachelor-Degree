@@ -6,4 +6,5 @@ export class Zone {
     name?: string;
     changeState: boolean;
     waterSwitch: boolean;
+    userVegetableName: string;
 }
