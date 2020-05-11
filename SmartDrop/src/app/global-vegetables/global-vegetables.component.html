@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Plante</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="dismissModal()" defaultHref="/vegetables"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-searchbar></ion-searchbar>
+
+<ion-content>
+  <mat-accordion *ngFor="let vegetable of globalVegetables">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header style="margin-top: 15px;">
+        <mat-panel-title>
+          {{vegetable.name}}
+        </mat-panel-title>
+        <mat-panel-description>
+          Umiditate recomandata {{vegetable.startMoisture}}% - {{vegetable.stopMoisture}}%
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <p>{{vegetable.description}}</p>
+      <ion-button (click)="addVegetableToList(vegetable)" expand="block">Adauga in lista mea</ion-button>
+    </mat-expansion-panel>
+  </mat-accordion>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="openAddNewVegetable()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

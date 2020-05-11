@@ -59,4 +59,8 @@ export class MyaccountPage implements OnInit {
 
   }
 
+  navigateToVegetables() {
+    this.route.navigateByUrl('/vegetables');
+  }
+
 }

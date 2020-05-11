@@ -12,6 +12,7 @@ using Smart_garden.Repository.SensorPortRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
 using Smart_garden.Repository.SystemStateRepository;
+using Smart_garden.Repository.UserVegetablesRepository;
 using Smart_garden.Repository.ZoneRepository;
 
 namespace Smart_garden.UnitOfWork
@@ -28,6 +29,8 @@ namespace Smart_garden.UnitOfWork
         ISensorPortRepository SensorPortRepository { get; }
         IMeasurementRepository MeasurementRepository { get; }
         IFCMTokenRepository FCMTokenRepository { get; }
+        IRepository<GlobalVegetables> GlobalVegetablesRepository { get; }
+        IUserVegetablesRepository UserVegetablesRepository { get; }
         bool Save();
     }
 }

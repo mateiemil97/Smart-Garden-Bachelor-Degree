@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Adauga tip leguma</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="dismissModal()" defaultHref="/vegetables"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form #f="ngForm" (ngSubmit)="createVegetable()">
+    
+      <ion-row>
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+          <ion-item>
+            <ion-label position="floating">Numele plantei</ion-label>
+            <ion-input placeholder="Ex: Cartof alb" required  [(ngModel)]="vegetable.name" name="name">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+          <ion-label>Umiditatea de start %</ion-label>
+          <ion-range (ionChange)="change()" [(ngModel)]="vegetable.startMoisture" name="moistureStart"
+            color="tertiary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
+            <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
+            <ion-icon slot="end" color="tertiary" name="water"></ion-icon>
+          </ion-range>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+          <ion-label>Umiditatea de stop %</ion-label>
+          <ion-range [(ngModel)]="vegetable.stopMoisture" name="moistureStop"
+            color="tertiary" pin="true" max=100 min=0 step=10 snaps=true ticks=true>
+            <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
+            <ion-icon slot="end" color="tertiary" name="water"></ion-icon>
+          </ion-range>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+        <ion-button [disabled]="!f.valid" type="submit" expand="block" color="primary">Adauga</ion-button>
+        </ion-col>
+      </ion-row>
+  </form>
+</ion-content>

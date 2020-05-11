@@ -19,6 +19,9 @@ import { LoginService } from './core/authentication/login/login.service';
 import { Interceptor } from './guards/interceptor';
 import { FCM } from '@ionic-native/fcm/ngx';
 
+import {MatExpansionModule} from '@angular/material/expansion';
+
+
 import 'chartjs-plugin-zoom';
 
 
@@ -33,6 +36,7 @@ import 'chartjs-plugin-zoom';
     HttpClientModule,
     FormsModule,
     BrowserAnimationsModule,
+    MatExpansionModule
   ],
   providers: [
     StatusBar,

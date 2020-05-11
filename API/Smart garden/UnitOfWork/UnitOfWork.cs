@@ -13,6 +13,7 @@ using Smart_garden.Repository.SensorPortRepository;
 using Smart_garden.Repository.SensorRepository;
 using Smart_garden.Repository.SystemRepository;
 using Smart_garden.Repository.SystemStateRepository;
+using Smart_garden.Repository.UserVegetablesRepository;
 using Smart_garden.Repository.ZoneRepository;
 
 namespace Smart_garden.UnitOfWork
@@ -32,6 +33,8 @@ namespace Smart_garden.UnitOfWork
         public  ISensorPortRepository SensorPortRepository { get; }
         public IMeasurementRepository MeasurementRepository { get; }
         public IFCMTokenRepository FCMTokenRepository { get; }
+        public IRepository<GlobalVegetables> GlobalVegetablesRepository { get; }
+        public IUserVegetablesRepository UserVegetablesRepository { get; }
         public UnitOfWork(
             SmartGardenContext context,
             IRepository<User> userRepository,
@@ -43,7 +46,9 @@ namespace Smart_garden.UnitOfWork
             IZoneRepository zoneRepository,
             ISensorPortRepository sensorPortRepository,
             IMeasurementRepository measurementRepository,
-            IFCMTokenRepository fcmTokenRepository
+            IFCMTokenRepository fcmTokenRepository,
+            IRepository<GlobalVegetables> globalVegetablesRepository,
+            IUserVegetablesRepository userVegetablesRepository
         )
         {
             _context = context;
@@ -57,6 +62,8 @@ namespace Smart_garden.UnitOfWork
             SensorPortRepository = sensorPortRepository;
             MeasurementRepository = measurementRepository;
             FCMTokenRepository = fcmTokenRepository;
+            GlobalVegetablesRepository = globalVegetablesRepository;
+            UserVegetablesRepository = userVegetablesRepository;
         }
         public bool Save()
         {

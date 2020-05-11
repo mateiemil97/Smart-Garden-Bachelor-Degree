@@ -11,5 +11,7 @@ namespace Smart_garden.Models.ZoneDto
         public int SensorId { get; set; }
         public int MoistureStart { get; set; }
         public int MoistureStop { get; set; }
+        public int UserVegetableId { get; set; }
+        public int WaterSwitch { get; set; }
     }
 }

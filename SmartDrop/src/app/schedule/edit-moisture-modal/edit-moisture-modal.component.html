@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>
+      Editeaza umiditatea solului
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="dismissModal()" defaultHref="tabs/schedule"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding-top">
+  <form #f="ngForm" (ngSubmit)="editMoisture()">
+    <ion-row>
+      <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+        <ion-label>Umiditatea de start: {{zoneForUpdate.moistureStart}} %</ion-label>
+        <ion-range [(ngModel)]="zoneForUpdate.moistureStart" name="moistureStart" color="tertiary"
+          pin="true" max=100 min=0 step=10 snaps=true ticks=true>
+          <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
+          <ion-icon slot="end" color="tertiary" name="water"></ion-icon>
+        </ion-range>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+        <ion-label>Umiditatea de stop: {{zoneForUpdate.moistureStop}}%</ion-label>
+        <ion-range [(ngModel)]="zoneForUpdate.moistureStop" name="moistureStop" color="tertiary" pin="true" max=100 min=0
+          step=10 snaps=true ticks=true>
+          <ion-icon size="small" color="tertiary" slot="start" name="water"></ion-icon>
+          <ion-icon slot="end" color="tertiary" name="water"></ion-icon>
+        </ion-range>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+        <ion-button [disabled]="!f.valid" type="submit" expand="block" color="primary">Actualizeaza</ion-button>
+      </ion-col>
+    </ion-row>
+  </form>
+</ion-content>

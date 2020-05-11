@@ -24,6 +24,8 @@ namespace Smart_garden.Entites
         public DbSet<Measurement> Measurement { get; set; }
         public DbSet<Zone> Zone { get; set; }
         public DbSet<FCMToken> FCMToken { get; set; }
+        public DbSet<GlobalVegetables> GlobalVegetableses { get; set; }
+        public DbSet<UserVegetables> UserVegetableses { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -10,7 +10,8 @@ namespace Smart_garden.Models.CompositesObjects
         public int SystemId { get; set; }
         public string Type { get; set; }
         public int PortId { get; set; }
-
+        public int UserVegetableId { get; set; }
+        public bool WaterSwitch { get; set; }
 
         public string Name { get; set; }
         public int SensorId { get; set; }

@@ -6,6 +6,7 @@ import { Zone } from '../models/zone.model';
 import { ModalZonePage } from './modal-zone/modal-zone.page';
 import { ZoneForUpdate } from '../models/zoneForUpdate.model';
 import { Storage } from '@ionic/storage';
+import { EditMoistureModalComponent } from './edit-moisture-modal/edit-moisture-modal.component';
 @Component({
   selector: 'app-schedule',
   templateUrl: 'schedule.page.html',
@@ -31,13 +32,14 @@ export class SchedulePage implements OnInit {
   ) { }
 
   ngOnInit() {
+
+  }
+
+  ionViewWillEnter() {
     this.storage.get('irrigationSystemId').then(id => {
       this.systemId = id;
       console.log(this.systemId);
     });
-  }
-
-  ionViewWillEnter() {
     this.getSchedule();
     this.getZones();
   }
@@ -67,6 +69,10 @@ export class SchedulePage implements OnInit {
     const modal = await this.modalController.create({
       component: ModalZonePage
     });
+    modal.onDidDismiss()
+      .then((data) => {
+        this.getZones();
+      });
     return await modal.present();
   }
 
@@ -75,7 +81,7 @@ export class SchedulePage implements OnInit {
       this.scheduleService.UpdateSchedule(this.systemId, this.schedule).subscribe(
         x => console.log('Observer got a next value: ' + x),
         err => this.presentToast('A aparut o eroare. Incercati mai tarziu'),
-        () => this.presentToast('Program updatat cu succes'));
+        () => this.presentToast('Program actualizat cu succes'));
     }
   }
 
@@ -97,50 +103,26 @@ export class SchedulePage implements OnInit {
   UpdateZoneMoisture(systemId: number, zoneId: number, zone: ZoneForUpdate) {
     this.scheduleService.UpdateMoisture(systemId, zoneId, zone).subscribe(
       x => console.log('Observer got a next value: ' + x),
-      err => this.presentToast('An error occured. Try again later'),
+      err => this.presentToast('A aparut o eroare. Incercati din nou'),
       () => {
-        this.presentToast('Program updatat cu succes');
+        this.presentToast(zone.waterSwitch ? 'Electrovalva a fost deschisa' : 'Electrovalva a fost inchisa');
       }
     );
   }
 
-  async presentMoistureUpdateAlertConfirm(zoneId: number, zone: Zone) {
-    const alert = await this.alertController.create({
-      header: 'Confirm!',
-      message: 'Schimbarea detaliilor zonei?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {
-            this.getZones();
-            zone.changeState = true;
-          }
-        },
-        {
-          text: 'Okay',
-          handler: () => {
-            const zoneForUpdate = {
-              moistureStart: zone.moistureStart,
-              moistureStop: zone.moistureStop,
-              waterSwitch: zone.waterSwitch
-            };
+  updateSwitchState(zoneId: number, zone: Zone) {
+    const zoneForUpdate = {
+      moistureStart: zone.moistureStart,
+      moistureStop: zone.moistureStop,
+      waterSwitch: zone.waterSwitch
+    };
 
-            this.UpdateZoneMoisture(this.systemId, zoneId, zoneForUpdate);
-            zone.changeState = true;
-            console.log('moisture updates');
-          }
-        }
-      ]
-    });
-    await alert.present();
+    this.UpdateZoneMoisture(this.systemId, zoneId, zoneForUpdate);
   }
-
 
   async presentTemperatureUpdateAlertConfirm() {
     const alert = await this.alertController.create({
-      header: 'Confirm!',
+      header: 'Confirmati!',
       message: 'Schimbarea intervalului temperaturii?',
       buttons: [
         {
@@ -171,14 +153,14 @@ export class SchedulePage implements OnInit {
       x => console.log('Observer got a next value: ' + x),
       err => this.presentToast('An error occured. Try again later'),
       () => {
-        this.presentToast('Succefully deleted');
+        this.presentToast('Senzor sters cu succes');
       });
   }
 
   async presentAlertDeleteZone(zone: Zone) {
     const alert = await this.alertController.create({
-      header: 'Confirm!',
-      message: 'Stergere zona' + zone.name + '?',
+      header: 'Confirmati stergerea!',
+      message: 'Doriti sa stergeti senzorul ' + ' ' + zone.name + '?',
       buttons: [
         {
           text: 'Nu',
@@ -207,6 +189,26 @@ export class SchedulePage implements OnInit {
   updateTemperatureConfirmation() {
     this.temperatureUpdatedState = false;
   }
+
+  async openEditModal(zone: Zone) {
+    const modal = await this.modalController.create({
+      component: EditMoistureModalComponent,
+      componentProps: {
+        moistureStart: zone.moistureStart,
+        moistureStop: zone.moistureStop,
+        waterSwitch: zone.waterSwitch,
+        zoneId: zone.id,
+        isAllZoneEdit: false,
+        systemId: this.systemId
+      }
+    },
+    );
+    modal.onDidDismiss().then((data) => {
+      this.getZones();
+    });
+    await modal.present();
+  }
+
 
   // restrictMoisture(zone: Zone) {
   //   if (zone.moistureStart >= zone.moistureStop) {
