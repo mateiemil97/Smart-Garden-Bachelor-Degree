@@ -55,6 +55,7 @@ namespace Smart_garden
             CreateMap<ZoneForUpdateDto, Zone>();
 
             CreateMap<Zone, ZoneDtoForArduino>();
+            CreateMap<ZoneDtoForGet, ZoneDtoForArduino>();
             CreateMap<ZoneDto, ZoneDtoForArduino>();
             CreateMap<ZoneSensorComposite, SensorForCreationDto>()
                 .ForMember(dest => dest.SystemId, src => src.MapFrom(id => id.SystemId))
