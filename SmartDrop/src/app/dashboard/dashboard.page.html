@@ -75,10 +75,10 @@
         <div fxLayout="row" fxLayoutAlign="space-evenly center">
           <ion-card *ngFor="let moisture of currentMoisture">
             <ion-card-header>
-              <ion-card-title>{{moisture.zone}}</ion-card-title>
+              <ion-card-title> {{moisture?.vegetableName}}: {{moisture?.zone}}</ion-card-title>
             </ion-card-header>
             <ion-card-content class="moistCardTextInfo">
-              Umiditata solului {{moisture.value}}% <br> {{moisture.dateTime | date: 'd/MMM/y, H:mm:ss'}}
+              Umiditata solului {{moisture?.value}}% <br> {{moisture?.dateTime | date: 'd/MMM/y, H:mm:ss'}}
             </ion-card-content>
           </ion-card>
         </div>

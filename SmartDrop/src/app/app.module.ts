@@ -23,11 +23,12 @@ import {MatExpansionModule} from '@angular/material/expansion';
 
 
 import 'chartjs-plugin-zoom';
+import { EditMoistureModalComponent } from './schedule/edit-moisture-modal/edit-moisture-modal.component';
 
 
 @NgModule({
-  declarations: [AppComponent],
-  entryComponents: [],
+  declarations: [AppComponent, EditMoistureModalComponent],
+  entryComponents: [EditMoistureModalComponent],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),

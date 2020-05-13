@@ -10,6 +10,7 @@ import { IrrigationSystem } from '../models/irrigationSystem';
 import { LoginService } from '../core/authentication/login/login.service';
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
+import { MeasurementForDashboard } from '../models/MeasurementForDashboard';
 @Component({
   selector: 'app-dashboard',
   templateUrl: 'dashboard.page.html',
@@ -18,14 +19,14 @@ import { Storage } from '@ionic/storage';
 export class DashboardPage implements OnInit {
 
   currentTemperature: Measurement;
-  currentMoisture: Measurement[] = [];
+  currentMoisture: MeasurementForDashboard[] = [];
   zones: Zone[] = [];
   currentState: CurrentState = new CurrentState();
   changeIrigationState: ChangeIrigationState = new ChangeIrigationState();
   irrigationSystems: IrrigationSystem[] = [];
 
   currentIrrigationSystem: IrrigationSystem;
-
+  zone: MeasurementForDashboard = new MeasurementForDashboard();
   userId: number;
 
   constructor(
@@ -45,7 +46,6 @@ export class DashboardPage implements OnInit {
       this.userId = id;
       this.dashboardService.GetSystemsByUser(this.userId).subscribe(system => {
         this.irrigationSystems = system;
-        //console.log(this.irrigationSystems);
         this.currentIrrigationSystem = this.irrigationSystems[0];
         this.storage.set('irrigationSystemId', this.currentIrrigationSystem.systemId);
         this.getCurrentState(this.irrigationSystems[0].systemId);
@@ -54,25 +54,38 @@ export class DashboardPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.getCurrentState(this.currentIrrigationSystem.systemId);
-    this.currentMoisture = [];
-    this.getTemperature(this.currentIrrigationSystem.systemId);
+    this.storage.get('userId').then((id) => {
+      this.getCurrentState(this.currentIrrigationSystem.systemId);
+      this.currentMoisture = [];
+      this.getTemperature(this.currentIrrigationSystem.systemId);
+    });
   }
 
   getTemperature(systemId: number) {
     this.dashboardService.GetLatestTemperature(this.currentIrrigationSystem.systemId).subscribe((temp: Measurement) => {
       this.currentTemperature = temp;
-      //console.log(this.currentTemperature);
     });
   }
 
   getZones(systemIds: number) {
     this.scheduleService.GetZones(this.currentIrrigationSystem.systemId).subscribe(
       zones => {
+        this.zones = zones;
         zones.forEach(element => {
+          console.log(element);
           this.dashboardService.GetLatestMeasurementValue(this.currentIrrigationSystem.systemId, element.sensorId).subscribe(moist => {
-            this.currentMoisture.push(moist);
-           // console.log(this.currentMoisture);
+
+            if (moist == null) {
+              moist = new MeasurementForDashboard();
+              moist.vegetableName = element.userVegetableName;
+              moist.zone = element.name;
+            }
+            if (moist != null) {
+              this.zone = moist;
+              this.zone.vegetableName = element.userVegetableName;
+            }
+            this.currentMoisture.push(this.zone);
+            console.log('dsdfsd');
           });
         });
       }
@@ -91,7 +104,6 @@ export class DashboardPage implements OnInit {
   getCurrentState(systemId: number) {
     this.dashboardService.GetSystemState(systemId).subscribe(state => {
       this.currentState = state;
-      //console.log(this.currentState);
     });
   }
 
@@ -99,7 +111,7 @@ export class DashboardPage implements OnInit {
     console.log('Begin async operation', refresher);
 
     setTimeout(() => {
-     // console.log('Async operation has ended');
+      // console.log('Async operation has ended');
       this.currentMoisture = [];
       this.getZones(this.currentIrrigationSystem.systemId);
       this.getTemperature(this.currentIrrigationSystem.systemId);
@@ -143,8 +155,8 @@ export class DashboardPage implements OnInit {
     const alert = await this.alertController.create({
       header: 'Confirm!',
       subHeader: this.currentState.automationMode ?
-      'Daca dezactivati irigarea automata aceasta nu va mai porni la program pana la reactivare!' :
-      'Daca activati irigarea, aceasta va porni in functie de programul ales'
+        'Daca dezactivati irigarea automata aceasta nu va mai porni la program pana la reactivare!' :
+        'Daca activati irigarea, aceasta va porni in functie de programul ales'
       ,
       message: this.currentState.automationMode ? 'Dezactivati irigarea automata?' : 'Activati irigarea automata?',
       buttons: [
@@ -160,14 +172,14 @@ export class DashboardPage implements OnInit {
               this.changeIrigationState.automationMode = false;
             } else if (this.currentState.automationMode === false) {
               this.changeIrigationState.automationMode = true;
-              if(this.currentState.working) {
+              if (this.currentState.working) {
                 this.changeIrigationState.manual = false;
               }
 
             }
 
             // tslint:disable-next-line: max-line-length
-            this.updateIrigationState(this.changeIrigationState, this.currentIrrigationSystem.systemId, 'Irigarea automata dezactivata cu success','Irigarea automata activata cu succes', 2);
+            this.updateIrigationState(this.changeIrigationState, this.currentIrrigationSystem.systemId, 'Irigarea automata dezactivata cu success', 'Irigarea automata activata cu succes', 2);
           }
         }
       ]

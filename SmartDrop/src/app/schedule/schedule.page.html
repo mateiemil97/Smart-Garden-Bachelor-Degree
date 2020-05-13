@@ -84,7 +84,7 @@
                 <ion-item-option color="danger" (click)="presentAlertDeleteZone(zone)">Sterge</ion-item-option>
               </ion-item-options>
               <ion-item>
-                <ion-label>{{zone.userVegetableName}}: {{zone.name}}</ion-label>
+                <ion-label>{{zone.userVegetableName}}: {{zone.name}} ({{zone.moistureStart}}% - {{zone.moistureStop}}%)</ion-label>
                 <ion-toggle (ionChange)="updateSwitchState(zone.id,zone)" [(ngModel)]="zone.waterSwitch"
                     name="waterSwitch" color="primary"></ion-toggle>
               </ion-item>

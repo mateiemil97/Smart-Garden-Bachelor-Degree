@@ -68,7 +68,7 @@
   const char* FCMToken;
   
   
-  const String  api = "http://192.168.1.6:45455/api";
+  const String  api = "http://192.168.1.6:45457/api";
   const String fingerPrint = "82:88:7C:B6:41:71:8B:04:67:A5:10:C2:34:40:24:04:78:A6:7E:55"; 
   
   const String series = "BBBB";
@@ -111,7 +111,7 @@
 
   void sendRequest() {
     if (request.readyState() == 0 || request.readyState() == 4) {
-      request.open("GET", "http://192.168.1.6:45455/api/systems/1013/arduino");
+      request.open("GET", "http://192.168.1.6:45457/api/systems/1013/arduino");
       request.send();
     }
   }
@@ -119,8 +119,11 @@
 
   void requestCB(void* optParm, asyncHTTPrequest* request, int readyState) {
     if (readyState == 4) {
-       dataToParseFromAPI = request->responseText();
-      //Serial.println(request->responseText());       
+//        Serial.println("intrerupere");       
+//       Serial.println(request->responseText());       
+       Serial.println(request->responseText());
+        Serial.println();
+        request->setDebug(false);
     }
   }
 
@@ -157,6 +160,7 @@
     notificationMoistureMaxSent[1] = false;
   
     localSystemState.working = false;
+    request.setDebug(true);
     request.onReadyStateChange(requestCB);
     ticker.attach(2, sendRequest);
   }
@@ -386,7 +390,7 @@
         String notifText0 = text0 + name0;
         Serial.print("Zone name :");
         Serial.println(notifText0);
-        SendNotification(FCMToken,notifText0);
+        //SendNotification(FCMToken,notifText0);
       }     
     
        if(moisture[1].value < zones[1].startMoisture && localSystemState.working == false && notificationSent[1]==false)
@@ -397,7 +401,7 @@
           String notifText1 = text1 + name1;
           Serial.print("Zone name:");
           Serial.println(notifText1);
-          SendNotification(FCMToken,notifText1);
+          //SendNotification(FCMToken,notifText1);
         }
 
         if(moisture[0].value > zones[0].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[0] == false)
@@ -408,7 +412,7 @@
         String notifText0 = text0 + name0;
         Serial.print("Zone name :");
         Serial.println(notifText0);
-        SendNotification(FCMToken,notifText0);
+        //SendNotification(FCMToken,notifText0);
       }
     
        if(moisture[1].value > zones[1].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[1] == false)
@@ -419,7 +423,7 @@
           String notifText1 = text1 + name1;
           Serial.print("Zone name:");
           Serial.println(notifText1);
-          SendNotification(FCMToken,notifText1);
+          //SendNotification(FCMToken,notifText1);
         }
         
    }

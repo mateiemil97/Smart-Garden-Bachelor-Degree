@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { VegetablesForCreationModel } from 'src/app/models/VegetablesForCreationModel';
+import { ZoneForUpdate } from 'src/app/models/zoneForUpdate.model';
 
 @Injectable({
   providedIn: 'root'
@@ -28,5 +29,8 @@ export class VegetablesServiceService {
   DeleteVegetable(id: number): Observable<any> {
     return this.http.delete(`${environment.url}/vegetables/${id}`);
   }
-  
+
+  UpdateVegetablesAndZones(vegetableId: number, userId: number, zoneForUpdate: ZoneForUpdate): Observable<any> {
+    return this.http.put(`${environment.url}/${userId}/vegetables/${vegetableId}`, zoneForUpdate);
+  }
 }
