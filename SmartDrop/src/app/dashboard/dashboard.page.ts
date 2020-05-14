@@ -46,6 +46,7 @@ export class DashboardPage implements OnInit {
       this.userId = id;
       this.dashboardService.GetSystemsByUser(this.userId).subscribe(system => {
         this.irrigationSystems = system;
+        console.log(this.irrigationSystems[0].systemId);
         this.currentIrrigationSystem = this.irrigationSystems[0];
         this.storage.set('irrigationSystemId', this.currentIrrigationSystem.systemId);
         this.getCurrentState(this.irrigationSystems[0].systemId);
@@ -107,15 +108,19 @@ export class DashboardPage implements OnInit {
     });
   }
 
+  refresh() {
+    this.currentMoisture = [];
+    this.getZones(this.currentIrrigationSystem.systemId);
+    this.getTemperature(this.currentIrrigationSystem.systemId);
+    this.getCurrentState(this.currentIrrigationSystem.systemId);
+  }
+
   doRefresh(refresher) {
     console.log('Begin async operation', refresher);
 
     setTimeout(() => {
       // console.log('Async operation has ended');
-      this.currentMoisture = [];
-      this.getZones(this.currentIrrigationSystem.systemId);
-      this.getTemperature(this.currentIrrigationSystem.systemId);
-      this.getCurrentState(this.currentIrrigationSystem.systemId);
+      this.refresh();
       refresher.target.complete();
     }, 2000);
   }
@@ -213,8 +218,16 @@ export class DashboardPage implements OnInit {
         } else if (choose === 2) {
           this.presentToast(this.currentState.automationMode ? stopIrr : startIrr);
         }
-
+        console.log("Id:" + systemId);
         this.getCurrentState(systemId);
+
+        this.dashboardService.GetSystemState(systemId).subscribe(state => {
+          console.log(state);
+          if (state.working) {
+            this.refresh();
+          }
+        });
+
       });
   }
 
