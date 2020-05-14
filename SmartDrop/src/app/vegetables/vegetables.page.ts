@@ -5,6 +5,9 @@ import { VegetablesServiceService } from './services/vegetables-service.service'
 import { VegetablesModel } from '../models/VegetablesModel';
 import {Storage} from '@ionic/storage';
 import { VegetablesForCreationModel } from '../models/VegetablesForCreationModel';
+import { ZoneForUpdate } from '../models/zoneForUpdate.model';
+import { EditMoistureModalComponent } from '../schedule/edit-moisture-modal/edit-moisture-modal.component';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-vegetables',
   templateUrl: './vegetables.page.html',
@@ -15,15 +18,20 @@ export class VegetablesPage implements OnInit {
   vegetables: VegetablesModel[] = [];
 
   userId: number;
+  systemId: number;
   constructor(
-    private addVegetablesModal: ModalController,
+    private modalController: ModalController,
     private vegetablesService: VegetablesServiceService,
-    public storage: Storage
+    public storage: Storage,
+    public router: Router
   ) { }
 
   ngOnInit() {
     this.storage.get('userId').then(item => {
       this.userId = item;
+    });
+    this.storage.get('irrigationSystemId').then(item => {
+      this.systemId = item;
     });
   }
 
@@ -55,14 +63,32 @@ export class VegetablesPage implements OnInit {
   }
 
   async openAddVegetablesModal() {
-    const modal = await this.addVegetablesModal.create({
+    const modal = await this.modalController.create({
       component: GlobalVegetablesComponent
     });
     return await modal.present();
   }
 
   dismissModal() {
-    this.addVegetablesModal.dismiss();
+    this.modalController.dismiss();
+  }
+
+  async openEditModal(vegetable) {
+    const modal = await this.modalController.create({
+      component: EditMoistureModalComponent,
+      componentProps: {
+        moistureStart: vegetable.startMoisture,
+        moistureStop: vegetable.stopMoisture,
+        waterSwitch: vegetable.waterSwitch,
+        isAllZoneEdit: true,
+        systemId: this.systemId,
+        userId: this.userId,
+        vegetableId: vegetable.id
+      }
+    });
+    modal.onDidDismiss().then(
+    );
+    return await modal.present();
   }
 
 }

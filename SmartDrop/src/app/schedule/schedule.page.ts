@@ -38,10 +38,10 @@ export class SchedulePage implements OnInit {
   ionViewWillEnter() {
     this.storage.get('irrigationSystemId').then(id => {
       this.systemId = id;
+      this.getSchedule();
+      this.getZones();
       console.log(this.systemId);
     });
-    this.getSchedule();
-    this.getZones();
   }
 
   getZones() {
@@ -114,7 +114,8 @@ export class SchedulePage implements OnInit {
     const zoneForUpdate = {
       moistureStart: zone.moistureStart,
       moistureStop: zone.moistureStop,
-      waterSwitch: zone.waterSwitch
+      waterSwitch: zone.waterSwitch,
+      systemId: this.systemId
     };
 
     this.UpdateZoneMoisture(this.systemId, zoneId, zoneForUpdate);

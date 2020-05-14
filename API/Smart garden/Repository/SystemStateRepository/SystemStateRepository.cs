@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +38,7 @@ namespace Smart_garden.Repository.SystemStateRepository
             var state = (from systemState in _context.SystemState
                 join irigationSystem in _context.IrigationSystem
                     on systemState.SystemId equals irigationSystem.Id
-                orderby systemState.Id descending
+               
                 select systemState).Take(1).SingleOrDefault();
 
             return state;

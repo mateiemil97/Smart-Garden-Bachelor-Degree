@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Smart_garden.Entites;
 using Smart_garden.Models.UserVegetablesDto;
+using Smart_garden.Models.ZoneDto;
 using Smart_garden.UnitOfWork;
 
 namespace Smart_garden.Controllers
@@ -105,6 +106,46 @@ namespace Smart_garden.Controllers
             catch
             {
                 return StatusCode(500, "Server error on deleting vegetable");
+            }
+            
+        }
+        [HttpPut("{userId}/vegetables/{vegetableId}")]
+        public IActionResult UpdateVegetableWithZones(int vegetableId,int userId, [FromBody]ZoneForUpdateDto zone)
+        {
+            try
+            {
+                var vegetable = _unitOfWork.UserVegetablesRepository.GetUserVegetable(userId, vegetableId).FirstOrDefault();
+
+                int initialStartMoisture = vegetable.StartMoisture;
+                int initialStopMoisture = vegetable.StopMoisture;
+
+                if (vegetable == null)
+                    return NotFound();
+
+                vegetable.StartMoisture = zone.MoistureStart;
+                vegetable.StopMoisture = zone.MoistureStop;
+
+                _unitOfWork.UserVegetablesRepository.Update(vegetable);
+
+                var zones = _unitOfWork.ZoneRepository.GetZonesBySystem(zone.SystemId);
+
+                foreach (var z in zones)
+                {
+                    if (z.MoistureStart == initialStartMoisture && z.MoistureStop == initialStopMoisture)
+                    {
+                        z.MoistureStart = zone.MoistureStart;
+                        z.MoistureStop = zone.MoistureStop;
+                        var zoneToUpdate = _mapper.Map<Zone>(z);
+                        _unitOfWork.ZoneRepository.Update(zoneToUpdate);
+                    }
+                }
+
+                _unitOfWork.Save();
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Error on updating");
             }
             
         }

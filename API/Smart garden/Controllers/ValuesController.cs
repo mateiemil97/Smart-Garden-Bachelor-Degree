@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Smart_garden.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
         // GET api/values
-        [HttpGet]
+
+        [HttpGet("values")]
         public ActionResult<IEnumerable<string>> Get()
         {
             return new string[] { "value1", "value2" }; //7552 53

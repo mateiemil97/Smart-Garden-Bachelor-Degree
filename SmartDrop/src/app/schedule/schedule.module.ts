@@ -17,12 +17,11 @@ import { EditMoistureModalComponent } from './edit-moisture-modal/edit-moisture-
   declarations: [
     SchedulePage,
     ModalZonePage,
-    EditMoistureModalComponent
+
   ],
   entryComponents:
   [
     ModalZonePage,
-    EditMoistureModalComponent
   ]
 })
 export class SchedulePageModule {}
