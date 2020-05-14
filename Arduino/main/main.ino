@@ -1,5 +1,8 @@
   #include <ArduinoJson.h>
   #include <ESP8266WiFi.h>
+  #include <DNSServer.h>
+  #include <WiFiManager.h>
+  #include <ESP8266WebServer.h>
   #include <ESP8266HTTPClient.h>
   #include "WifiConnect.h";
   #include <string.h>
@@ -68,7 +71,7 @@
   const char* FCMToken;
   
   
-  const String  api = "http://192.168.1.6:45457/api";
+  const String  api = "http://192.168.1.7/api";
   const String fingerPrint = "82:88:7C:B6:41:71:8B:04:67:A5:10:C2:34:40:24:04:78:A6:7E:55"; 
   
   const String series = "BBBB";
@@ -102,16 +105,12 @@
   
   SystemState localSystemState;
   SystemState SystemStateFromDb;
-  
-   WifiConnect wifi = WifiConnect("DIGI_ce10a8","989d31ef");
-  
-   //WifiConnect wifi = WifiConnect("MERCUSYS_98EB","matei123");
-  
+    
   bool manualIrrigation;
 
   void sendRequest() {
     if (request.readyState() == 0 || request.readyState() == 4) {
-      request.open("GET", "http://192.168.1.6:45457/api/systems/1013/arduino");
+      request.open("GET", "http://192.168.1.7/api/systems/1013/arduino");
       request.send();
     }
   }
@@ -119,17 +118,16 @@
 
   void requestCB(void* optParm, asyncHTTPrequest* request, int readyState) {
     if (readyState == 4) {
-//        Serial.println("intrerupere");       
-//       Serial.println(request->responseText());       
-       Serial.println(request->responseText());
-        Serial.println();
-        request->setDebug(false);
+       dataToParseFromAPI = request->responseText();
+      //Serial.println(request->responseText());       
     }
   }
 
   void setup() {
-    
-    wifi.Connect();
+    WiFiManager wifiManager;
+    Serial.println("Conecting.....");
+    wifiManager.autoConnect("Smart Drop");
+    Serial.println("connected");
     Serial.begin(9600);
     //serial with uno
     s.begin(9600);
@@ -160,7 +158,6 @@
     notificationMoistureMaxSent[1] = false;
   
     localSystemState.working = false;
-    request.setDebug(true);
     request.onReadyStateChange(requestCB);
     ticker.attach(2, sendRequest);
   }
@@ -193,8 +190,10 @@
     Serial.println(localSystemState.working);
     
     
-    //temperature = ReadTemperature();
-    temperature = 20;
+    temperature = ReadTemperature();
+    Serial.print("Temperature");
+    Serial.println(temperature);
+    //temperature = 20;
     bool temperatureNotification;
     
      //automation code
@@ -390,7 +389,7 @@
         String notifText0 = text0 + name0;
         Serial.print("Zone name :");
         Serial.println(notifText0);
-        //SendNotification(FCMToken,notifText0);
+        SendNotification(FCMToken,notifText0);
       }     
     
        if(moisture[1].value < zones[1].startMoisture && localSystemState.working == false && notificationSent[1]==false)
@@ -401,7 +400,7 @@
           String notifText1 = text1 + name1;
           Serial.print("Zone name:");
           Serial.println(notifText1);
-          //SendNotification(FCMToken,notifText1);
+          SendNotification(FCMToken,notifText1);
         }
 
         if(moisture[0].value > zones[0].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[0] == false)
@@ -412,7 +411,7 @@
         String notifText0 = text0 + name0;
         Serial.print("Zone name :");
         Serial.println(notifText0);
-        //SendNotification(FCMToken,notifText0);
+        SendNotification(FCMToken,notifText0);
       }
     
        if(moisture[1].value > zones[1].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[1] == false)
@@ -423,7 +422,7 @@
           String notifText1 = text1 + name1;
           Serial.print("Zone name:");
           Serial.println(notifText1);
-          //SendNotification(FCMToken,notifText1);
+          SendNotification(FCMToken,notifText1);
         }
         
    }
