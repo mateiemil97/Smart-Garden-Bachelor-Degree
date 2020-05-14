@@ -24,7 +24,7 @@ namespace Smart_garden.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("fcmtoken")]
+        [HttpGet("{systemId}/fcmtoken")]
         public IActionResult GetToken(int systemId)
         {
             var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
