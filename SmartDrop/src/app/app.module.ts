@@ -25,6 +25,9 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import 'chartjs-plugin-zoom';
 import { EditMoistureModalComponent } from './schedule/edit-moisture-modal/edit-moisture-modal.component';
 
+import {AngularFireModule} from 'angularfire2';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
+import {environment} from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent, EditMoistureModalComponent],
@@ -37,7 +40,9 @@ import { EditMoistureModalComponent } from './schedule/edit-moisture-modal/edit-
     HttpClientModule,
     FormsModule,
     BrowserAnimationsModule,
-    MatExpansionModule
+    MatExpansionModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireDatabaseModule
   ],
   providers: [
     StatusBar,

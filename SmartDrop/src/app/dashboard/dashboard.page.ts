@@ -11,6 +11,8 @@ import { LoginService } from '../core/authentication/login/login.service';
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { MeasurementForDashboard } from '../models/MeasurementForDashboard';
+import { IrrigationSysteConnectedFirebase } from '../models/IrrigationSysteConnectedFirebase';
+import { UpdateZoneForNotConnected } from '../models/UpdateZoneForNotConnected';
 @Component({
   selector: 'app-dashboard',
   templateUrl: 'dashboard.page.html',
@@ -29,6 +31,10 @@ export class DashboardPage implements OnInit {
   zone: MeasurementForDashboard = new MeasurementForDashboard();
   userId: number;
 
+  systemConectionStatus: IrrigationSysteConnectedFirebase = new IrrigationSysteConnectedFirebase();
+
+  irrigationSystemNotConnected: boolean;
+
   constructor(
     public dashboardService: DashboardService,
     public scheduleService: ScheduleService,
@@ -38,7 +44,8 @@ export class DashboardPage implements OnInit {
     public storage: Storage,
     private alertController: AlertController,
 
-  ) { }
+  ) {
+  }
 
   ngOnInit() {
     this.currentMoisture = [];
@@ -50,21 +57,50 @@ export class DashboardPage implements OnInit {
         this.currentIrrigationSystem = this.irrigationSystems[0];
         this.storage.set('irrigationSystemId', this.currentIrrigationSystem.systemId);
         this.getCurrentState(this.irrigationSystems[0].systemId);
+        this.getOnlineSystemState()
       });
+
     });
   }
 
   ionViewWillEnter() {
     this.storage.get('userId').then((id) => {
       this.getCurrentState(this.currentIrrigationSystem.systemId);
-      this.currentMoisture = [];
+      // this.currentMoisture = [];
       this.getTemperature(this.currentIrrigationSystem.systemId);
+      this.getOnlineSystemState();
     });
   }
 
   getTemperature(systemId: number) {
     this.dashboardService.GetLatestTemperature(this.currentIrrigationSystem.systemId).subscribe((temp: Measurement) => {
       this.currentTemperature = temp;
+    });
+  }
+
+  getOnlineSystemState() {
+    this.dashboardService.GetLastTimeSystemSeenOnline(this.currentIrrigationSystem.seriesKey).
+    valueChanges().subscribe(time => {
+      const newTime = new Date();
+      const currentTime = (newTime.getHours() * 3600) + (newTime.getMinutes() * 60) + newTime.getSeconds();
+      // tslint:disable-next-line: radix
+
+      if (currentTime - time.Miliseconds > 3) {
+        this.irrigationSystemNotConnected = false;
+        this.systemConectionStatus.DateAndTime = time.DateAndTime;
+
+        const state: UpdateZoneForNotConnected = {
+          working: false,
+          automation: false,
+          manual: true
+        };
+
+        this.dashboardService.UpdateStateWhenNotConnectedSystem(this.currentIrrigationSystem.systemId, state).subscribe();
+        this.getCurrentState(this.currentIrrigationSystem.systemId);
+
+      } else {
+        this.irrigationSystemNotConnected = true;
+      }
     });
   }
 
@@ -113,6 +149,7 @@ export class DashboardPage implements OnInit {
     this.getZones(this.currentIrrigationSystem.systemId);
     this.getTemperature(this.currentIrrigationSystem.systemId);
     this.getCurrentState(this.currentIrrigationSystem.systemId);
+    this.getOnlineSystemState();
   }
 
   doRefresh(refresher) {
