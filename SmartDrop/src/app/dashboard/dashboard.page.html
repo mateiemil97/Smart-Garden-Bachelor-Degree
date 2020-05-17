@@ -22,11 +22,14 @@
       </ion-select-option>
     </ion-select>
   </ion-item>
+
   <ion-grid>
     <ion-row>
       <ion-col offset-md="3" size-md="6">
         <ion-card>
           <ion-card-header>
+            <ion-icon *ngIf="irrigationSystemNotConnected" name="ios-wifi"></ion-icon>
+            <ion-icon *ngIf="!irrigationSystemNotConnected" name="ios-alert"></ion-icon>
             <ion-row class="nameRow">
               <ion-col>
                 <ion-label class="temperatureLabel">Temperatura</ion-label>
@@ -41,14 +44,18 @@
         </ion-card>
       </ion-col>
     </ion-row>
-   
+
     <ion-row>
       <ion-col offset-md="3" size-md="6">
-        <ion-item  >
-          <ion-label style="font-size: 20px;"*ngIf="currentState?.automationMode === true">Irigarea automata activata</ion-label>
-          <ion-button *ngIf="currentState?.automationMode === true" color="danger" (click)=presentIrrigationAutomatedStateUpdateAlertConfirm()>Dezactiveaza</ion-button>
-          <ion-label style="font-size: 20px;" *ngIf="currentState?.automationMode === false">Irigarea automata dezactivata</ion-label>
-          <ion-button *ngIf="currentState?.automationMode === false" color="primary" (click)=presentIrrigationAutomatedStateUpdateAlertConfirm()>Activeaza</ion-button>
+        <ion-item>
+          <ion-label style="font-size: 20px;" *ngIf="currentState?.automationMode === true">Irigarea automata activata
+          </ion-label>
+          <ion-button [disabled]="!irrigationSystemNotConnected" *ngIf="currentState?.automationMode === true" color="danger"
+            (click)=presentIrrigationAutomatedStateUpdateAlertConfirm()>Dezactiveaza</ion-button>
+          <ion-label style="font-size: 20px;" *ngIf="currentState?.automationMode === false">Irigarea automata
+            dezactivata</ion-label>
+          <ion-button [disabled]="!irrigationSystemNotConnected" *ngIf="currentState?.automationMode === false" color="primary"
+            (click)=presentIrrigationAutomatedStateUpdateAlertConfirm()>Activeaza</ion-button>
         </ion-item>
       </ion-col>
     </ion-row>
@@ -65,7 +72,7 @@
       <ion-col offset-md="3" size-md="6">
         <ion-item *ngIf="currentState?.working === true">
           <ion-label>Se iriga</ion-label>
-          <ion-progress-bar  reversed="true" type="indeterminate"></ion-progress-bar>
+          <ion-progress-bar reversed="true" type="indeterminate"></ion-progress-bar>
         </ion-item>
       </ion-col>
     </ion-row>
@@ -87,10 +94,22 @@
 
     <ion-row>
       <ion-col offset-md="3" size-md="6">
-        <ion-button *ngIf="!currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" expand="block">
+        <ion-button [disabled]="!irrigationSystemNotConnected" *ngIf="!currentState?.working"
+          (click)="presentIrrigationStateUpdateAlertConfirm()" expand="block">
           Porneste irigarea manual</ion-button>
-        <ion-button *ngIf="currentState?.working" (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger"
-          expand="block">Opreste irigarea manual</ion-button>
+        <ion-button [disabled]="!irrigationSystemNotConnected" *ngIf="currentState?.working"
+          (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger" expand="block">Opreste irigarea manual
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col offset-md="3" size-md="6">
+        <ion-label *ngIf="!irrigationSystemNotConnected" color=danger>Irigarea nu poate fi pornita.<br></ion-label>
+        <ion-label *ngIf="!irrigationSystemNotConnected" color="danger">Sistemul de irigatii nu mai este conectat la
+          internet<br></ion-label>
+        <ion-label *ngIf="!irrigationSystemNotConnected" color=danger>Ultima data a fost vazut online la ora:
+          {{this.systemConectionStatus?.DateAndTime}}
+        </ion-label>
       </ion-col>
     </ion-row>
   </ion-grid>

@@ -49,7 +49,9 @@
             </ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <ion-label>Irigarea incepe la {{schedule.start | date:'HH:mm'}} daca valoarea temperaturii este intre
+            <ion-label>Irigarea se face intre orele la {{schedule.start | date:'HH:mm'}} si {{schedule.stop | date:'HH:mm'}} daca valoarea temperaturii este intre {{schedule.temperatureMin}}°C -
+              {{schedule.temperatureMax}}°C
+
             </ion-label>
             <ion-range (ionFocus)="updateTemperatureConfirmation()" [(ngModel)]="dualKnobs" name="dualKnobs"
               dualKnobs="true" color="danger" pin="true" max=40 min=15 step=1 snaps=true ticks=true>
