@@ -238,6 +238,7 @@
         }
         if(countSwitchOn > 0)
         {
+          UpdateWorking(false,true,SystemStateFromDb.automationMode,board.id);
           digitalWrite(RELAYS_PUMP_PIN,LOW);
           localSystemState.working = true;
           notificationSent[0] = false;
@@ -245,7 +246,6 @@
          // SendNotification(FCMToken, "Irigarea automata a inceput");
           temperatureNotification = false;
           SystemStateFromDb.working = true;
-          UpdateWorking(false,true,SystemStateFromDb.automationMode,board.id);
         }
       }
       else if(temperature < schedule.temperatureMin || temperature > schedule.temperatureMax && localSystemState.working == true && SystemStateFromDb.manual == false && SystemStateFromDb.automationMode == true)
