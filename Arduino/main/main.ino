@@ -4,7 +4,6 @@
   #include <WiFiManager.h>
   #include <ESP8266WebServer.h>
   #include <ESP8266HTTPClient.h>
-  #include "WifiConnect.h";
   #include <string.h>
   #include <OneWire.h>
   #include <DallasTemperature.h>
@@ -13,6 +12,8 @@
   #include <WiFiUdp.h>
   #include <asyncHTTPrequest.h>
   #include <Ticker.h>
+  #include <FirebaseArduino.h>
+
   
   int D5 = 14, D6 = 12;
   SoftwareSerial s(D6,D5);
@@ -30,9 +31,13 @@
   #define RELAYS_WATER_SWITCH_P0_PIN 4
   #define RELAYS_WATER_SWITCH_P1_PIN 15
   
-  #define TEMPERATURE_INTERVAL_TIME_POST 60000
+  #define TEMPERATURE_INTERVAL_TIME_POST 600000
   #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 120000
   #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF 120000
+  #define FIREBASE_INTERVAL_TIME_POST_SYSTEM 1000
+  
+  #define FIREBASE_HOST "smart-drop-2eda9.firebaseio.com"
+  #define FIREBASE_AUTH "g0J8wyFbZC1zVgxLR5z5jBHEcLpypnuyPIhR0xXp"
   
   struct Board 
   { 
@@ -72,8 +77,7 @@
   
   
   const String  api = "http://192.168.1.7/api";
-  const String fingerPrint = "82:88:7C:B6:41:71:8B:04:67:A5:10:C2:34:40:24:04:78:A6:7E:55"; 
-  
+
   const String series = "BBBB";
   bool registered; //if user registered system from app
   Board board;
@@ -107,7 +111,7 @@
   SystemState SystemStateFromDb;
     
   bool manualIrrigation;
-
+  bool a;
   void sendRequest() {
     if (request.readyState() == 0 || request.readyState() == 4) {
       request.open("GET", "http://192.168.1.7/api/systems/1013/arduino");
@@ -122,7 +126,7 @@
       //Serial.println(request->responseText());       
     }
   }
-
+  
   void setup() {
     WiFiManager wifiManager;
     Serial.println("Conecting.....");
@@ -131,7 +135,12 @@
     Serial.begin(9600);
     //serial with uno
     s.begin(9600);
-  
+    
+
+    Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+//    //Enable auto reconnect the WiFi when connection lost
+
+    
     timeClient.begin();
     timeClient.setTimeOffset(utcOffsetInSeconds);
   
@@ -143,7 +152,8 @@
   
     temperatureTimeTrigger = 0;
     moistureTimeTrigger = millis();
-    
+    long firebaseTimeTrigger = millis();
+        
     //registered = CheckForRegisteredBoard(series);
     board = GetBoardByBoardSeries(series);
     Serial.print("Id:");
@@ -165,22 +175,28 @@
   
   void loop() {
 
-    moisture[0].port = "A0";
-    moisture[0].value = 50;
+//    moisture[0].port = "A0";
+//    moisture[0].value = 50;
+//
+//    moisture[1].port = "A1";
+//    moisture[1].value = 40;  
 
-    moisture[1].port = "A1";
-    moisture[1].value = 40;  
-  // ReadMoisture();  
+   if(!board.registered)
+   {
+      board = GetBoardByBoardSeries(series);
+   }
   
-   if (WiFi.status() == WL_CONNECTED) //&& board.registered)  //Check WiFi connection status
+   if (WiFi.status() == WL_CONNECTED && board.registered)  //Check WiFi connection status
    {
     GetScheduleZonesState(dataToParseFromAPI);
     timeClient.update();
-   
-    int currentTimeFromServer = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60));
-    
+    ReadMoisture();  
+    unsigned int currentTimeFromServer = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60));
+    unsigned int currentTimeFromServerForFirebase  = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60) + timeClient.getSeconds());
+    String currentTimeFromServerForFirebaseDateAndTime = String(timeClient.getHours()) + ":" + String(timeClient.getMinutes()) + ":" + String(timeClient.getSeconds());
     int currentTime = millis();
-    
+
+      
   
     Serial.print("System state working: ");
     Serial.println(SystemStateFromDb.working);
@@ -200,10 +216,11 @@
      int startTime = TransformTimeInSeconds(schedule.beginTime);
      int stopTime = TransformTimeInSeconds(schedule.endTime);
      
-    if((currentTimeFromServer >= startTime) && (currentTimeFromServer <= stopTime) && localSystemState.working == false && SystemStateFromDb.automationMode == true)
+    if((currentTimeFromServer >= startTime) && (currentTimeFromServer <= stopTime) && localSystemState.working == false  && SystemStateFromDb.automationMode == true)
     {
       if(temperature >= schedule.temperatureMin && temperature <= schedule.temperatureMax)
       {
+        a = true;
         Serial.println("data");
         Serial.println("primul temp");
         int countSwitchOn = 0;
@@ -227,6 +244,7 @@
           notificationSent[1] = false;
          // SendNotification(FCMToken, "Irigarea automata a inceput");
           temperatureNotification = false;
+          SystemStateFromDb.working = true;
           UpdateWorking(false,true,SystemStateFromDb.automationMode,board.id);
         }
       }
@@ -255,9 +273,10 @@
     //  SendNotification(FCMToken, "Irigarea automata s-a incheiat din cauza programului.");
       UpdateWorking(false,false,SystemStateFromDb.automationMode,board.id);
     } 
-    else if(SystemStateFromDb.working == false && SystemStateFromDb.manual == false && manualIrrigation == false && localSystemState.working == true)
+    else if(SystemStateFromDb.automationMode == false && localSystemState.working == true)
    {
     Serial.println("intra ultimul");
+    Serial.println(SystemStateFromDb.working);
       digitalWrite(RELAYS_PUMP_PIN,HIGH);
       digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,HIGH);
       digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,HIGH); 
@@ -330,8 +349,25 @@
             delay(1000);
           }
     }
+
+    if(localSystemState.working == true) {
+        digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,!zones[0].waterSwitch);
+        digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,!zones[1].waterSwitch);        
+
+        if(zones[0].waterSwitch == false && zones[1].waterSwitch == false)
+        {
+          digitalWrite(RELAYS_PUMP_PIN,HIGH);
+          localSystemState.working = false;
+         // SendNotification(FCMToken, "Irigarea s-a incheiat. Niciun robinet deschis.");
+          UpdateWorking(false,false,SystemStateFromDb.automationMode,board.id);  
+          delay(1000);
+        }
+    }
     
      //end manual irrigation
+
+      
+      
       Serial.print("Time from server:");
       Serial.println(currentTimeFromServer);
       Serial.print("Time from app start:");
@@ -381,51 +417,64 @@
 
     //Send notidication
       
-      if(moisture[0].value < zones[0].startMoisture && localSystemState.working == false && notificationSent[0] == false)
-      {
-        notificationSent[0]=true;
-        String text0 = "A scazut umiditatea in zona: ";
-        String name0 = String(zones[0].name);
-        String notifText0 = text0 + name0;
-        Serial.print("Zone name :");
-        Serial.println(notifText0);
-        SendNotification(FCMToken,notifText0);
-      }     
-    
-       if(moisture[1].value < zones[1].startMoisture && localSystemState.working == false && notificationSent[1]==false)
-        {
-          notificationSent[1]=true;
-          String text1 = "A scazut umiditatea in zona: ";
-          String name1 = String(zones[1].name);
-          String notifText1 = text1 + name1;
-          Serial.print("Zone name:");
-          Serial.println(notifText1);
-          SendNotification(FCMToken,notifText1);
-        }
+//      if(moisture[0].value < zones[0].startMoisture && localSystemState.working == false && notificationSent[0] == false)
+//      {
+//        notificationSent[0]=true;
+//        String text0 = "A scazut umiditatea in zona: ";
+//        String name0 = String(zones[0].name);
+//        String notifText0 = text0 + name0;
+//        Serial.print("Zone name :");
+//        Serial.println(notifText0);
+//        // SendNotification(FCMToken,notifText0);
+//      }     
+//    
+//       if(moisture[1].value < zones[1].startMoisture && localSystemState.working == false && notificationSent[1]==false)
+//        {
+//          notificationSent[1]=true;
+//          String text1 = "A scazut umiditatea in zona: ";
+//          String name1 = String(zones[1].name);
+//          String notifText1 = text1 + name1;
+//          Serial.print("Zone name:");
+//          Serial.println(notifText1);
+//        //  SendNotification(FCMToken,notifText1);
+//        }
+//
+//        if(moisture[0].value > zones[0].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[0] == false)
+//      {
+//        notificationMoistureMaxSent[0]=true;
+//        String text0 = "S-a atins umiditatea dorita in zona: ";
+//        String name0 = String(zones[0].name);
+//        String notifText0 = text0 + name0;
+//        Serial.print("Zone name :");
+//        Serial.println(notifText0);
+//       // SendNotification(FCMToken,notifText0);
+//      }
+//    
+//       if(moisture[1].value > zones[1].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[1] == false)
+//        {
+//          notificationMoistureMaxSent[1]=true;
+//          String text1 = "S-a atins umiditatea dorita in zona: ";
+//          String name1 = String(zones[1].name);
+//          String notifText1 = text1 + name1;
+//          Serial.print("Zone name:");
+//          Serial.println(notifText1);
+//       //   SendNotification(FCMToken,notifText1);
+//      }
+          
+          unsigned int firebaseTimeTrigger;
+          if((currentTime - firebaseTimeTrigger >= FIREBASE_INTERVAL_TIME_POST_SYSTEM))
+          {
+            String pathForFirebase = "System_Series/" +series+ "/Last_Time_Seen_Online/Miliseconds";
+            Firebase.setInt(pathForFirebase,currentTimeFromServerForFirebase);
+            String pathForFirebaseDateTime = "System_Series/" +series+ "/Last_Time_Seen_Online/DateAndTime";
+            Firebase.setString(pathForFirebaseDateTime,currentTimeFromServerForFirebaseDateAndTime);
 
-        if(moisture[0].value > zones[0].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[0] == false)
-      {
-        notificationMoistureMaxSent[0]=true;
-        String text0 = "S-a atins umiditatea dorita in zona: ";
-        String name0 = String(zones[0].name);
-        String notifText0 = text0 + name0;
-        Serial.print("Zone name :");
-        Serial.println(notifText0);
-        SendNotification(FCMToken,notifText0);
-      }
-    
-       if(moisture[1].value > zones[1].stopMoisture && localSystemState.working == true && SystemStateFromDb.working == true && SystemStateFromDb.manual == true  && notificationMoistureMaxSent[1] == false)
-        {
-          notificationMoistureMaxSent[1]=true;
-          String text1 = "S-a atins umiditatea dorita in zona: ";
-          String name1 = String(zones[1].name);
-          String notifText1 = text1 + name1;
-          Serial.print("Zone name:");
-          Serial.println(notifText1);
-          SendNotification(FCMToken,notifText1);
-        }
-        
+            firebaseTimeTrigger = millis();
+          }
    }
+   else {
+      Serial.println("System not connected or not registered");
+    }
  }
   
   
