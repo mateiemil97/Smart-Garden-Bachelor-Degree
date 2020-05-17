@@ -53,22 +53,22 @@ export class DashboardPage implements OnInit {
       this.userId = id;
       this.dashboardService.GetSystemsByUser(this.userId).subscribe(system => {
         this.irrigationSystems = system;
-        console.log(this.irrigationSystems[0].systemId);
-        this.currentIrrigationSystem = this.irrigationSystems[0];
-        this.storage.set('irrigationSystemId', this.currentIrrigationSystem.systemId);
-        this.getCurrentState(this.irrigationSystems[0].systemId);
-        this.getOnlineSystemState()
+        this.storage.set('irrigationSystemId', this.irrigationSystems[0].systemId);
+        this.currentIrrigationSystem = system[0];
+        this.getOnlineSystemState();
       });
 
     });
   }
 
   ionViewWillEnter() {
-    this.storage.get('userId').then((id) => {
-      this.getCurrentState(this.currentIrrigationSystem.systemId);
-      // this.currentMoisture = [];
-      this.getTemperature(this.currentIrrigationSystem.systemId);
+    this.storage.get('irrigationSystemId').then((id) => {
+      this.getCurrentState(id);
+      this.currentMoisture = [];
+      this.getTemperature(id);
       this.getOnlineSystemState();
+      this.currentMoisture = [];
+      this.getZones(id);
     });
   }
 
