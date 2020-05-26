@@ -32,12 +32,12 @@
             <ion-icon *ngIf="!irrigationSystemNotConnected" name="ios-alert"></ion-icon>
             <ion-row class="nameRow">
               <ion-col>
-                <ion-label class="temperatureLabel">Temperatura</ion-label>
+                <ion-label class="temperatureLabel">Temperatura: {{currentTemperature?.value}}°C</ion-label>
               </ion-col>
             </ion-row>
-            <ion-row>
+            <ion-row class="nameRow">
               <ion-col>
-                <ion-label class="temperatureValue">{{currentTemperature?.value}}°C</ion-label>
+                <ion-label class="temperatureLabel">Umiditatea aerului: {{currentHumidity?.value}}%</ion-label>
               </ion-col>
             </ion-row>
           </ion-card-header>
@@ -98,7 +98,7 @@
           (click)="presentIrrigationStateUpdateAlertConfirm()" expand="block">
           Porneste irigarea manual</ion-button>
         <ion-button [disabled]="!irrigationSystemNotConnected" *ngIf="currentState?.working"
-          (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger" expand="block">Opreste irigarea manual
+          (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger" expand="block">Opreste irigarea
         </ion-button>
       </ion-col>
     </ion-row>
@@ -107,7 +107,7 @@
         <ion-label *ngIf="!irrigationSystemNotConnected" color=danger>Irigarea nu poate fi pornita.<br></ion-label>
         <ion-label *ngIf="!irrigationSystemNotConnected" color="danger">Sistemul de irigatii nu mai este conectat la
           internet<br></ion-label>
-        <ion-label *ngIf="!irrigationSystemNotConnected" color=danger>Ultima data a fost vazut online la ora:
+        <ion-label *ngIf="!irrigationSystemNotConnected" color=danger>Ultima data a fost vazut online:
           {{this.systemConectionStatus?.DateAndTime}}
         </ion-label>
       </ion-col>

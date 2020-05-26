@@ -25,6 +25,10 @@ export class DashboardService {
     return this.http.get(`${environment.url}/systems/${systemId}/measurements/temperature`);
   }
 
+  public GetLatestHumidity(systemId: number) {
+    return this.http.get(`${environment.url}/systems/${systemId}/measurements/humidity`);
+  }
+
   public ChangeIrigationState(systemId: number, irigationState: ChangeIrigationState): Observable<any> {
     return this.http.put(`${environment.url}/systems/${systemId}/systemState`, irigationState);
   }

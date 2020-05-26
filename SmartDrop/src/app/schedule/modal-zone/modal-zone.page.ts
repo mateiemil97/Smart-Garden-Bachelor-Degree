@@ -61,9 +61,6 @@ export class ModalZonePage implements OnInit {
       } else {
         this.formValidation = false;
       }
-
-      console.log(f.value.port);
-      console.log(f.valid);
     });
 
   }

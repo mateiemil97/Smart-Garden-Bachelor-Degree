@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Sign Up</ion-title>
+    <ion-title>Inregistrare</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -10,26 +10,26 @@
       <ion-row>
         <ion-col size-sm="6" offset-sm="3">
           <ion-item>
-            <ion-label position="floating">Last name</ion-label>
+            <ion-label position="floating">Nume</ion-label>
             <ion-input required type="text" [(ngModel)]="userForRegister.lastName" name="lastName"
               #lastNameCtrl="ngModel">
             </ion-input>
           </ion-item>
           <ion-item lines="none" *ngIf="lastNameCtrl.touched && !lastNameCtrl.value">
-            <ion-label color="danger">Last name is required</ion-label>
+            <ion-label color="danger">Numele este obligatoriu</ion-label>
           </ion-item>
         </ion-col>
       </ion-row>
       <ion-row>
         <ion-col size-sm="6" offset-sm="3">
           <ion-item>
-            <ion-label position="floating">First name</ion-label>
+            <ion-label position="floating">Prenume</ion-label>
             <ion-input required type="text" [(ngModel)]="userForRegister.firstName" name="firstName"
               #firstNameCtrl="ngModel">
             </ion-input>
           </ion-item>
           <ion-item lines="none" *ngIf="firstNameCtrl.touched && !firstNameCtrl.value">
-            <ion-label color="danger">First name is required</ion-label>
+            <ion-label color="danger">Prenumele este obligatoriu</ion-label>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -42,40 +42,40 @@
             </ion-input>
           </ion-item>
           <ion-item lines="none" *ngIf="emailCtrl.touched && emailCtrl.errors?.pattern">
-            <ion-label>Should be a valid email adress</ion-label>
+            <ion-label>Trebuie sa fie o adresa de email valida</ion-label>
           </ion-item>
         </ion-col>
       </ion-row>
       <ion-row>
         <ion-col size-sm="6" offset-sm="3">
           <ion-item>
-            <ion-label position="floating">Password</ion-label>
+            <ion-label position="floating">Parola</ion-label>
             <ion-input required type="password" [(ngModel)]="userForRegister.password" name="password"
               #passwordCtrl="ngModel">
             </ion-input>
           </ion-item>
           <ion-item *ngIf="passwordCtrl.touched && !passwordCtrl.value" lines="none">
-            <ion-label color="danger">Password is required</ion-label>
+            <ion-label color="danger">Parola este obligatorie</ion-label>
           </ion-item>
         </ion-col>
       </ion-row>
       <ion-row>
         <ion-col size-sm="6" offset-sm="3">
           <ion-item>
-            <ion-label position="floating">Confirm password</ion-label>
+            <ion-label position="floating">Confirmare parola</ion-label>
             <ion-input required type="password" [(ngModel)]="userForRegister.confirmPassword" name="confirmPassword"
               #confirmPasswordCtrl="ngModel">
             </ion-input>
           </ion-item>
           <ion-item *ngIf="passwordCtrl.touched && passwordCtrl.value != confirmPasswordCtrl.value" lines="none">
-            <ion-label color="danger">Inconsistent password</ion-label>
+            <ion-label color="danger">Parolele nu se aseamana</ion-label>
           </ion-item>
         </ion-col>
       </ion-row>
       <ion-row>
         <ion-col size-sm="6" offset-sm="3">
           <ion-item>
-            <ion-label position="floating">Country</ion-label>
+            <ion-label position="floating">Tara</ion-label>
             <ion-input type="text" [(ngModel)]="userForRegister.country" name="country"></ion-input>
           </ion-item>
         </ion-col>
@@ -83,17 +83,17 @@
       <ion-row>
         <ion-col size-sm="6" offset-sm="3">
           <ion-item>
-            <ion-label position="floating">City</ion-label>
+            <ion-label position="floating">Oras</ion-label>
             <ion-input type="text" [(ngModel)]="userForRegister.city" name="city"></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
       <ion-button [disabled]="!form.valid || passwordCtrl.value != confirmPasswordCtrl.value" type="submit"
-        color="primary" expand="block" class="register-button">Register
+        color="primary" expand="block" class="register-button">Inregistrare
       </ion-button>
     </ion-grid>
   </form>
   <div class="loginLink">
-    <span [routerLink]="['/login']">Already have an account? Log in</span>
+    <span [routerLink]="['/login']">Ai deja un cont? Autentificare</span>
   </div>
 </ion-content>

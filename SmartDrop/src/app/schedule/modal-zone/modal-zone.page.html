@@ -42,13 +42,16 @@
       </ion-row>
 
     </ion-grid>
-    <ion-button [disabled]="ports == 0" expand="block" color="primary" type="submit">Add zone</ion-button>
-    <ion-label color="danger" *ngIf="ports==0">No available sensor port. Delete zone for creating new one</ion-label>
-    <ion-label color="danger" *ngIf="!formValidation">All fields are required!</ion-label>
-
+    <ion-button [disabled]="ports == 0" expand="block" color="primary" type="submit">Creaza zona</ion-button>
+    <ion-row>
+      <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+        <ion-label color="danger" *ngIf="ports==0">Nu mai sunt porturi disponibile!</ion-label>
+      </ion-col>
+    </ion-row>
+    <ion-label color="danger" *ngIf="!formValidation">Toate campurile sunt obligatorii</ion-label>
   </form>
   <ion-row>
-    <ion-col offset-md="2" size-md="8" size-xs="10" offset-xs="1">
+    <ion-col *ngIf="ports != 0" offset-md="2" size-md="8" size-xs="10" offset-xs="1">
       <h6>Daca planta nu se gaseste, adaug-o in 'Lista mea'.(Contul meu -> Lista plante)</h6>
     </ion-col>
   </ion-row>
