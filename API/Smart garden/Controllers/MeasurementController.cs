@@ -52,6 +52,21 @@ namespace Smart_garden.Controllers
             return Ok(mappedMeasurement);
         }
 
+        [HttpGet("humidity")]
+        public IActionResult GetLatestHumidityValueBySystem(int systemId, int sensorId)
+        {
+            var system = _unitOfWork.IrigationSystemRepository.ExistIrigationSystem(systemId);
+            if (!system)
+            {
+                return BadRequest("Irigation system not found");
+            }
+
+            var measurement = _unitOfWork.MeasurementRepository.GetLatestMeasurementOfHumidity(systemId);
+            var mappedMeasurement = _mapper.Map<MeasurementDto>(measurement);
+
+            return Ok(mappedMeasurement);
+        }
+
         [HttpGet("{sensorId}/statistics/day")]
         public IActionResult GetMeasurementForStatistics([FromQuery(Name = "date")] DateTime dateTime, int systemId, int sensorId)
         {
