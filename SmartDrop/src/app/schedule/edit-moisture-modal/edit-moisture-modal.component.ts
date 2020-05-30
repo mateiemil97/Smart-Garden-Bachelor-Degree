@@ -47,51 +47,51 @@ export class EditMoistureModalComponent implements OnInit {
     });
   }
 
-  editMoisture() {
-    if (!this.isAllZoneEdit) {
-      this.updateMoistureForOneZone();
-    } else {
-      this.updateMultipleZonesMoisture(this.vegetableId);
+    editMoisture() {
+      if (!this.isAllZoneEdit) {
+        this.updateMoistureForOneZone();
+      } else {
+        this.updateMultipleZonesMoisture(this.vegetableId);
+      }
     }
-  }
 
-  updateMoistureForOneZone() {
-    const zoneForUpdate = {
-      moistureStart: this.zoneForUpdate.moistureStart,
-      moistureStop: this.zoneForUpdate.moistureStop,
-      waterSwitch: this.zoneForUpdate.waterSwitch,
-      systemId: this.systemId
-    };
+    updateMoistureForOneZone() {
+      const zoneForUpdate = {
+        moistureStart: this.zoneForUpdate.moistureStart,
+        moistureStop: this.zoneForUpdate.moistureStop,
+        waterSwitch: this.zoneForUpdate.waterSwitch,
+        systemId: this.systemId
+      };
 
-    this.UpdateZoneMoisture(this.systemId, this.zoneId, zoneForUpdate);
-  }
+      this.UpdateZoneMoisture(this.systemId, this.zoneId, zoneForUpdate);
+    }
 
-  UpdateZoneMoisture(systemId: number, zoneId: number, zone: ZoneForUpdate) {
-    this.scheduleService.UpdateMoisture(systemId, zoneId, zone).subscribe(
-      x => console.log('Observer got a next value: ' + x),
-      err => this.presentToast('A aparut o eroare. Incercati din nou'),
-      () => {
-        this.presentToast('Umiditate actualizata cu succes');
-      }
-    );
-  }
+    UpdateZoneMoisture(systemId: number, zoneId: number, zone: ZoneForUpdate) {
+      this.scheduleService.UpdateMoisture(systemId, zoneId, zone).subscribe(
+        x => console.log('Observer got a next value: ' + x),
+        err => this.presentToast('A aparut o eroare. Incercati din nou'),
+        () => {
+          this.presentToast('Umiditate actualizata cu succes');
+        }
+      );
+    }
 
-  updateMultipleZonesMoisture(vegetableId: number) {
-    const zoneForUpdate = {
-      moistureStart: this.zoneForUpdate.moistureStart,
-      moistureStop: this.zoneForUpdate.moistureStop,
-      waterSwitch: this.zoneForUpdate.waterSwitch,
-      systemId: this.systemId
-    };
-    console.log(this.systemId);
-    this.vegetableService.UpdateVegetablesAndZones(vegetableId, this.userId, zoneForUpdate).subscribe(
-      x => console.log('Observer got a next value: ' + x),
-      err => this.presentToast('A aparut o eroare. Incercati din nou'),
-      () => {
-        this.presentToast('Umiditate actualizata cu succes');
-      }
-    );
-  }
+    updateMultipleZonesMoisture(vegetableId: number) {
+      const zoneForUpdate = {
+        moistureStart: this.zoneForUpdate.moistureStart,
+        moistureStop: this.zoneForUpdate.moistureStop,
+        waterSwitch: this.zoneForUpdate.waterSwitch,
+        systemId: this.systemId
+      };
+      console.log(this.systemId);
+      this.vegetableService.UpdateVegetablesAndZones(vegetableId, this.userId, zoneForUpdate).subscribe(
+        x => console.log('Observer got a next value: ' + x),
+        err => this.presentToast('A aparut o eroare. Incercati din nou'),
+        () => {
+          this.presentToast('Umiditate actualizata cu succes');
+        }
+      );
+    }
 
   async presentToast(message: string) {
     const toast = await this.toastController.create({

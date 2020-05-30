@@ -8,7 +8,7 @@
   <form #form="ngForm" (ngSubmit)="register(form)">
     <ion-grid>
       <ion-row>
-        <ion-col size-sm="6" offset-sm="3">
+        <ion-col size-sm="8" offset-sm="2">
           <ion-item>
             <ion-label position="floating">Nume</ion-label>
             <ion-input required type="text" [(ngModel)]="userForRegister.lastName" name="lastName"
@@ -21,7 +21,7 @@
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-sm="6" offset-sm="3">
+        <ion-col size-sm="8" offset-sm="2">
           <ion-item>
             <ion-label position="floating">Prenume</ion-label>
             <ion-input required type="text" [(ngModel)]="userForRegister.firstName" name="firstName"
@@ -34,7 +34,7 @@
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-sm="6" offset-sm="3">
+        <ion-col size-sm="8" offset-sm="2">
           <ion-item>
             <ion-label position="floating">Email</ion-label>
             <ion-input required type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
@@ -47,7 +47,7 @@
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-sm="6" offset-sm="3">
+        <ion-col size-sm="8" offset-sm="2">
           <ion-item>
             <ion-label position="floating">Parola</ion-label>
             <ion-input required type="password" [(ngModel)]="userForRegister.password" name="password"
@@ -60,7 +60,7 @@
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-sm="6" offset-sm="3">
+        <ion-col size-sm="8" offset-sm="2">
           <ion-item>
             <ion-label position="floating">Confirmare parola</ion-label>
             <ion-input required type="password" [(ngModel)]="userForRegister.confirmPassword" name="confirmPassword"
@@ -73,7 +73,7 @@
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-sm="6" offset-sm="3">
+        <ion-col size-sm="8" offset-sm="2">
           <ion-item>
             <ion-label position="floating">Tara</ion-label>
             <ion-input type="text" [(ngModel)]="userForRegister.country" name="country"></ion-input>
@@ -81,7 +81,7 @@
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-sm="6" offset-sm="3">
+        <ion-col size-sm="8" offset-sm="2">
           <ion-item>
             <ion-label position="floating">Oras</ion-label>
             <ion-input type="text" [(ngModel)]="userForRegister.city" name="city"></ion-input>

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "846949956862",
+    "firebase_url": "https://smart-drop-2eda9.firebaseio.com",
+    "project_id": "smart-drop-2eda9",
+    "storage_bucket": "smart-drop-2eda9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:846949956862:android:4d841865d32b92714af9af",
+        "android_client_info": {
+          "package_name": "com.mgasoftware.smartdrop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "846949956862-083rhm35tadrk8f33fplvs3pobq248ap.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALEJ5xMNdOOiF0YZW0hXlfUdMPk-ctEF0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "846949956862-083rhm35tadrk8f33fplvs3pobq248ap.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

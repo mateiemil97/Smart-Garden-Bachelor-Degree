@@ -8,7 +8,7 @@
   <form #form="ngForm" (ngSubmit)="login(form)">
   <ion-grid>
     <ion-row>
-      <ion-col size-sm="6" offset-sm="3">
+      <ion-col size-sm="8" offset-sm="2">
         <ion-item>
           <ion-label position="floating">Email</ion-label>
           <ion-input [(ngModel)]="userForLogin.email" name="email" type="text">
@@ -17,7 +17,7 @@
       </ion-col>
     </ion-row>
     <ion-row>
-      <ion-col size-sm="6" offset-sm="3">
+      <ion-col size-sm="8" offset-sm="2">
         <ion-item>
           <ion-label position="floating">Parola</ion-label>
           <ion-input [(ngModel)]="userForLogin.password" name="password" required type="password"></ion-input>

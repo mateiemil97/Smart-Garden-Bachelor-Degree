@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartDataSets } from 'chart.js';
-import { Label, Color } from 'ng2-charts';
+import { Label, Color, ThemeService } from 'ng2-charts';
 import { HttpClient } from '@angular/common/http';
 import { WeekDay } from '@angular/common';
 import { SensorsForStatistics } from '../models/SensorsForStatistics';
@@ -40,6 +40,7 @@ export class StatisticsPage implements OnInit {
 
   }
 
+
   // tslint:disable-next-line: member-ordering
   chartData: ChartDataSets[] = [{ data: [], label: '' }];
   // tslint:disable-next-line: member-ordering
@@ -63,7 +64,7 @@ export class StatisticsPage implements OnInit {
     maintainAspectRatio: false,
     title: {
       display: true,
-      text: 'Istoric umiditate sol'
+      text: ''
     },
     pan: {
       // enabled: true,
@@ -111,14 +112,22 @@ export class StatisticsPage implements OnInit {
   // tslint:disable-next-line: member-ordering
   chartColors: Color[] = [
     {
-      borderColor: '#79ae39',
-      //backgroundColor: '#79ae39'
+      borderColor: [],
+      // backgroundColor: []
     }
   ];
   // tslint:disable-next-line: member-ordering
   chartType = 'line';
 
-
+  setTitle() {
+    if (this.currentSensor.type === 'Moisture') {
+      this.chartOptionsMoisture.title.text = `Istoric umiditate sol(interval umiditate optima selectat ${this.currentSensor.moistureStart}% - ${this.currentSensor.moistureStop}%)`;
+    } else if (this.currentSensor.type === 'Temperature') {
+      this.chartOptionsTemperature.title.text = `Istoric temperatura`;
+    } else if (this.currentSensor.type === 'Humidity') {
+      this.chartOptionsMoisture.title.text = `Istoric umiditate aer`;
+    }
+  }
 
   public getData() {
     const dateSplited = this.date.split('T');
@@ -126,18 +135,48 @@ export class StatisticsPage implements OnInit {
       this.values = res;
       this.chartLabels = [];
       this.chartData[0].data = [];
-      console.log(this.values);
 
-      for (const entry of this.values) {
+      console.log('values:' + this.values);
+      this.values.forEach((entry, index) => {
         if (this.dayMonth === 'month') {
           const val = entry.dateTime.split('T');
           this.chartLabels.push(val[0]);
           this.chartData[0].data.push(entry.value);
+          if (this.currentSensor.type === 'Moisture') {
+            if (entry.value >= this.currentSensor.moistureStart && entry.value <= this.currentSensor.moistureStop) {
+              this.chartColors[0].borderColor.push('#8AC641');
+              this.chartColors[0].backgroundColor.push('#8AC641');
+            } else {
+              this.chartColors[0].borderColor.push('#F04141');
+              this.chartColors[0].backgroundColor.push('#F04141');
+            }
+          } else {
+            this.chartColors[0].borderColor.push('#8AC641');
+            this.chartColors[0].backgroundColor.push('#8AC641');
+          }
+
         } else {
-          this.chartLabels.push(entry.dateTime);
-          this.chartData[0].data.push(entry.value);
+          this.chartData[0].fill =  true;
+          this.chartColors[0].backgroundColor = [];
+          this.chartColors[0].backgroundColor.push("rgba(138, 198, 65, 0.3");
+          if (this.currentSensor.type === 'Moisture') {
+            this.chartLabels.push(entry.dateTime);
+            this.chartData[0].data.push(entry.value);
+            if (entry.value >= this.currentSensor.moistureStart && entry.value <= this.currentSensor.moistureStop) {
+              this.chartColors[0].borderColor.push('#8AC641');
+             // this.chartColors[0].backgroundColor.push('#8AC641');
+            } else {
+              // this.chartColors[i].borderColor = '#F04141';
+              this.chartColors[0].borderColor.push('#F04141');
+              //sthis.chartColors[0].backgroundColor.push('#F04141');
+            }
+          } else {
+            this.chartColors[0].borderColor.push('#8AC641');
+            this.chartColors[0].backgroundColor.push('#8AC641');
+          }
+          console.log(this.chartColors[index]);
         }
-      }
+      });
     });
   }
 
@@ -147,11 +186,9 @@ export class StatisticsPage implements OnInit {
     this.getData();
     if (e === 'month') {
       this.chartType = 'bar';
-      this.chartColors = [{ backgroundColor: '#79ae39' }];
+      this.chartColors[0].backgroundColor = [];
     } else {
       this.chartType = 'line';
-      this.chartColors = [{ backgroundColor: '' }];
     }
-    console.log(this.chartType);
   }
 }

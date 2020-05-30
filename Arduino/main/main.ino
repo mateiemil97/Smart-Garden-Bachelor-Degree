@@ -412,7 +412,7 @@
     if((currentTime - temperatureTimeTrigger >= TEMPHUM_INTERVAL_TIME_POST))
     {
          PostSensorValue(board.id,"Temperature","D0",temperature);
-         PostSensorValue(board.id,"Humidity","D0",humidity);
+         PostSensorValue(board.id,"Humidity","D1",humidity);
          temperatureTimeTrigger = millis();
     }
   

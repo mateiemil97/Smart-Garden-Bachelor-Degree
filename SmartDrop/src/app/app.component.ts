@@ -18,14 +18,16 @@ export class AppComponent {
     private statusBar: StatusBar,
     private fcm: FCM,
     private router: Router,
-    private toastController: ToastController
+    private toastController: ToastController,
   ) {
     this.initializeApp();
   }
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.statusBar.styleDefault();
+      this.statusBar.overlaysWebView(false);
+      this.statusBar.styleLightContent();
+      this.statusBar.backgroundColorByHexString('#8AC641');
       this.splashScreen.hide();
 
       this.fcm.getToken().then(token => {
