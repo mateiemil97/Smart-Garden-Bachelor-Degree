@@ -1,0 +1,21 @@
+USE [SmartGarden]
+GO
+/****** Object:  Trigger [dbo].[AfterDeleteMeasurementsTrigger]    Script Date: 7/1/2020 10:20:46 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER TRIGGER [dbo].[AfterDeleteMeasurementsTrigger] on [dbo].[Measurement]
+AFTER DELETE AS
+INSERT INTO HistoryMeasurements(IrrigationSystemId,ZoneName,PlantName,Value,DateTime)
+SELECT irSystem.id as IrrigationSystemId,
+	   z.Name as ZoneName,
+	   uv.Name as PlantName,
+	   i.Value,
+	   i.DateTime
+FROM deleted i												
+join Sensor sns on(sns.Id = i.SensorId)
+join IrigationSystem irSystem on(sns.SystemId = irSystem.id)
+join Zone z on(z.SensorId = sns.Id)
+join UserVegetableses uv on (z.UserVegetableId = uv.Id)
+
