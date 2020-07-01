@@ -25,19 +25,19 @@
 
   <ion-grid>
     <ion-row>
-      <ion-col offset-md="3" size-md="6">
+      <ion-col offset-md="2" size-md="8">
         <ion-card>
           <ion-card-header>
             <ion-icon *ngIf="irrigationSystemNotConnected" name="ios-wifi"></ion-icon>
             <ion-icon *ngIf="!irrigationSystemNotConnected" name="ios-alert"></ion-icon>
             <ion-row class="nameRow">
               <ion-col>
-                <ion-label class="temperatureLabel">Temperatura</ion-label>
+                <ion-label class="temperatureLabel">Temperatura: {{currentTemperature?.value}}°C</ion-label>
               </ion-col>
             </ion-row>
-            <ion-row>
+            <ion-row class="nameRow">
               <ion-col>
-                <ion-label class="temperatureValue">{{currentTemperature?.value}}°C</ion-label>
+                <ion-label class="humidityLabel">Umiditatea aerului: {{currentHumidity?.value}}%</ion-label>
               </ion-col>
             </ion-row>
           </ion-card-header>
@@ -46,7 +46,7 @@
     </ion-row>
 
     <ion-row>
-      <ion-col offset-md="3" size-md="6">
+      <ion-col offset-md="2" size-md="8">
         <ion-item>
           <ion-label style="font-size: 20px;" *ngIf="currentState?.automationMode === true">Irigarea automata activata
           </ion-label>
@@ -61,7 +61,7 @@
     </ion-row>
 
     <ion-row>
-      <ion-col offset-md="3" size-md="6">
+      <ion-col offset-md="2" size-md="8">
         <ion-item *ngIf="currentState?.working === true">
           <h3>Se iriga</h3>
         </ion-item>
@@ -69,7 +69,7 @@
     </ion-row>
 
     <ion-row>
-      <ion-col offset-md="3" size-md="6">
+      <ion-col offset-md="2" size-md="8">
         <ion-item *ngIf="currentState?.working === true">
           <ion-label>Se iriga</ion-label>
           <ion-progress-bar reversed="true" type="indeterminate"></ion-progress-bar>
@@ -78,7 +78,7 @@
     </ion-row>
 
     <ion-row>
-      <ion-col offset-md="3" size-md="6">
+      <ion-col offset-md="2" size-md="8">
         <div fxLayout="row" fxLayoutAlign="space-evenly center">
           <ion-card *ngFor="let moisture of currentMoisture">
             <ion-card-header>
@@ -93,21 +93,21 @@
     </ion-row>
 
     <ion-row>
-      <ion-col offset-md="3" size-md="6">
+      <ion-col offset-md="2" size-md="8">
         <ion-button [disabled]="!irrigationSystemNotConnected" *ngIf="!currentState?.working"
           (click)="presentIrrigationStateUpdateAlertConfirm()" expand="block">
           Porneste irigarea manual</ion-button>
         <ion-button [disabled]="!irrigationSystemNotConnected" *ngIf="currentState?.working"
-          (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger" expand="block">Opreste irigarea manual
+          (click)="presentIrrigationStateUpdateAlertConfirm()" color="danger" expand="block">Opreste irigarea
         </ion-button>
       </ion-col>
     </ion-row>
     <ion-row>
-      <ion-col offset-md="3" size-md="6">
+      <ion-col offset-md="2" size-md="8">
         <ion-label *ngIf="!irrigationSystemNotConnected" color=danger>Irigarea nu poate fi pornita.<br></ion-label>
         <ion-label *ngIf="!irrigationSystemNotConnected" color="danger">Sistemul de irigatii nu mai este conectat la
           internet<br></ion-label>
-        <ion-label *ngIf="!irrigationSystemNotConnected" color=danger>Ultima data a fost vazut online la ora:
+        <ion-label *ngIf="!irrigationSystemNotConnected" color=danger>Ultima data a fost vazut online:
           {{this.systemConectionStatus?.DateAndTime}}
         </ion-label>
       </ion-col>

@@ -41,23 +41,20 @@ export class SignupPage implements OnInit {
       (res: any) => {
         if (res.succeeded) {
           this.resetForm();
-          this.presentToast('New user created! Registration successful.');
+          this.presentToast('Contul a fost creat!');
         } else {
           res.errors.forEach(element => {
             switch (element.code) {
               case 'DuplicateUserName':
-                this.presentToast('Username is already taken.Registration failed.');
+                this.presentToast('Username deja existent.');
                 break;
 
               default:
-                this.presentToast(`${element.code}.Registration failed`);
+                this.presentToast(`${element.code}.Inregistrarea a esuat!`);
                 break;
             }
           });
         }
-      },
-      err => {
-        console.log(err);
       }
     );
   }

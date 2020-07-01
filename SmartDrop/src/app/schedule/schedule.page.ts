@@ -23,6 +23,7 @@ export class SchedulePage implements OnInit {
 
   public zones: Zone[];
 
+
   constructor(
     public scheduleService: ScheduleService,
     private alertController: AlertController,

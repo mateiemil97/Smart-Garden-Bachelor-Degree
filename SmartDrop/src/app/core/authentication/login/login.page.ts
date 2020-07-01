@@ -49,6 +49,7 @@ export class LoginPage implements OnInit {
         this.fcm.getToken().then(token => {
           console.log('tokenNotification:' + token);
         });
+        console.log('AAAAAAA');
 
         this.fcm.getToken().then(token => {
           console.log(token);
@@ -61,6 +62,7 @@ export class LoginPage implements OnInit {
                 systemId: element.systemId,
                 token
               };
+              console.log('logddd');
               this.loginService.postToken(tokenForDb).subscribe();
             });
           });

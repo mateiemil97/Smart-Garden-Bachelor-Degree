@@ -8,7 +8,7 @@
 <ion-content>
   <ion-item>
     <ion-label>Selecteaza un senzor</ion-label>
-    <ion-select [(ngModel)]="currentSensor" #sensor>
+    <ion-select [(ngModel)]="currentSensor" #sensor (ionChange)="setTitle()">
       <ion-select-option *ngFor="let sns of sensors" [value]="sns">{{sns.name? sns.name : sns.type}}</ion-select-option>
     </ion-select>
   </ion-item>
@@ -29,13 +29,16 @@
       displayFormat="D-M-YYYY" placeholder="Selecteaza o zi"></ion-datetime>
   </ion-item>
 
+  
+    <canvas style="overflow-scroll:false" *ngIf="currentSensor?.type==='Moisture' || currentSensor?.type==='Humidity'" baseChart [datasets]="chartData"
+      [labels]="chartLabels" [options]="chartOptionsMoisture" [colors]="chartColors" [chartType]="chartType">
+    </canvas>
+  
 
-  <canvas style="overflow-scroll:false" *ngIf="currentSensor?.type==='Moisture'" baseChart [datasets]="chartData" [labels]="chartLabels"
-    [options]="chartOptionsMoisture" [colors]="chartColors" [chartType]="chartType">
-  </canvas>
-
-  <canvas baseChart *ngIf="currentSensor?.type==='Temperature'" [datasets]="chartData" [labels]="chartLabels"
-    [options]="chartOptionsTemperature" [colors]="chartColors" [chartType]="chartType">
-  </canvas>
+  
+    <canvas baseChart *ngIf="currentSensor?.type==='Temperature'" [datasets]="chartData" [labels]="chartLabels"
+      [options]="chartOptionsTemperature" [colors]="chartColors" [chartType]="chartType">
+    </canvas>
+  
 
 </ion-content>

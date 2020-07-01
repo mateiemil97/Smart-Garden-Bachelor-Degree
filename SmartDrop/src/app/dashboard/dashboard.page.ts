@@ -21,6 +21,7 @@ import { UpdateZoneForNotConnected } from '../models/UpdateZoneForNotConnected';
 export class DashboardPage implements OnInit {
 
   currentTemperature: Measurement;
+  currentHumidity: Measurement;
   currentMoisture: MeasurementForDashboard[] = [];
   zones: Zone[] = [];
   currentState: CurrentState = new CurrentState();
@@ -33,7 +34,7 @@ export class DashboardPage implements OnInit {
 
   systemConectionStatus: IrrigationSysteConnectedFirebase = new IrrigationSysteConnectedFirebase();
 
-  irrigationSystemNotConnected: boolean;
+  irrigationSystemNotConnected = true;
 
   constructor(
     public dashboardService: DashboardService,
@@ -66,6 +67,7 @@ export class DashboardPage implements OnInit {
       this.getCurrentState(id);
       this.currentMoisture = [];
       this.getTemperature(id);
+      this.getHumidity(id);
       this.getOnlineSystemState();
       this.currentMoisture = [];
       this.getZones(id);
@@ -78,6 +80,12 @@ export class DashboardPage implements OnInit {
     });
   }
 
+  getHumidity(systemId: number) {
+    this.dashboardService.GetLatestHumidity(this.currentIrrigationSystem.systemId).subscribe((hum: Measurement) => {
+      this.currentHumidity = hum;
+    });
+  }
+
   getOnlineSystemState() {
     this.dashboardService.GetLastTimeSystemSeenOnline(this.currentIrrigationSystem.seriesKey).
     valueChanges().subscribe(time => {
@@ -85,7 +93,7 @@ export class DashboardPage implements OnInit {
       const currentTime = (newTime.getHours() * 3600) + (newTime.getMinutes() * 60) + newTime.getSeconds();
       // tslint:disable-next-line: radix
 
-      if (currentTime - time.Miliseconds > 3) {
+      if (currentTime - time.Miliseconds > 10) {
         this.irrigationSystemNotConnected = false;
         this.systemConectionStatus.DateAndTime = time.DateAndTime;
 
@@ -174,7 +182,7 @@ export class DashboardPage implements OnInit {
         }, {
           text: 'Da',
           handler: () => {
-
+           // this.getOnlineSystemState();
             if (this.currentState.working === true) {
               this.changeIrigationState.working = false;
               this.changeIrigationState.manual = false;

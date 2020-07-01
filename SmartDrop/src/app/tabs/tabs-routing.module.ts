@@ -52,17 +52,7 @@ const routes: Routes = [
           }
         ]
       },
-      {
-        path: 'live-stream',
-        canActivate: [AuthGuard],
-        children: [
-          {
-            path: '',
-            loadChildren: () =>
-              import('../live-stream/live-stream.module').then(m => m.LiveStreamPageModule)
-          }
-        ]
-      },
+
       {
         path: '',
         canActivate: [AuthGuard],

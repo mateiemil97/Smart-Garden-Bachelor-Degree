@@ -5,14 +5,17 @@
   #include <ESP8266WebServer.h>
   #include <ESP8266HTTPClient.h>
   #include <string.h>
-  #include <OneWire.h>
-  #include <DallasTemperature.h>
+  #include <Adafruit_Sensor.h>
+  #include <DHT.h>
   #include <SoftwareSerial.h>
   #include <NTPClient.h>
   #include <WiFiUdp.h>
   #include <asyncHTTPrequest.h>
   #include <Ticker.h>
   #include <FirebaseArduino.h>
+  #include <LiquidCrystal_I2C.h>
+
+  void ICACHE_RAM_ATTR TurnOnOffIrrigation();
 
   
   int D5 = 14, D6 = 12;
@@ -24,17 +27,20 @@
   const long utcOffsetInSeconds = 10800;
   
   //PIN 
-  #define TEMPERATURE_SENSOR_PIN 2
-  #define MOISTURE_SENSOR_PIN A0
+  #define TEMPHUM_SENSOR_PIN 2     // Digital pin connected to the DHT sensor
+  #define DHTTYPE    DHT11  
   
-  #define RELAYS_PUMP_PIN 5
-  #define RELAYS_WATER_SWITCH_P0_PIN 4
-  #define RELAYS_WATER_SWITCH_P1_PIN 15
+  #define RELAYS_PUMP_PIN 0
+  #define RELAYS_WATER_SWITCH_P0_PIN 13
+  #define RELAYS_WATER_SWITCH_P1_PIN 16
+
+  #define BUTTON_IRRIGATION_SWITCH_PIN 15
   
-  #define TEMPERATURE_INTERVAL_TIME_POST 600000
+  #define TEMPHUM_INTERVAL_TIME_POST 600000
   #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_ON 120000
   #define MOISTURE_INTERVAL_TIME_POST_SYSTEM_OFF 120000
   #define FIREBASE_INTERVAL_TIME_POST_SYSTEM 1000
+  #define DISPLAY_INTERVAL_TIME_CHANGE_PAGE 5000
   
   #define FIREBASE_HOST "smart-drop-2eda9.firebaseio.com"
   #define FIREBASE_AUTH "g0J8wyFbZC1zVgxLR5z5jBHEcLpypnuyPIhR0xXp"
@@ -76,12 +82,18 @@
   const char* FCMToken;
   
   
-  const String  api = "http://192.168.1.7/api";
-
+  const String  api = "http://192.168.1.7:80/api";
+  const String apiGetData = "http://192.168.1.7:80/api/systems/1013/arduino";
   const String series = "BBBB";
   bool registered; //if user registered system from app
   Board board;
+
+  bool intreruptionModeOn;
+
+  LiquidCrystal_I2C lcd(0x27, 16, 2);
   
+  int page_counter;
+  long previousDisplayMillis;
   HTTPClient http;
   //WiFiClient cli;
 
@@ -91,7 +103,9 @@
   
   
   SystemState systemState;
-  
+
+  DHT dht(TEMPHUM_SENSOR_PIN, DHTTYPE);
+  float humidity;
   float temperature;
   unsigned long temperatureTimeTrigger;
   
@@ -99,8 +113,14 @@
   unsigned long moistureTimeTrigger;
   
   Schedule schedule;
+
   
-  //unsigned long currentTime = millis();
+  
+  unsigned long currentTime = millis();
+
+  int irrigationState = LOW;
+  int stateButton;
+  int previousIrrigationState = LOW;
   
   Zone zones[2];
   
@@ -114,7 +134,7 @@
   bool a;
   void sendRequest() {
     if (request.readyState() == 0 || request.readyState() == 4) {
-      request.open("GET", "http://192.168.1.7/api/systems/1013/arduino");
+      request.open("GET", "http://192.168.1.7:80/api/systems/1013/arduino");
       request.send();
     }
   }
@@ -126,8 +146,15 @@
       //Serial.println(request->responseText());       
     }
   }
+
+  String daysOfWeek[7] = {"Duminica","Luni","Marti","Miercuri","Joi","Vineri","Sambata"};
   
   void setup() {
+    lcd.begin(16,2);
+    lcd.init();
+    lcd.backlight();
+    page_counter = 1;
+    dht.begin();
     WiFiManager wifiManager;
     Serial.println("Conecting.....");
     wifiManager.autoConnect("Smart Drop");
@@ -135,8 +162,9 @@
     Serial.begin(9600);
     //serial with uno
     s.begin(9600);
-    
 
+    pinMode(BUTTON_IRRIGATION_SWITCH_PIN, INPUT); 
+   
     Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
 //    //Enable auto reconnect the WiFi when connection lost
 
@@ -144,8 +172,8 @@
     timeClient.begin();
     timeClient.setTimeOffset(utcOffsetInSeconds);
   
-    pinMode(MOISTURE_SENSOR_PIN,INPUT);
-    pinMode(TEMPERATURE_SENSOR_PIN ,INPUT);
+
+    pinMode(TEMPHUM_SENSOR_PIN ,INPUT);
     pinMode(RELAYS_PUMP_PIN,OUTPUT);
     pinMode(RELAYS_WATER_SWITCH_P0_PIN,OUTPUT);
     pinMode(RELAYS_WATER_SWITCH_P1_PIN,OUTPUT);
@@ -153,6 +181,7 @@
     temperatureTimeTrigger = 0;
     moistureTimeTrigger = millis();
     long firebaseTimeTrigger = millis();
+
         
     //registered = CheckForRegisteredBoard(series);
     board = GetBoardByBoardSeries(series);
@@ -170,6 +199,8 @@
     localSystemState.working = false;
     request.onReadyStateChange(requestCB);
     ticker.attach(2, sendRequest);
+
+    previousDisplayMillis = millis();
   }
   
   
@@ -181,20 +212,23 @@
 //    moisture[1].port = "A1";
 //    moisture[1].value = 40;  
 
-   if(!board.registered)
+   if(board.registered != 1)
    {
       board = GetBoardByBoardSeries(series);
    }
-  
-   if (WiFi.status() == WL_CONNECTED && board.registered)  //Check WiFi connection status
+
+
+   //ReadMoisture();  
+   temperature = ReadTemperature();
+   humidity = ReadHumidity();
+   if (WiFi.status() == WL_CONNECTED && board.registered == 1)  //Check WiFi connection status
    {
     GetScheduleZonesState(dataToParseFromAPI);
     timeClient.update();
-    ReadMoisture();  
     unsigned int currentTimeFromServer = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60));
     unsigned int currentTimeFromServerForFirebase  = ((timeClient.getHours() * 3600) + (timeClient.getMinutes()* 60) + timeClient.getSeconds());
-    String currentTimeFromServerForFirebaseDateAndTime = String(timeClient.getHours()) + ":" + String(timeClient.getMinutes()) + ":" + String(timeClient.getSeconds());
-    int currentTime = millis();
+    String currentTimeFromServerForFirebaseDateAndTime = String( daysOfWeek[timeClient.getDay()] +" " + timeClient.getHours()) + ":" + String(timeClient.getMinutes()) + ":" + String(timeClient.getSeconds());
+    currentTime = millis();
 
       
   
@@ -205,10 +239,8 @@
     Serial.print("System state local : ");
     Serial.println(localSystemState.working);
     
-    
-    temperature = ReadTemperature();
+  
     Serial.print("Temperature");
-    Serial.println(temperature);
     //temperature = 20;
     bool temperatureNotification;
     
@@ -273,7 +305,7 @@
     //  SendNotification(FCMToken, "Irigarea automata s-a incheiat din cauza programului.");
       UpdateWorking(false,false,SystemStateFromDb.automationMode,board.id);
     } 
-    else if(SystemStateFromDb.automationMode == false && localSystemState.working == true)
+    else if(SystemStateFromDb.automationMode == false && localSystemState.working == true && SystemStateFromDb.manual == false)
    {
     Serial.println("intra ultimul");
     Serial.println(SystemStateFromDb.working);
@@ -367,7 +399,6 @@
      //end manual irrigation
 
       
-      
       Serial.print("Time from server:");
       Serial.println(currentTimeFromServer);
       Serial.print("Time from app start:");
@@ -378,9 +409,10 @@
     //send temperature to db
   
    
-    if((currentTime - temperatureTimeTrigger >= TEMPERATURE_INTERVAL_TIME_POST))
+    if((currentTime - temperatureTimeTrigger >= TEMPHUM_INTERVAL_TIME_POST))
     {
          PostSensorValue(board.id,"Temperature","D0",temperature);
+         PostSensorValue(board.id,"Humidity","D1",humidity);
          temperatureTimeTrigger = millis();
     }
   
@@ -475,6 +507,12 @@
    else {
       Serial.println("System not connected or not registered");
     }
+
+    if (currentTime - previousDisplayMillis > DISPLAY_INTERVAL_TIME_CHANGE_PAGE) {  //If interval is reached, return to home page 1
+       previousDisplayMillis = millis();
+       lcd.clear();
+       DisplayInformationsOnPages();
+    }
  }
   
   
@@ -532,15 +570,34 @@
     
     float ReadTemperature()
     {
-      // Setup a oneWire instance to communicate with any OneWire device
-      OneWire oneWire(TEMPERATURE_SENSOR_PIN);  
-    
-      // Pass oneWire reference to DallasTemperature library
-      DallasTemperature sensors(&oneWire);
-    
-      sensors.requestTemperatures(); 
-    
-      return sensors.getTempCByIndex(0);
+      float newT = dht.readTemperature();
+      float currentTemp;
+      if (isnan(newT)) {
+        Serial.println("Failed to read from DHT sensor!");
+        currentTemp = temperature;
+      }
+      else {
+        currentTemp = newT;
+        Serial.print("Temperatura:");
+        Serial.println(currentTemp );
+      }
+      return currentTemp;
+    }
+
+    float ReadHumidity()
+    {
+      float newH = dht.readHumidity();
+      float currentHum;
+      if (isnan(newH)) {
+        Serial.println("Failed to read from DHT sensor!");
+        currentHum = humidity;
+      }
+      else {
+        currentHum = newH;
+        Serial.print("Humidity:");
+        Serial.println(currentHum);
+      }
+      return currentHum;
     }
     
     Board GetBoardByBoardSeries(String series)
@@ -637,7 +694,29 @@
        // Serial.println(totalSeconds);
         return totalSeconds;
       }
-    
+
+      String GetDateFromDateTime(String date)
+      {
+        int splitT = date.indexOf("T");
+        String  dateFromDate = date.substring(0, splitT);
+        return dateFromDate;
+      }
+
+      String GetTimeFromDateTime(String date)
+      {
+        int splitT = date.indexOf("T");
+        String  timeFromDate = date.substring(splitT+1, date.lastIndexOf(":" +1));
+      
+        int firstColon = timeFromDate.indexOf(":");
+        int secondColon = timeFromDate.lastIndexOf(":");
+        
+        // get the substrings for hour, minute second:
+        String hourString = timeFromDate.substring(0, firstColon);
+        String minString = timeFromDate.substring(firstColon + 1, secondColon);
+
+        String timeToReturn = hourString + ":" + minString;
+        return timeToReturn;
+      }
     
       void SendNotification(String token, String message)
       {
@@ -692,3 +771,117 @@
       
         http.end();  //Close connection
       }
+
+      void DisplayInformationsOnPages()
+      {
+        switch (page_counter) {
+   
+      case 1:{     //Design of home page 1
+        lcd.setCursor(0, 0);  
+        lcd.print("Temp:" + String(int(temperature)));
+        lcd.print((char)223);
+        lcd.print("C");
+        lcd.setCursor(11, 0);
+        lcd.print(String(timeClient.getHours()) + ":" + String(timeClient.getMinutes()));
+        lcd.setCursor(0, 1);  
+        lcd.print("Umid. aer:" + String(int(humidity)) + "%");
+      }
+      break;
+  
+       case 2: { //Design of page 2 
+      }
+   
+       case 3: {   //Design of page 3 
+       lcd.setCursor(0,0);
+       lcd.print("CONEXIUNEA LA   ");
+       lcd.setCursor(0,1);
+       lcd.print("WI-FI PIERDUTA  ");
+      }
+      break;
+
+       case 4: {   //Design of page 3 
+       lcd.setCursor(6,0);
+       lcd.print("SMART");
+       lcd.setCursor(6,1);
+       lcd.print("DROP");
+      }
+      break;
+
+      case 5: {
+        lcd.setCursor(0, 0);
+        String automationState;
+        String workingState;
+         if(localSystemState.working)
+         {
+           workingState = "ON";
+         }
+         else
+         {
+          workingState = "OFF";
+         }
+       lcd.print("Irigare:" + workingState);
+       if(SystemStateFromDb.automationMode)
+       {
+        automationState = "ON";
+       }
+       else
+       {
+        automationState = "OFF";
+       }
+       lcd.setCursor(0,1);
+       lcd.print("Irigare aut.:" + automationState);
+      }
+      
+    }//switch
+    
+       
+       if(page_counter == 1){
+        Serial.println(WiFi.status());
+        if(WiFi.status() == WL_CONNECTED){
+         page_counter = 5;
+        }
+        else{
+         page_counter = 3;
+        }
+       }
+       else if (page_counter ==5)
+       {
+           page_counter = 4;
+          
+       }
+         
+       else if(page_counter == 3)
+       {
+          page_counter = 4;
+       }  
+       else if(page_counter == 4)
+       {
+          page_counter = 1;  
+       }
+    }
+
+    void TurnOnOffIrrigation()
+    {     
+      Serial.println("interuption");
+
+      if(stateButton == HIGH && previousIrrigationState == LOW){
+        if(localSystemState.working == true)
+        {
+          digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,HIGH);
+          digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,HIGH);
+          digitalWrite(RELAYS_PUMP_PIN,HIGH);
+          UpdateWorking(true,false,false,board.id);
+          intreruptionModeOn = false;
+        }
+        else if(localSystemState.working == false)
+        {
+          digitalWrite(RELAYS_WATER_SWITCH_P0_PIN,LOW);
+          digitalWrite(RELAYS_WATER_SWITCH_P1_PIN,LOW);
+          digitalWrite(RELAYS_PUMP_PIN,LOW);
+          UpdateWorking(true,true,false,board.id);
+          intreruptionModeOn = true;
+        }
+       
+     }
+    }
+      

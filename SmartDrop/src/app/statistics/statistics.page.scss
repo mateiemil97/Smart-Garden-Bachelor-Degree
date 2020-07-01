@@ -1,0 +1,9 @@
+canvas {
+    touch-action: auto !important;
+    user-select: auto !important;
+    -webkit-user-drag: auto !important;
+ }
+
+ .scroll-content {
+    overflow-x: scroll !important;
+ }

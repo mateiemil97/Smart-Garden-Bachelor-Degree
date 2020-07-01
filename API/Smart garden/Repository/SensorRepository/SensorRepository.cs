@@ -93,7 +93,9 @@ namespace Smart_garden.Repository.SensorRepository
                     {
                         SensorId = sns.Id,
                         Type = sns.Type,
-                        Name = zone.Name
+                        Name = zone.Name,
+                        MoistureStop = zone.MoistureStop,
+                        MoistureStart = zone.MoistureStart
                     }
                 );
             return info;

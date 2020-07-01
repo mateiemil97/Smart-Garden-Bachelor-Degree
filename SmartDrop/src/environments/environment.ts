@@ -5,9 +5,9 @@
 export const environment = {
   production: false,
   // url: 'https://smart-garden.conveyor.cloud/api',
-  // url: 'http://localhost:58108/api',
+  //url: 'http://localhost:58108/api',
 
-  url: 'http://192.168.1.7/api',
+  url: 'http://192.168.1.7:80/api',
 
   systemId: 1012,
   userId: 1002,

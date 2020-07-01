@@ -16,27 +16,27 @@ namespace Smart_garden.Repository.BoardsKeyRepository
             _context = context;
         }
 
-        public MeasurementDto GetLatestMeasurementValueByType(int systemId,int sensorId)
+        public MeasurementDto GetLatestMeasurementValueByType(int systemId, int sensorId)
         {
             var measurement = (from sys in _context.IrigationSystem
-                join sns in _context.Sensor
-                    on sys.Id equals sns.SystemId
-                join measure in _context.Measurement
-                   on sns.Id equals  measure.SensorId
-                join snsPort in _context.SensorPort
-                    on sns.PortId equals snsPort.Id
-                join zone in _context.Zone
-                    on sns.Id equals zone.SensorId
-                where sns.Id == sensorId && sys.Id == systemId
-                orderby measure.DateTime descending
-                select new MeasurementDto()
-                {
-                    DateTime = measure.DateTime,
-                    Id = measure.Id,
-                    SensorId = measure.SensorId,
-                    Value = measure.Value,
-                    Zone = zone.Name
-                }
+                    join sns in _context.Sensor
+                        on sys.Id equals sns.SystemId
+                    join measure in _context.Measurement
+                        on sns.Id equals measure.SensorId
+                    join snsPort in _context.SensorPort
+                        on sns.PortId equals snsPort.Id
+                    join zone in _context.Zone
+                        on sns.Id equals zone.SensorId
+                    where sns.Id == sensorId && sys.Id == systemId
+                    orderby measure.DateTime descending
+                    select new MeasurementDto()
+                    {
+                        DateTime = measure.DateTime,
+                        Id = measure.Id,
+                        SensorId = measure.SensorId,
+                        Value = measure.Value,
+                        Zone = zone.Name
+                    }
                 ).Take(1).SingleOrDefault();
 
             return measurement;
@@ -63,6 +63,29 @@ namespace Smart_garden.Repository.BoardsKeyRepository
 
             return temperature;
         }
+
+        MeasurementDto IMeasurementRepository.GetLatestMeasurementOfHumidity(int systemId)
+        {
+            var humidity = (from sys in _context.IrigationSystem
+                    join sns in _context.Sensor
+                        on sys.Id equals sns.SystemId
+                    join measure in _context.Measurement
+                        on sns.Id equals measure.SensorId
+                    where sys.Id == systemId && sns.Type == "Humidity"
+                    orderby measure.DateTime descending
+                    select new MeasurementDto()
+                    {
+                        DateTime = measure.DateTime,
+                        Id = measure.Id,
+                        SensorId = measure.SensorId,
+                        Value = measure.Value,
+                        Zone = "Environment"
+                    }
+                ).Take(1).SingleOrDefault();
+
+            return humidity;
+        }
+
 
 
         public IQueryable<MeasurementForStatisticsDto> GetMeasurementForStatisticsByDay(int systemId, int sensorId, DateTime dateTime)
@@ -95,5 +118,6 @@ namespace Smart_garden.Repository.BoardsKeyRepository
             return measurements;
         }
 
+     
     }
 }

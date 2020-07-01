@@ -46,9 +46,9 @@ export class AddIrrigationSystemModalComponent implements OnInit {
       },
       (err: Response)  => {
         if (err.status === 404) {
-          this.presentToast('Serie negasita. Verificati si introduceti din nou');
+          this.presentToast('Serie cheie negasita. Verificati si incercati din nou');
         } else if (err.status === 400) {
-          this.presentToast('Seria a fost deja folosita');
+          this.presentToast('Seria cheie a fost deja folosita');
         }
       }
     );
